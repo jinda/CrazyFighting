@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385",
+  "files": [],
+  "subMetas": {
+    "32ab6": {
+      "importer": "gltf-mesh",
+      "uuid": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@32ab6",
+      "displayName": "",
+      "id": "32ab6",
+      "name": "sword_2handed_color.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 412
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "48b02": {
+      "importer": "gltf-embeded-image",
+      "uuid": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@48b02",
+      "displayName": "",
+      "id": "48b02",
+      "name": "base_color_texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@48b02"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "d77ec": {
+      "importer": "gltf-material",
+      "uuid": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@d77ec",
+      "displayName": "",
+      "id": "d77ec",
+      "name": "knight.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "505a5": {
+      "importer": "gltf-scene",
+      "uuid": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@505a5",
+      "displayName": "",
+      "id": "505a5",
+      "name": "sword_2handed_color.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@48b02"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@32ab6"
+      ],
+      "skeletons": [],
+      "textures": [
+        "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@7d6ab"
+      ],
+      "materials": [
+        "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@d77ec"
+      ],
+      "scenes": [
+        "c4ca271e-4cc9-43b7-8b1b-8b8d7b30b385@505a5"
+      ]
+    }
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "ver": "1.2.0",
+  "importer": "directory",
+  "imported": true,
+  "uuid": "55b5802b-15dd-4821-bd6a-308d5b697601",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "isSubpackage": true,
+    "subpackageName": "card",
+    "compressionType": {},
+    "isRemoteBundle": {}
+  }
+}

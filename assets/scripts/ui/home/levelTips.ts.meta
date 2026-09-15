@@ -1,0 +1,12 @@
+{
+  "ver": "4.0.24",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "3efdcfd4-2cb9-4f47-863a-0f8e09f0a725",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/scripts/ui/home/levelTips.js",
+    "simulateGlobals": []
+  }
+}

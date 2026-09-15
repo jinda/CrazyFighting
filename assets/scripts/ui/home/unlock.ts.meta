@@ -1,0 +1,12 @@
+{
+  "ver": "4.0.24",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "e4456651-1e57-4094-b315-02fc2d2c9342",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/scripts/ui/home/unlock.js",
+    "simulateGlobals": []
+  }
+}

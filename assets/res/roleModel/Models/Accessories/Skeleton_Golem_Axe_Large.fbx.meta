@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46",
+  "files": [],
+  "subMetas": {
+    "ca6da": {
+      "importer": "gltf-mesh",
+      "uuid": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@ca6da",
+      "displayName": "",
+      "id": "ca6da",
+      "name": "Cylinder.011.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 1334
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "48b02": {
+      "importer": "gltf-embeded-image",
+      "uuid": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@48b02",
+      "displayName": "",
+      "id": "48b02",
+      "name": "base_color_texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@48b02"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c96cf": {
+      "importer": "gltf-material",
+      "uuid": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@c96cf",
+      "displayName": "",
+      "id": "c96cf",
+      "name": "skeleton.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "15aa3": {
+      "importer": "gltf-scene",
+      "uuid": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@15aa3",
+      "displayName": "",
+      "id": "15aa3",
+      "name": "Skeleton_Golem_Axe_Large.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@48b02"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@ca6da"
+      ],
+      "skeletons": [],
+      "textures": [
+        "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@7d6ab"
+      ],
+      "materials": [
+        "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@c96cf"
+      ],
+      "scenes": [
+        "2e4a70e4-e9bc-4bce-afdb-cbba2c79dc46@15aa3"
+      ]
+    }
+  }
+}

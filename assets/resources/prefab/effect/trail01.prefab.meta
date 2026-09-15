@@ -1,0 +1,14 @@
+{
+  "ver": "1.1.50",
+  "importer": "prefab",
+  "imported": true,
+  "uuid": "40fe44b7-240e-4974-8f51-a2d01dbc8371",
+  "files": [
+    ".json"
+  ],
+  "subMetas": {},
+  "userData": {
+    "asyncLoadAssets": false,
+    "syncNodeName": "trail01"
+  }
+}

@@ -1,0 +1,330 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8",
+  "files": [],
+  "subMetas": {
+    "30732": {
+      "importer": "gltf-skeleton",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@30732",
+      "displayName": "",
+      "id": "30732",
+      "name": "UnnamedSkeleton-0.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "62756": {
+      "importer": "gltf-skeleton",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@62756",
+      "displayName": "",
+      "id": "62756",
+      "name": "UnnamedSkeleton-5.skeleton",
+      "userData": {
+        "gltfIndex": 5,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "72987": {
+      "importer": "gltf-scene",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@72987",
+      "displayName": "",
+      "id": "72987",
+      "name": "Mannequin_Medium.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f440a": {
+      "importer": "gltf-mesh",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@f440a",
+      "displayName": "",
+      "id": "f440a",
+      "name": "Mannequin_Medium_Head.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 966
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "ae45b": {
+      "importer": "gltf-mesh",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@ae45b",
+      "displayName": "",
+      "id": "ae45b",
+      "name": "Mannequin_Medium_ArmLeft.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 954
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "22c5b": {
+      "importer": "gltf-mesh",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@22c5b",
+      "displayName": "",
+      "id": "22c5b",
+      "name": "Mannequin_Medium_ArmRight.mesh",
+      "userData": {
+        "gltfIndex": 2,
+        "triangleCount": 954
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "de66f": {
+      "importer": "gltf-mesh",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@de66f",
+      "displayName": "",
+      "id": "de66f",
+      "name": "Mannequin_Medium_LegLeft.mesh",
+      "userData": {
+        "gltfIndex": 3,
+        "triangleCount": 1468
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c441e": {
+      "importer": "gltf-mesh",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@c441e",
+      "displayName": "",
+      "id": "c441e",
+      "name": "Mannequin_Medium_LegRight.mesh",
+      "userData": {
+        "gltfIndex": 4,
+        "triangleCount": 1468
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "b0aa9": {
+      "importer": "gltf-mesh",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@b0aa9",
+      "displayName": "",
+      "id": "b0aa9",
+      "name": "Mannequin_Medium_Body.mesh",
+      "userData": {
+        "gltfIndex": 5,
+        "triangleCount": 1106
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f1394": {
+      "importer": "gltf-skeleton",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@f1394",
+      "displayName": "",
+      "id": "f1394",
+      "name": "UnnamedSkeleton-1.skeleton",
+      "userData": {
+        "gltfIndex": 1,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "75ee4": {
+      "importer": "gltf-skeleton",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@75ee4",
+      "displayName": "",
+      "id": "75ee4",
+      "name": "UnnamedSkeleton-2.skeleton",
+      "userData": {
+        "gltfIndex": 2,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a72ab": {
+      "importer": "gltf-skeleton",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@a72ab",
+      "displayName": "",
+      "id": "a72ab",
+      "name": "UnnamedSkeleton-3.skeleton",
+      "userData": {
+        "gltfIndex": 3,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "2224c": {
+      "importer": "gltf-skeleton",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@2224c",
+      "displayName": "",
+      "id": "2224c",
+      "name": "UnnamedSkeleton-4.skeleton",
+      "userData": {
+        "gltfIndex": 4,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": false,
+        "imageUuidOrDatabaseUri": "db://assets/res/roleModel/Animations/Avatars_Source_FBX/mannequin_texture.png"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0e326": {
+      "importer": "gltf-material",
+      "uuid": "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@0e326",
+      "displayName": "",
+      "id": "0e326",
+      "name": "Character_Material.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "db://assets/res/roleModel/Animations/Avatars_Source_FBX/mannequin_texture.png"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@f440a",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@ae45b",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@22c5b",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@de66f",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@c441e",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@b0aa9"
+      ],
+      "skeletons": [
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@30732",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@f1394",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@75ee4",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@a72ab",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@2224c",
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@62756"
+      ],
+      "textures": [
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@7d6ab"
+      ],
+      "materials": [
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@0e326"
+      ],
+      "scenes": [
+        "b1011b90-e3d4-4f5a-8a8f-b3d518cee1b8@72987"
+      ]
+    }
+  }
+}

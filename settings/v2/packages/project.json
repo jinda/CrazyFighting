@@ -1,0 +1,90 @@
+{
+  "__version__": "1.0.6",
+  "layer": [
+    {
+      "name": "canvas_19",
+      "value": 524288
+    }
+  ],
+  "general": {
+    "designResolution": {
+      "width": 720,
+      "height": 1280
+    }
+  },
+  "custom_joint_texture_layouts": [
+    {
+      "textureLength": 120,
+      "contents": [
+        {
+          "skeleton": "f8c97c91-c3b1-4f51-a662-c91ba9e3abcd@438fe",
+          "clips": [
+            "f8c97c91-c3b1-4f51-a662-c91ba9e3abcd@989ed",
+            "f8c97c91-c3b1-4f51-a662-c91ba9e3abcd@5b2e9",
+            "f8c97c91-c3b1-4f51-a662-c91ba9e3abcd@1f586",
+            "f8c97c91-c3b1-4f51-a662-c91ba9e3abcd@cf5ee",
+            "f8c97c91-c3b1-4f51-a662-c91ba9e3abcd@ee525"
+          ]
+        },
+        {
+          "skeleton": "5f35effe-a1a1-4c6a-8a36-5ad85ff66628@438fe",
+          "clips": [
+            "5f35effe-a1a1-4c6a-8a36-5ad85ff66628@989ed",
+            "5f35effe-a1a1-4c6a-8a36-5ad85ff66628@5b2e9",
+            "5f35effe-a1a1-4c6a-8a36-5ad85ff66628@1f586",
+            "5f35effe-a1a1-4c6a-8a36-5ad85ff66628@cf5ee",
+            "5f35effe-a1a1-4c6a-8a36-5ad85ff66628@ee525"
+          ]
+        },
+        {
+          "skeleton": "502b4d03-a036-48c7-bb74-667654db2940@438fe",
+          "clips": [
+            "502b4d03-a036-48c7-bb74-667654db2940@989ed",
+            "502b4d03-a036-48c7-bb74-667654db2940@5b2e9",
+            "502b4d03-a036-48c7-bb74-667654db2940@1f586",
+            "502b4d03-a036-48c7-bb74-667654db2940@cf5ee",
+            "502b4d03-a036-48c7-bb74-667654db2940@ee525"
+          ]
+        },
+        {
+          "skeleton": "9445909f-4879-4c2b-8bc3-a48e7015a2ba@438fe",
+          "clips": [
+            "9445909f-4879-4c2b-8bc3-a48e7015a2ba@989ed",
+            "9445909f-4879-4c2b-8bc3-a48e7015a2ba@5b2e9",
+            "9445909f-4879-4c2b-8bc3-a48e7015a2ba@1f586",
+            "9445909f-4879-4c2b-8bc3-a48e7015a2ba@cf5ee",
+            "9445909f-4879-4c2b-8bc3-a48e7015a2ba@ee525"
+          ]
+        },
+        {
+          "skeleton": "e8fe9966-5f03-4cc0-ad69-01d536be6c21@438fe",
+          "clips": [
+            "e8fe9966-5f03-4cc0-ad69-01d536be6c21@989ed",
+            "e8fe9966-5f03-4cc0-ad69-01d536be6c21@5b2e9",
+            "e8fe9966-5f03-4cc0-ad69-01d536be6c21@1f586",
+            "e8fe9966-5f03-4cc0-ad69-01d536be6c21@cf5ee",
+            "e8fe9966-5f03-4cc0-ad69-01d536be6c21@ee525"
+          ]
+        },
+        {
+          "skeleton": "57d4c4ef-3199-4596-bf79-7c065964ca9c@438fe",
+          "clips": [
+            "57d4c4ef-3199-4596-bf79-7c065964ca9c@989ed",
+            "57d4c4ef-3199-4596-bf79-7c065964ca9c@5b2e9",
+            "57d4c4ef-3199-4596-bf79-7c065964ca9c@1f586",
+            "57d4c4ef-3199-4596-bf79-7c065964ca9c@cf5ee",
+            "57d4c4ef-3199-4596-bf79-7c065964ca9c@ee525"
+          ]
+        }
+      ]
+    }
+  ],
+  "fbx": {
+    "legacyFbxImporter": {
+      "visible": true
+    }
+  },
+  "script": {
+    "preserveSymlinks": true
+  }
+}

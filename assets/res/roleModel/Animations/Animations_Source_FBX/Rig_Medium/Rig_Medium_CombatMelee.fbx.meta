@@ -1,0 +1,1139 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be",
+  "files": [
+    "__original-animation-0.bin",
+    "__original-animation-1.bin",
+    "__original-animation-10.bin",
+    "__original-animation-11.bin",
+    "__original-animation-12.bin",
+    "__original-animation-13.bin",
+    "__original-animation-14.bin",
+    "__original-animation-15.bin",
+    "__original-animation-16.bin",
+    "__original-animation-17.bin",
+    "__original-animation-18.bin",
+    "__original-animation-19.bin",
+    "__original-animation-2.bin",
+    "__original-animation-20.bin",
+    "__original-animation-21.bin",
+    "__original-animation-3.bin",
+    "__original-animation-4.bin",
+    "__original-animation-5.bin",
+    "__original-animation-6.bin",
+    "__original-animation-7.bin",
+    "__original-animation-8.bin",
+    "__original-animation-9.bin"
+  ],
+  "subMetas": {
+    "30732": {
+      "importer": "gltf-skeleton",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@30732",
+      "displayName": "",
+      "id": "30732",
+      "name": "UnnamedSkeleton-0.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "62756": {
+      "importer": "gltf-skeleton",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@62756",
+      "displayName": "",
+      "id": "62756",
+      "name": "UnnamedSkeleton-5.skeleton",
+      "userData": {
+        "gltfIndex": 5,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "2b6c3": {
+      "importer": "gltf-mesh",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@2b6c3",
+      "displayName": "",
+      "id": "2b6c3",
+      "name": "Mannequin_Head.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 966
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "624d9": {
+      "importer": "gltf-mesh",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@624d9",
+      "displayName": "",
+      "id": "624d9",
+      "name": "Mannequin_ArmLeft.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 954
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "69c3b": {
+      "importer": "gltf-mesh",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@69c3b",
+      "displayName": "",
+      "id": "69c3b",
+      "name": "Mannequin_ArmRight.mesh",
+      "userData": {
+        "gltfIndex": 2,
+        "triangleCount": 954
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "eb502": {
+      "importer": "gltf-mesh",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@eb502",
+      "displayName": "",
+      "id": "eb502",
+      "name": "Mannequin_LegLeft.mesh",
+      "userData": {
+        "gltfIndex": 3,
+        "triangleCount": 1468
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "000d9": {
+      "importer": "gltf-mesh",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@000d9",
+      "displayName": "",
+      "id": "000d9",
+      "name": "Mannequin_LegRight.mesh",
+      "userData": {
+        "gltfIndex": 4,
+        "triangleCount": 1468
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "e512c": {
+      "importer": "gltf-mesh",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@e512c",
+      "displayName": "",
+      "id": "e512c",
+      "name": "Mannequin_Body.mesh",
+      "userData": {
+        "gltfIndex": 5,
+        "triangleCount": 1106
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "5c1d5": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@5c1d5",
+      "displayName": "",
+      "id": "5c1d5",
+      "name": "T-Pose.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.03333333507180214
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "a16ad": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@a16ad",
+      "displayName": "",
+      "id": "a16ad",
+      "name": "Melee_1H_Attack_Chop.animation",
+      "userData": {
+        "gltfIndex": 1,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "de8ca": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@de8ca",
+      "displayName": "",
+      "id": "de8ca",
+      "name": "Melee_1H_Attack_Jump_Chop.animation",
+      "userData": {
+        "gltfIndex": 2,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.3333333730697632
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "f9b6b": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@f9b6b",
+      "displayName": "",
+      "id": "f9b6b",
+      "name": "Melee_1H_Attack_Slice_Diagonal.animation",
+      "userData": {
+        "gltfIndex": 3,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "4b12b": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@4b12b",
+      "displayName": "",
+      "id": "4b12b",
+      "name": "Melee_1H_Attack_Slice_Horizontal.animation",
+      "userData": {
+        "gltfIndex": 4,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.3666666746139526
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "6e284": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@6e284",
+      "displayName": "",
+      "id": "6e284",
+      "name": "Melee_1H_Attack_Stab.animation",
+      "userData": {
+        "gltfIndex": 5,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.600000023841858
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "e688c": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@e688c",
+      "displayName": "",
+      "id": "e688c",
+      "name": "Melee_2H_Attack_Chop.animation",
+      "userData": {
+        "gltfIndex": 6,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.6333333253860474
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "55e31": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@55e31",
+      "displayName": "",
+      "id": "55e31",
+      "name": "Melee_2H_Attack_Slice.animation",
+      "userData": {
+        "gltfIndex": 7,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.100000023841858
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "71d49": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@71d49",
+      "displayName": "",
+      "id": "71d49",
+      "name": "Melee_2H_Attack_Spin.animation",
+      "userData": {
+        "gltfIndex": 8,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2.4000000953674316
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "bc770": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@bc770",
+      "displayName": "",
+      "id": "bc770",
+      "name": "Melee_2H_Attack_Spinning.animation",
+      "userData": {
+        "gltfIndex": 9,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.6666666865348816
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "b4647": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@b4647",
+      "displayName": "",
+      "id": "b4647",
+      "name": "Melee_2H_Attack_Stab.animation",
+      "userData": {
+        "gltfIndex": 10,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.600000023841858
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "7b6ce": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@7b6ce",
+      "displayName": "",
+      "id": "7b6ce",
+      "name": "Melee_2H_Idle.animation",
+      "userData": {
+        "gltfIndex": 11,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "6c256": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@6c256",
+      "displayName": "",
+      "id": "6c256",
+      "name": "Melee_Block.animation",
+      "userData": {
+        "gltfIndex": 12,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "b966c": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@b966c",
+      "displayName": "",
+      "id": "b966c",
+      "name": "Melee_Block_Attack.animation",
+      "userData": {
+        "gltfIndex": 13,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "cee99": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@cee99",
+      "displayName": "",
+      "id": "cee99",
+      "name": "Melee_Block_Hit.animation",
+      "userData": {
+        "gltfIndex": 14,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "6ce37": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@6ce37",
+      "displayName": "",
+      "id": "6ce37",
+      "name": "Melee_Blocking.animation",
+      "userData": {
+        "gltfIndex": 15,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "eb869": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@eb869",
+      "displayName": "",
+      "id": "eb869",
+      "name": "Melee_Dualwield_Attack_Chop.animation",
+      "userData": {
+        "gltfIndex": 16,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.2666666507720947
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "bb3d3": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@bb3d3",
+      "displayName": "",
+      "id": "bb3d3",
+      "name": "Melee_Dualwield_Attack_Slice.animation",
+      "userData": {
+        "gltfIndex": 17,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.1666666269302368
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "ec11f": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@ec11f",
+      "displayName": "",
+      "id": "ec11f",
+      "name": "Melee_Dualwield_Attack_Stab.animation",
+      "userData": {
+        "gltfIndex": 18,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.600000023841858
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "6332b": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@6332b",
+      "displayName": "",
+      "id": "6332b",
+      "name": "Melee_Unarmed_Attack_Kick.animation",
+      "userData": {
+        "gltfIndex": 19,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.9333333373069763
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "f0e85": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@f0e85",
+      "displayName": "",
+      "id": "f0e85",
+      "name": "Melee_Unarmed_Attack_Punch_A.animation",
+      "userData": {
+        "gltfIndex": 20,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.1666666269302368
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "8c1fe": {
+      "importer": "gltf-animation",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@8c1fe",
+      "displayName": "",
+      "id": "8c1fe",
+      "name": "Melee_Unarmed_Idle.animation",
+      "userData": {
+        "gltfIndex": 21,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0666667222976685
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "f1394": {
+      "importer": "gltf-skeleton",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@f1394",
+      "displayName": "",
+      "id": "f1394",
+      "name": "UnnamedSkeleton-1.skeleton",
+      "userData": {
+        "gltfIndex": 1,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "75ee4": {
+      "importer": "gltf-skeleton",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@75ee4",
+      "displayName": "",
+      "id": "75ee4",
+      "name": "UnnamedSkeleton-2.skeleton",
+      "userData": {
+        "gltfIndex": 2,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a72ab": {
+      "importer": "gltf-skeleton",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@a72ab",
+      "displayName": "",
+      "id": "a72ab",
+      "name": "UnnamedSkeleton-3.skeleton",
+      "userData": {
+        "gltfIndex": 3,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "2224c": {
+      "importer": "gltf-skeleton",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@2224c",
+      "displayName": "",
+      "id": "2224c",
+      "name": "UnnamedSkeleton-4.skeleton",
+      "userData": {
+        "gltfIndex": 4,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0e326": {
+      "importer": "gltf-material",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@0e326",
+      "displayName": "",
+      "id": "0e326",
+      "name": "Character_Material.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "7bcf7": {
+      "importer": "gltf-scene",
+      "uuid": "918b575a-287a-4d96-8ef1-9f3995fbf5be@7bcf7",
+      "displayName": "",
+      "id": "7bcf7",
+      "name": "Rig_Medium_CombatMelee.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "T-Pose",
+        "duration": 0.03333333507180214,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "T-Pose",
+            "from": 0,
+            "to": 0.03333333507180214,
+            "wrapMode": 2,
+            "previousId": "5c1d5"
+          }
+        ]
+      },
+      {
+        "name": "Melee_1H_Attack_Chop",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_1H_Attack_Chop",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "a16ad"
+          }
+        ]
+      },
+      {
+        "name": "Melee_1H_Attack_Jump_Chop",
+        "duration": 1.3333333730697632,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_1H_Attack_Jump_Chop",
+            "from": 0,
+            "to": 1.3333333730697632,
+            "wrapMode": 2,
+            "previousId": "de8ca"
+          }
+        ]
+      },
+      {
+        "name": "Melee_1H_Attack_Slice_Diagonal",
+        "duration": 1,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_1H_Attack_Slice_Diagonal",
+            "from": 0,
+            "to": 1,
+            "wrapMode": 2,
+            "previousId": "f9b6b"
+          }
+        ]
+      },
+      {
+        "name": "Melee_1H_Attack_Slice_Horizontal",
+        "duration": 1.3666666746139526,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_1H_Attack_Slice_Horizontal",
+            "from": 0,
+            "to": 1.3666666746139526,
+            "wrapMode": 2,
+            "previousId": "4b12b"
+          }
+        ]
+      },
+      {
+        "name": "Melee_1H_Attack_Stab",
+        "duration": 1.600000023841858,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_1H_Attack_Stab",
+            "from": 0,
+            "to": 1.600000023841858,
+            "wrapMode": 2,
+            "previousId": "6e284"
+          }
+        ]
+      },
+      {
+        "name": "Melee_2H_Attack_Chop",
+        "duration": 1.6333333253860474,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_2H_Attack_Chop",
+            "from": 0,
+            "to": 1.6333333253860474,
+            "wrapMode": 2,
+            "previousId": "e688c"
+          }
+        ]
+      },
+      {
+        "name": "Melee_2H_Attack_Slice",
+        "duration": 1.100000023841858,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_2H_Attack_Slice",
+            "from": 0,
+            "to": 1.100000023841858,
+            "wrapMode": 2,
+            "previousId": "55e31"
+          }
+        ]
+      },
+      {
+        "name": "Melee_2H_Attack_Spin",
+        "duration": 2.4000000953674316,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_2H_Attack_Spin",
+            "from": 0,
+            "to": 2.4000000953674316,
+            "wrapMode": 2,
+            "previousId": "71d49"
+          }
+        ]
+      },
+      {
+        "name": "Melee_2H_Attack_Spinning",
+        "duration": 0.6666666865348816,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_2H_Attack_Spinning",
+            "from": 0,
+            "to": 0.6666666865348816,
+            "wrapMode": 2,
+            "previousId": "bc770"
+          }
+        ]
+      },
+      {
+        "name": "Melee_2H_Attack_Stab",
+        "duration": 1.600000023841858,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_2H_Attack_Stab",
+            "from": 0,
+            "to": 1.600000023841858,
+            "wrapMode": 2,
+            "previousId": "b4647"
+          }
+        ]
+      },
+      {
+        "name": "Melee_2H_Idle",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_2H_Idle",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "7b6ce"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Block",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Block",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "6c256"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Block_Attack",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Block_Attack",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "b966c"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Block_Hit",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Block_Hit",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "cee99"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Blocking",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Blocking",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "6ce37"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Dualwield_Attack_Chop",
+        "duration": 1.2666666507720947,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Dualwield_Attack_Chop",
+            "from": 0,
+            "to": 1.2666666507720947,
+            "wrapMode": 2,
+            "previousId": "eb869"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Dualwield_Attack_Slice",
+        "duration": 1.1666666269302368,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Dualwield_Attack_Slice",
+            "from": 0,
+            "to": 1.1666666269302368,
+            "wrapMode": 2,
+            "previousId": "bb3d3"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Dualwield_Attack_Stab",
+        "duration": 1.600000023841858,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Dualwield_Attack_Stab",
+            "from": 0,
+            "to": 1.600000023841858,
+            "wrapMode": 2,
+            "previousId": "ec11f"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Unarmed_Attack_Kick",
+        "duration": 0.9333333373069763,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Unarmed_Attack_Kick",
+            "from": 0,
+            "to": 0.9333333373069763,
+            "wrapMode": 2,
+            "previousId": "6332b"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Unarmed_Attack_Punch_A",
+        "duration": 1.1666666269302368,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Unarmed_Attack_Punch_A",
+            "from": 0,
+            "to": 1.1666666269302368,
+            "wrapMode": 2,
+            "previousId": "f0e85"
+          }
+        ]
+      },
+      {
+        "name": "Melee_Unarmed_Idle",
+        "duration": 1.0666667222976685,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Melee_Unarmed_Idle",
+            "from": 0,
+            "to": 1.0666667222976685,
+            "wrapMode": 2,
+            "previousId": "8c1fe"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@2b6c3",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@624d9",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@69c3b",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@eb502",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@000d9",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@e512c"
+      ],
+      "skeletons": [
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@30732",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@f1394",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@75ee4",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@a72ab",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@2224c",
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@62756"
+      ],
+      "textures": [],
+      "materials": [
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@0e326"
+      ],
+      "scenes": [
+        "918b575a-287a-4d96-8ef1-9f3995fbf5be@7bcf7"
+      ]
+    }
+  }
+}

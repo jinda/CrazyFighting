@@ -1,0 +1,16 @@
+{
+  "ver": "4.0.24",
+  "importer": "javascript",
+  "imported": true,
+  "uuid": "09ac752a-7306-4c63-bf65-5d1e51bb5a29",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "isPlugin": false,
+    "loadPluginInWeb": true,
+    "loadPluginInNative": true,
+    "loadPluginInEditor": false,
+    "moduleId": "project:///assets/scripts/libs/box2d.js",
+    "simulateGlobals": []
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "ver": "4.0.24",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "a39e52e5-22e2-47c7-9ffc-cf1c3c6ecb3c",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/scripts/fight/fighterRigidBody.js",
+    "simulateGlobals": []
+  }
+}

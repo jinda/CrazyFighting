@@ -1,0 +1,873 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee",
+  "files": [
+    "__original-animation-0.bin",
+    "__original-animation-1.bin",
+    "__original-animation-10.bin",
+    "__original-animation-11.bin",
+    "__original-animation-12.bin",
+    "__original-animation-13.bin",
+    "__original-animation-14.bin",
+    "__original-animation-2.bin",
+    "__original-animation-3.bin",
+    "__original-animation-4.bin",
+    "__original-animation-5.bin",
+    "__original-animation-6.bin",
+    "__original-animation-7.bin",
+    "__original-animation-8.bin",
+    "__original-animation-9.bin"
+  ],
+  "subMetas": {
+    "30103": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@30103",
+      "displayName": "",
+      "id": "30103",
+      "name": "Skeletons_Death_Resurrect.animation",
+      "userData": {
+        "gltfIndex": 7,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2.700000047683716
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "30732": {
+      "importer": "gltf-skeleton",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@30732",
+      "displayName": "",
+      "id": "30732",
+      "name": "UnnamedSkeleton-0.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "35323": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@35323",
+      "displayName": "",
+      "id": "35323",
+      "name": "Skeletons_Spawn_Ground.animation",
+      "userData": {
+        "gltfIndex": 11,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 3.566666603088379
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "62756": {
+      "importer": "gltf-skeleton",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@62756",
+      "displayName": "",
+      "id": "62756",
+      "name": "UnnamedSkeleton-5.skeleton",
+      "userData": {
+        "gltfIndex": 5,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "88759": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@88759",
+      "displayName": "",
+      "id": "88759",
+      "name": "Skeletons_Inactive_Floor_Pose.animation",
+      "userData": {
+        "gltfIndex": 9,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.03333333507180214
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "94260": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@94260",
+      "displayName": "",
+      "id": "94260",
+      "name": "Skeletons_Inactive_Standing_Pose.animation",
+      "userData": {
+        "gltfIndex": 10,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.03333333507180214
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "98969": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@98969",
+      "displayName": "",
+      "id": "98969",
+      "name": "EXPERIMENTAL_Medium_Transform.animation",
+      "userData": {
+        "gltfIndex": 1,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "2b6c3": {
+      "importer": "gltf-mesh",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@2b6c3",
+      "displayName": "",
+      "id": "2b6c3",
+      "name": "Mannequin_Head.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 966
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "624d9": {
+      "importer": "gltf-mesh",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@624d9",
+      "displayName": "",
+      "id": "624d9",
+      "name": "Mannequin_ArmLeft.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 954
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "69c3b": {
+      "importer": "gltf-mesh",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@69c3b",
+      "displayName": "",
+      "id": "69c3b",
+      "name": "Mannequin_ArmRight.mesh",
+      "userData": {
+        "gltfIndex": 2,
+        "triangleCount": 954
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "eb502": {
+      "importer": "gltf-mesh",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@eb502",
+      "displayName": "",
+      "id": "eb502",
+      "name": "Mannequin_LegLeft.mesh",
+      "userData": {
+        "gltfIndex": 3,
+        "triangleCount": 1468
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "000d9": {
+      "importer": "gltf-mesh",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@000d9",
+      "displayName": "",
+      "id": "000d9",
+      "name": "Mannequin_LegRight.mesh",
+      "userData": {
+        "gltfIndex": 4,
+        "triangleCount": 1468
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "e512c": {
+      "importer": "gltf-mesh",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@e512c",
+      "displayName": "",
+      "id": "e512c",
+      "name": "Mannequin_Body.mesh",
+      "userData": {
+        "gltfIndex": 5,
+        "triangleCount": 1106
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "5c1d5": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@5c1d5",
+      "displayName": "",
+      "id": "5c1d5",
+      "name": "T-Pose.animation",
+      "userData": {
+        "gltfIndex": 0,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.03333333507180214
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "dabfb": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@dabfb",
+      "displayName": "",
+      "id": "dabfb",
+      "name": "Skeletons_Awaken_Floor.animation",
+      "userData": {
+        "gltfIndex": 2,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2.299999952316284
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "f0f64": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@f0f64",
+      "displayName": "",
+      "id": "f0f64",
+      "name": "Skeletons_Awaken_Floor_Long.animation",
+      "userData": {
+        "gltfIndex": 3,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 3.8333332538604736
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "9d26e": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@9d26e",
+      "displayName": "",
+      "id": "9d26e",
+      "name": "Skeletons_Awaken_Standing.animation",
+      "userData": {
+        "gltfIndex": 4,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "0f2e8": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@0f2e8",
+      "displayName": "",
+      "id": "0f2e8",
+      "name": "Skeletons_Death.animation",
+      "userData": {
+        "gltfIndex": 5,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 2
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "9e01c": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@9e01c",
+      "displayName": "",
+      "id": "9e01c",
+      "name": "Skeletons_Death_Pose.animation",
+      "userData": {
+        "gltfIndex": 6,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 0.03333333507180214
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "fc42c": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@fc42c",
+      "displayName": "",
+      "id": "fc42c",
+      "name": "Skeletons_Idle.animation",
+      "userData": {
+        "gltfIndex": 8,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 4.266666889190674
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "8aef5": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@8aef5",
+      "displayName": "",
+      "id": "8aef5",
+      "name": "Skeletons_Taunt.animation",
+      "userData": {
+        "gltfIndex": 12,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.0333333015441895
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "e4dcb": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@e4dcb",
+      "displayName": "",
+      "id": "e4dcb",
+      "name": "Skeletons_Taunt_Longer.animation",
+      "userData": {
+        "gltfIndex": 13,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 3
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "c07d1": {
+      "importer": "gltf-animation",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@c07d1",
+      "displayName": "",
+      "id": "c07d1",
+      "name": "Skeletons_Walking.animation",
+      "userData": {
+        "gltfIndex": 14,
+        "wrapMode": 2,
+        "sample": 30,
+        "span": {
+          "from": 0,
+          "to": 1.600000023841858
+        },
+        "events": []
+      },
+      "ver": "1.0.18",
+      "imported": true,
+      "files": [
+        ".bin"
+      ],
+      "subMetas": {}
+    },
+    "f1394": {
+      "importer": "gltf-skeleton",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@f1394",
+      "displayName": "",
+      "id": "f1394",
+      "name": "UnnamedSkeleton-1.skeleton",
+      "userData": {
+        "gltfIndex": 1,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "75ee4": {
+      "importer": "gltf-skeleton",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@75ee4",
+      "displayName": "",
+      "id": "75ee4",
+      "name": "UnnamedSkeleton-2.skeleton",
+      "userData": {
+        "gltfIndex": 2,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a72ab": {
+      "importer": "gltf-skeleton",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@a72ab",
+      "displayName": "",
+      "id": "a72ab",
+      "name": "UnnamedSkeleton-3.skeleton",
+      "userData": {
+        "gltfIndex": 3,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "2224c": {
+      "importer": "gltf-skeleton",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@2224c",
+      "displayName": "",
+      "id": "2224c",
+      "name": "UnnamedSkeleton-4.skeleton",
+      "userData": {
+        "gltfIndex": 4,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0e326": {
+      "importer": "gltf-material",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@0e326",
+      "displayName": "",
+      "id": "0e326",
+      "name": "Character_Material.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "9c62f": {
+      "importer": "gltf-scene",
+      "uuid": "4211854c-8cb1-4d28-8319-e88d1528c1ee@9c62f",
+      "displayName": "",
+      "id": "9c62f",
+      "name": "Rig_Medium_Special.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "animationImportSettings": [
+      {
+        "name": "T-Pose",
+        "duration": 0.03333333507180214,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "T-Pose",
+            "from": 0,
+            "to": 0.03333333507180214,
+            "wrapMode": 2,
+            "previousId": "5c1d5"
+          }
+        ]
+      },
+      {
+        "name": "EXPERIMENTAL_Medium_Transform",
+        "duration": 1,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "EXPERIMENTAL_Medium_Transform",
+            "from": 0,
+            "to": 1,
+            "wrapMode": 2,
+            "previousId": "98969"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Awaken_Floor",
+        "duration": 2.299999952316284,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Awaken_Floor",
+            "from": 0,
+            "to": 2.299999952316284,
+            "wrapMode": 2,
+            "previousId": "dabfb"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Awaken_Floor_Long",
+        "duration": 3.8333332538604736,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Awaken_Floor_Long",
+            "from": 0,
+            "to": 3.8333332538604736,
+            "wrapMode": 2,
+            "previousId": "f0f64"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Awaken_Standing",
+        "duration": 1,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Awaken_Standing",
+            "from": 0,
+            "to": 1,
+            "wrapMode": 2,
+            "previousId": "9d26e"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Death",
+        "duration": 2,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Death",
+            "from": 0,
+            "to": 2,
+            "wrapMode": 2,
+            "previousId": "0f2e8"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Death_Pose",
+        "duration": 0.03333333507180214,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Death_Pose",
+            "from": 0,
+            "to": 0.03333333507180214,
+            "wrapMode": 2,
+            "previousId": "9e01c"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Death_Resurrect",
+        "duration": 2.700000047683716,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Death_Resurrect",
+            "from": 0,
+            "to": 2.700000047683716,
+            "wrapMode": 2,
+            "previousId": "30103"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Idle",
+        "duration": 4.266666889190674,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Idle",
+            "from": 0,
+            "to": 4.266666889190674,
+            "wrapMode": 2,
+            "previousId": "fc42c"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Inactive_Floor_Pose",
+        "duration": 0.03333333507180214,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Inactive_Floor_Pose",
+            "from": 0,
+            "to": 0.03333333507180214,
+            "wrapMode": 2,
+            "previousId": "88759"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Inactive_Standing_Pose",
+        "duration": 0.03333333507180214,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Inactive_Standing_Pose",
+            "from": 0,
+            "to": 0.03333333507180214,
+            "wrapMode": 2,
+            "previousId": "94260"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Spawn_Ground",
+        "duration": 3.566666603088379,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Spawn_Ground",
+            "from": 0,
+            "to": 3.566666603088379,
+            "wrapMode": 2,
+            "previousId": "35323"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Taunt",
+        "duration": 1.0333333015441895,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Taunt",
+            "from": 0,
+            "to": 1.0333333015441895,
+            "wrapMode": 2,
+            "previousId": "8aef5"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Taunt_Longer",
+        "duration": 3,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Taunt_Longer",
+            "from": 0,
+            "to": 3,
+            "wrapMode": 2,
+            "previousId": "e4dcb"
+          }
+        ]
+      },
+      {
+        "name": "Skeletons_Walking",
+        "duration": 1.600000023841858,
+        "fps": 30,
+        "splits": [
+          {
+            "name": "Skeletons_Walking",
+            "from": 0,
+            "to": 1.600000023841858,
+            "wrapMode": 2,
+            "previousId": "c07d1"
+          }
+        ]
+      }
+    ],
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@2b6c3",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@624d9",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@69c3b",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@eb502",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@000d9",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@e512c"
+      ],
+      "skeletons": [
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@30732",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@f1394",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@75ee4",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@a72ab",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@2224c",
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@62756"
+      ],
+      "textures": [],
+      "materials": [
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@0e326"
+      ],
+      "scenes": [
+        "4211854c-8cb1-4d28-8319-e88d1528c1ee@9c62f"
+      ]
+    }
+  }
+}

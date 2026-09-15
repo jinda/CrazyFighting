@@ -1,0 +1,148 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "a1d41516-8186-4273-a5e8-d367e54b36a3",
+  "files": [],
+  "subMetas": {
+    "97298": {
+      "importer": "gltf-mesh",
+      "uuid": "a1d41516-8186-4273-a5e8-d367e54b36a3@97298",
+      "displayName": "",
+      "id": "97298",
+      "name": "ball.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 48
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "181cb": {
+      "importer": "gltf-embeded-image",
+      "uuid": "a1d41516-8186-4273-a5e8-d367e54b36a3@181cb",
+      "displayName": "",
+      "id": "181cb",
+      "name": "贴图 #4.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "442db": {
+      "importer": "texture",
+      "uuid": "a1d41516-8186-4273-a5e8-d367e54b36a3@442db",
+      "displayName": "",
+      "id": "442db",
+      "name": "贴图 #4.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "a1d41516-8186-4273-a5e8-d367e54b36a3@181cb"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "74c03": {
+      "importer": "gltf-material",
+      "uuid": "a1d41516-8186-4273-a5e8-d367e54b36a3@74c03",
+      "displayName": "",
+      "id": "74c03",
+      "name": "Material #4.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "ed0ff": {
+      "importer": "gltf-scene",
+      "uuid": "a1d41516-8186-4273-a5e8-d367e54b36a3@ed0ff",
+      "displayName": "",
+      "id": "ed0ff",
+      "name": "clownBall.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "贴图 #4",
+        "uri": "a1d41516-8186-4273-a5e8-d367e54b36a3@181cb"
+      }
+    ],
+    "assetFinder": {
+      "meshes": [
+        "a1d41516-8186-4273-a5e8-d367e54b36a3@97298"
+      ],
+      "skeletons": [],
+      "textures": [
+        "a1d41516-8186-4273-a5e8-d367e54b36a3@442db"
+      ],
+      "materials": [
+        "a1d41516-8186-4273-a5e8-d367e54b36a3@74c03"
+      ],
+      "scenes": [
+        "a1d41516-8186-4273-a5e8-d367e54b36a3@ed0ff"
+      ]
+    },
+    "legacyFbxImporter": true,
+    "fbx": {
+      "smartMaterialEnabled": false,
+      "matchMeshNames": false
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

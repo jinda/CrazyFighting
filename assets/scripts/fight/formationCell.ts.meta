@@ -1,0 +1,12 @@
+{
+  "ver": "4.0.24",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "cce3551f-6b9a-45e5-9d44-df04931d78b4",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/scripts/fight/formationCell.js",
+    "simulateGlobals": []
+  }
+}

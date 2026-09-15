@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "79930e52-197e-4568-8d57-37d9026a0cdd",
+  "files": [],
+  "subMetas": {
+    "4cd97": {
+      "importer": "gltf-mesh",
+      "uuid": "79930e52-197e-4568-8d57-37d9026a0cdd@4cd97",
+      "displayName": "",
+      "id": "4cd97",
+      "name": "Cube.16554.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 680
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "48b02": {
+      "importer": "gltf-embeded-image",
+      "uuid": "79930e52-197e-4568-8d57-37d9026a0cdd@48b02",
+      "displayName": "",
+      "id": "48b02",
+      "name": "base_color_texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "79930e52-197e-4568-8d57-37d9026a0cdd@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "79930e52-197e-4568-8d57-37d9026a0cdd@48b02"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c96cf": {
+      "importer": "gltf-material",
+      "uuid": "79930e52-197e-4568-8d57-37d9026a0cdd@c96cf",
+      "displayName": "",
+      "id": "c96cf",
+      "name": "skeleton.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "0533b": {
+      "importer": "gltf-scene",
+      "uuid": "79930e52-197e-4568-8d57-37d9026a0cdd@0533b",
+      "displayName": "",
+      "id": "0533b",
+      "name": "Skeleton_Dagger.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "79930e52-197e-4568-8d57-37d9026a0cdd@48b02"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "79930e52-197e-4568-8d57-37d9026a0cdd@4cd97"
+      ],
+      "skeletons": [],
+      "textures": [
+        "79930e52-197e-4568-8d57-37d9026a0cdd@7d6ab"
+      ],
+      "materials": [
+        "79930e52-197e-4568-8d57-37d9026a0cdd@c96cf"
+      ],
+      "scenes": [
+        "79930e52-197e-4568-8d57-37d9026a0cdd@0533b"
+      ]
+    }
+  }
+}

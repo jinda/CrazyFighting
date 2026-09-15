@@ -1,0 +1,12 @@
+{
+  "ver": "4.0.24",
+  "importer": "typescript",
+  "imported": true,
+  "uuid": "e96a6ad2-1c1b-4fe0-9d08-956f2d19a01a",
+  "files": [],
+  "subMetas": {},
+  "userData": {
+    "moduleId": "project:///assets/scripts/fight/fighterManager.js",
+    "simulateGlobals": []
+  }
+}

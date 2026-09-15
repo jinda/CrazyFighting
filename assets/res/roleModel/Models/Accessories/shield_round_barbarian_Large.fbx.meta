@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "9f297e34-d8fd-4894-85e6-129380cbec07",
+  "files": [],
+  "subMetas": {
+    "6c964": {
+      "importer": "gltf-mesh",
+      "uuid": "9f297e34-d8fd-4894-85e6-129380cbec07@6c964",
+      "displayName": "",
+      "id": "6c964",
+      "name": "shield_round_barbarian_Large.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 284
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "48b02": {
+      "importer": "gltf-embeded-image",
+      "uuid": "9f297e34-d8fd-4894-85e6-129380cbec07@48b02",
+      "displayName": "",
+      "id": "48b02",
+      "name": "base_color_texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "9f297e34-d8fd-4894-85e6-129380cbec07@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "9f297e34-d8fd-4894-85e6-129380cbec07@48b02"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "06d75": {
+      "importer": "gltf-material",
+      "uuid": "9f297e34-d8fd-4894-85e6-129380cbec07@06d75",
+      "displayName": "",
+      "id": "06d75",
+      "name": "barbarian.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f518c": {
+      "importer": "gltf-scene",
+      "uuid": "9f297e34-d8fd-4894-85e6-129380cbec07@f518c",
+      "displayName": "",
+      "id": "f518c",
+      "name": "shield_round_barbarian_Large.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "9f297e34-d8fd-4894-85e6-129380cbec07@48b02"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "9f297e34-d8fd-4894-85e6-129380cbec07@6c964"
+      ],
+      "skeletons": [],
+      "textures": [
+        "9f297e34-d8fd-4894-85e6-129380cbec07@7d6ab"
+      ],
+      "materials": [
+        "9f297e34-d8fd-4894-85e6-129380cbec07@06d75"
+      ],
+      "scenes": [
+        "9f297e34-d8fd-4894-85e6-129380cbec07@f518c"
+      ]
+    }
+  }
+}

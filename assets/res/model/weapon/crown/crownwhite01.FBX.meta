@@ -1,0 +1,98 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "5a032389-2223-46bc-b7ad-110d1f01da6a",
+  "files": [],
+  "subMetas": {
+    "8ac03": {
+      "importer": "gltf-mesh",
+      "uuid": "5a032389-2223-46bc-b7ad-110d1f01da6a@8ac03",
+      "displayName": "",
+      "id": "8ac03",
+      "name": "crownWhite.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 360
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "3249e": {
+      "importer": "gltf-material",
+      "uuid": "5a032389-2223-46bc-b7ad-110d1f01da6a@3249e",
+      "displayName": "",
+      "id": "3249e",
+      "name": "unit-gold-material.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "9750f": {
+      "importer": "gltf-scene",
+      "uuid": "5a032389-2223-46bc-b7ad-110d1f01da6a@9750f",
+      "displayName": "",
+      "id": "9750f",
+      "name": "crownwhite01.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "assetFinder": {
+      "meshes": [
+        "5a032389-2223-46bc-b7ad-110d1f01da6a@8ac03"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "5a032389-2223-46bc-b7ad-110d1f01da6a@3249e"
+      ],
+      "scenes": [
+        "5a032389-2223-46bc-b7ad-110d1f01da6a@9750f"
+      ]
+    },
+    "legacyFbxImporter": true,
+    "fbx": {
+      "smartMaterialEnabled": false,
+      "matchMeshNames": false
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

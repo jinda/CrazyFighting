@@ -1,0 +1,404 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5",
+  "files": [],
+  "subMetas": {
+    "30732": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@30732",
+      "displayName": "",
+      "id": "30732",
+      "name": "UnnamedSkeleton-0.skeleton",
+      "userData": {
+        "gltfIndex": 0,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "62756": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@62756",
+      "displayName": "",
+      "id": "62756",
+      "name": "UnnamedSkeleton-5.skeleton",
+      "userData": {
+        "gltfIndex": 5,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "61e1c": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@61e1c",
+      "displayName": "",
+      "id": "61e1c",
+      "name": "Necromancer_Body.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 1478
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "cfd63": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@cfd63",
+      "displayName": "",
+      "id": "cfd63",
+      "name": "Necromancer_ArmRight.mesh",
+      "userData": {
+        "gltfIndex": 1,
+        "triangleCount": 748
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "da945": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@da945",
+      "displayName": "",
+      "id": "da945",
+      "name": "Necromancer_ArmLeft.mesh",
+      "userData": {
+        "gltfIndex": 2,
+        "triangleCount": 864
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "063e9": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@063e9",
+      "displayName": "",
+      "id": "063e9",
+      "name": "Necromancer_LegLeft.mesh",
+      "userData": {
+        "gltfIndex": 3,
+        "triangleCount": 490
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "499bf": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@499bf",
+      "displayName": "",
+      "id": "499bf",
+      "name": "Necromancer_LegRight.mesh",
+      "userData": {
+        "gltfIndex": 4,
+        "triangleCount": 490
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a99bc": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@a99bc",
+      "displayName": "",
+      "id": "a99bc",
+      "name": "Necromancer_Crown.mesh",
+      "userData": {
+        "gltfIndex": 5,
+        "triangleCount": 716
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "4ad29": {
+      "importer": "gltf-mesh",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@4ad29",
+      "displayName": "",
+      "id": "4ad29",
+      "name": "Necromancer_Head.mesh",
+      "userData": {
+        "gltfIndex": 6,
+        "triangleCount": 1246
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f1394": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@f1394",
+      "displayName": "",
+      "id": "f1394",
+      "name": "UnnamedSkeleton-1.skeleton",
+      "userData": {
+        "gltfIndex": 1,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "75ee4": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@75ee4",
+      "displayName": "",
+      "id": "75ee4",
+      "name": "UnnamedSkeleton-2.skeleton",
+      "userData": {
+        "gltfIndex": 2,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a72ab": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@a72ab",
+      "displayName": "",
+      "id": "a72ab",
+      "name": "UnnamedSkeleton-3.skeleton",
+      "userData": {
+        "gltfIndex": 3,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "2224c": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@2224c",
+      "displayName": "",
+      "id": "2224c",
+      "name": "UnnamedSkeleton-4.skeleton",
+      "userData": {
+        "gltfIndex": 4,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "7d08b": {
+      "importer": "gltf-skeleton",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@7d08b",
+      "displayName": "",
+      "id": "7d08b",
+      "name": "UnnamedSkeleton-6.skeleton",
+      "userData": {
+        "gltfIndex": 6,
+        "jointsLength": 23
+      },
+      "ver": "1.0.1",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "48b02": {
+      "importer": "gltf-embeded-image",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@48b02",
+      "displayName": "",
+      "id": "48b02",
+      "name": "base_color_texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "98b52192-74ca-4729-a0fa-c67029c358d5@48b02"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c96cf": {
+      "importer": "gltf-material",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@c96cf",
+      "displayName": "",
+      "id": "c96cf",
+      "name": "skeleton.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c7836": {
+      "importer": "gltf-material",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@c7836",
+      "displayName": "",
+      "id": "c7836",
+      "name": "Glow.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "fc512": {
+      "importer": "gltf-scene",
+      "uuid": "98b52192-74ca-4729-a0fa-c67029c358d5@fc512",
+      "displayName": "",
+      "id": "fc512",
+      "name": "Necromancer.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "98b52192-74ca-4729-a0fa-c67029c358d5@48b02"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "98b52192-74ca-4729-a0fa-c67029c358d5@61e1c",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@cfd63",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@da945",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@063e9",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@499bf",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@a99bc",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@4ad29"
+      ],
+      "skeletons": [
+        "98b52192-74ca-4729-a0fa-c67029c358d5@30732",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@f1394",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@75ee4",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@a72ab",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@2224c",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@62756",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@7d08b"
+      ],
+      "textures": [
+        "98b52192-74ca-4729-a0fa-c67029c358d5@7d6ab"
+      ],
+      "materials": [
+        "98b52192-74ca-4729-a0fa-c67029c358d5@c96cf",
+        "98b52192-74ca-4729-a0fa-c67029c358d5@c7836"
+      ],
+      "scenes": [
+        "98b52192-74ca-4729-a0fa-c67029c358d5@fc512"
+      ]
+    }
+  }
+}

@@ -1,0 +1,150 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21",
+  "files": [],
+  "subMetas": {
+    "9df44": {
+      "importer": "gltf-mesh",
+      "uuid": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@9df44",
+      "displayName": "",
+      "id": "9df44",
+      "name": "boom.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 126
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "98e57": {
+      "importer": "gltf-embeded-image",
+      "uuid": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@98e57",
+      "displayName": "",
+      "id": "98e57",
+      "name": "贴图 #9.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "5ad75": {
+      "importer": "texture",
+      "uuid": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@5ad75",
+      "displayName": "",
+      "id": "5ad75",
+      "name": "贴图 #9.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@98e57"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a0a0e": {
+      "importer": "gltf-material",
+      "uuid": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@a0a0e",
+      "displayName": "",
+      "id": "a0a0e",
+      "name": "Material #45.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c7f78": {
+      "importer": "gltf-scene",
+      "uuid": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@c7f78",
+      "displayName": "",
+      "id": "c7f78",
+      "name": "catapultBoom.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "贴图 #9",
+        "uri": "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@98e57"
+      }
+    ],
+    "assetFinder": {
+      "meshes": [
+        "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@9df44"
+      ],
+      "skeletons": [],
+      "textures": [
+        "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@5ad75"
+      ],
+      "materials": [
+        "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@a0a0e"
+      ],
+      "scenes": [
+        "72ab7d8d-10ad-4c48-aae0-92c0fe7bbe21@c7f78"
+      ]
+    },
+    "dumpMaterials": false,
+    "legacyFbxImporter": true,
+    "materialDumpDir": "db://assets/resources/subPackage/model/weapon/catapultBoom/Materials_catapultBoom",
+    "fbx": {
+      "smartMaterialEnabled": false,
+      "matchMeshNames": false
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

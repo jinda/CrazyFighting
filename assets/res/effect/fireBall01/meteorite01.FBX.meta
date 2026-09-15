@@ -1,0 +1,148 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2",
+  "files": [],
+  "subMetas": {
+    "5586c": {
+      "importer": "gltf-mesh",
+      "uuid": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@5586c",
+      "displayName": "",
+      "id": "5586c",
+      "name": "meteorite01.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 102
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "af455": {
+      "importer": "gltf-embeded-image",
+      "uuid": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@af455",
+      "displayName": "",
+      "id": "af455",
+      "name": "meteorite01.jpg.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": false,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".jpg",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "59f96": {
+      "importer": "texture",
+      "uuid": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@59f96",
+      "displayName": "",
+      "id": "59f96",
+      "name": "贴图 #2.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@af455"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c28f0": {
+      "importer": "gltf-material",
+      "uuid": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@c28f0",
+      "displayName": "",
+      "id": "c28f0",
+      "name": "Material #26.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "b5cb0": {
+      "importer": "gltf-scene",
+      "uuid": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@b5cb0",
+      "displayName": "",
+      "id": "b5cb0",
+      "name": "meteorite01.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "meteorite01.jpg",
+        "uri": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@af455"
+      }
+    ],
+    "assetFinder": {
+      "meshes": [
+        "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@5586c"
+      ],
+      "skeletons": [],
+      "textures": [
+        "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@59f96"
+      ],
+      "materials": [
+        "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@c28f0"
+      ],
+      "scenes": [
+        "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@b5cb0"
+      ]
+    },
+    "legacyFbxImporter": true,
+    "fbx": {
+      "smartMaterialEnabled": false,
+      "matchMeshNames": false
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

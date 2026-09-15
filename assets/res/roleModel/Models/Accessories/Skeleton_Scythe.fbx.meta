@@ -1,0 +1,146 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4",
+  "files": [],
+  "subMetas": {
+    "4bd76": {
+      "importer": "gltf-mesh",
+      "uuid": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@4bd76",
+      "displayName": "",
+      "id": "4bd76",
+      "name": "Cylinder.562.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 492
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "48b02": {
+      "importer": "gltf-embeded-image",
+      "uuid": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@48b02",
+      "displayName": "",
+      "id": "48b02",
+      "name": "base_color_texture.image",
+      "userData": {
+        "gltfIndex": 0,
+        "fixAlphaTransparencyArtifacts": true,
+        "hasAlpha": true,
+        "type": "texture"
+      },
+      "ver": "1.0.3",
+      "imported": true,
+      "files": [
+        ".json",
+        ".png"
+      ],
+      "subMetas": {}
+    },
+    "7d6ab": {
+      "importer": "texture",
+      "uuid": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@7d6ab",
+      "displayName": "",
+      "id": "7d6ab",
+      "name": "base_color_texture.texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@48b02"
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "c96cf": {
+      "importer": "gltf-material",
+      "uuid": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@c96cf",
+      "displayName": "",
+      "id": "c96cf",
+      "name": "skeleton.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "4b609": {
+      "importer": "gltf-scene",
+      "uuid": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@4b609",
+      "displayName": "",
+      "id": "4b609",
+      "name": "Skeleton_Scythe.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [
+      {
+        "name": "base_color_texture",
+        "uri": "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@48b02"
+      }
+    ],
+    "fbx": {
+      "smartMaterialEnabled": true
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    },
+    "assetFinder": {
+      "meshes": [
+        "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@4bd76"
+      ],
+      "skeletons": [],
+      "textures": [
+        "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@7d6ab"
+      ],
+      "materials": [
+        "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@c96cf"
+      ],
+      "scenes": [
+        "f6b8a6a5-487b-4dc7-8d11-07584ca7cdc4@4b609"
+      ]
+    }
+  }
+}
