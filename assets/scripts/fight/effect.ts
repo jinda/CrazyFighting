@@ -51,6 +51,12 @@ export class Effect extends Component {
    *
    */
   public play() {
+    //节点来自对象池时，必须清掉上一次生命周期残留的定时器：
+    //否则旧定时器会在新一次播放过程中触发 effectOver，把正在使用的节点回收进池
+    //（注意：这里不能清 _endListenerCb，win01/hitBoom01 的 playOnStart 为 true，
+    //  start() 会在调用方 setEndListener 之后再调一次 play()，清掉会丢回调）
+    this.unscheduleAllCallbacks();
+
     let arrParticle = this.node.getComponentsInChildren(
       ParticleSystemComponent,
     );
@@ -81,7 +87,11 @@ export class Effect extends Component {
       this.node.destroy();
     }
 
-    this._endListenerCb && this._endListenerCb();
+    //取出后置空：保证“播放结束回调”最多只触发一次，
+    //否则同一个节点会被重复 putNode（对象池里出现同一个节点的多份引用）
+    let endCb = this._endListenerCb;
+    this._endListenerCb = null!;
+    endCb && endCb();
   }
 
   /**

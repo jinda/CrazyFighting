@@ -106,10 +106,24 @@ export default class Constants {
     }
 
     //游戏名称
-    static GAME_NAME: 'gangWar';
+    static GAME_NAME = 'crazyFight';
     
     //先设置最多50关
     static MAX_LEVEL = 50;
+
+    //配置表加载兜底超时（毫秒）：超时后走错误分支，避免资源异常时首屏黑屏卡死
+    static LOAD_CONFIG_TIMEOUT = 8000;
+
+    //士兵移动速度换算基数：166.6 = 10000/60帧
+    //原实现中追击分支按“每帧位移”、冲锋分支按“每秒位移”，帧率不同速度就不同，这里统一为按秒计算
+    static MOVE_SPEED_BASE = 166.6;
+
+    //士兵朝向随机扰动幅度（实际扰动为 ±幅度/2）
+    static FIGHTER_DIRECTION_RANDOM = 0.2;
+
+    //物理世界固定步长（秒）与单帧最多步进次数：避免每帧固定 Step 导致高刷新率设备物理推进加速
+    static PHYSICS_STEP = 1 / 30;
+    static PHYSICS_MAX_STEPS = 3;
 
     //基础兵，默认解锁
     static BASE_FIGHTER = 101; 

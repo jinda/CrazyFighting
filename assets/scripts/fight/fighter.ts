@@ -353,6 +353,12 @@ export class Fighter extends Component {
    * @param attacker
    */
   public onDamage(damageValue: number, attacker?: number) {
+    //同一帧可能被多个伤害源命中（近战 + 范围伤害 + 飞行武器），必须幂等：
+    //否则会重复触发 onSomeoneDead → 重复掉落金币、重复播放阵亡缓动
+    if (this.isDead) {
+      return;
+    }
+
     this._hp -= damageValue;
 
     if (this._hp <= 0) {
@@ -368,11 +374,15 @@ export class Fighter extends Component {
    * @memberof Fighter
    */
   public _onDead(killer?: number) {
+    //提前置位 + 重入保护：保证同一帧只结算一次死亡
+    if (this.isDead) {
+      return;
+    }
+    this.isDead = true;
     //播放死亡效果
     this._enterStatus(Constants.FIGHTER_STATUS.DEAD);
 
     this.ndShadow.active = false;
-    this.isDead = true;
     this.rigidBody.destroyBody();
 
     if (this._tweenDead) {
@@ -421,7 +431,7 @@ export class Fighter extends Component {
     //计算出移动到_posFightStartTarget这个位置所需的时间，时间完成后，直接寻找目标，省的卡住
     this._moveStartCostTime =
       this._startOffset.subtract(this.node.position).length() /
-      (this._moveSpeed / 166.6); //166.6 = 10000/60帧
+      (this._moveSpeed / Constants.MOVE_SPEED_BASE); //166.6 = 10000/60帧
 
     this._enterStatus(Constants.FIGHTER_STATUS.CHARGE);
   }
@@ -589,8 +599,10 @@ export class Fighter extends Component {
           this._fighterModel.playAni(Constants.ANI_TYPE.RUN, true);
 
         this._direction.set(offset);
-        this._direction.x += Math.floor(Math.random() * 0.2) - 0.1;
-        this._direction.z += Math.floor(Math.random() * 0.2) - 0.1;
+        //随机扰动 ±0.1：原实现 Math.floor(Math.random() * 0.2) - 0.1 因为 floor 恒为 0，
+        //实际等于常量 -0.1，随机完全失效（人群会朝同一侧偏斜）
+        this._direction.x += (Math.random() - 0.5) * Constants.FIGHTER_DIRECTION_RANDOM;
+        this._direction.z += (Math.random() - 0.5) * Constants.FIGHTER_DIRECTION_RANDOM;
         this._direction.normalize();
 
         this._forward.set(this._direction);
@@ -600,7 +612,7 @@ export class Fighter extends Component {
         this.node.forward = this._forward;
 
         this._direction = this._direction.multiplyScalar(
-          this._moveSpeed / 10000,
+          (this._moveSpeed * deltaTime) / Constants.MOVE_SPEED_BASE,
         );
 
         this._curPos.set(this.node.position);
@@ -638,8 +650,8 @@ export class Fighter extends Component {
         this._direction.set(offset);
 
         //增加值取-0.1～0.1之间
-        this._direction.x += Math.floor(Math.random() * 0.2) - 0.1;
-        this._direction.z += Math.floor(Math.random() * 0.2) - 0.1;
+        this._direction.x += (Math.random() - 0.5) * Constants.FIGHTER_DIRECTION_RANDOM;
+        this._direction.z += (Math.random() - 0.5) * Constants.FIGHTER_DIRECTION_RANDOM;
         this._direction.normalize();
 
         this._forward.set(this._direction);
@@ -650,7 +662,7 @@ export class Fighter extends Component {
 
         //士兵朝向目标位移的向量差
         this._direction = this._direction.multiplyScalar(
-          (this._moveSpeed * deltaTime) / 166.6,
+          (this._moveSpeed * deltaTime) / Constants.MOVE_SPEED_BASE,
         ); //166.6 = 10000/60帧
 
         this._nowPos.set(this.node.worldPosition);

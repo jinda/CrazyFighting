@@ -41,11 +41,14 @@ export class GameLogic {
             case 1: //1个人
                 return [posCell];
             case 2: //2个人
+                //注意：不能用 posCell 原对象做加减。调用方（fighterManager._checkNewCell）传入的可能是
+                //物理射线结果的共享对象 hitPoint，原地修改会污染后续的格子判定，因此一律操作克隆对象
+                let posClone = posCell.clone();
                 let left = posCell.clone();
                 left.z -= Constants.CELL_FIGHTER_SPACING;
-                posCell.z += Constants.CELL_FIGHTER_SPACING;
+                posClone.z += Constants.CELL_FIGHTER_SPACING;
 
-                return [left, posCell];
+                return [left, posClone];
             case 4:
                 let lt = new Vec3(posCell.x - Constants.CELL_FIGHTER_SPACING, posCell.y, posCell.z - Constants.CELL_FIGHTER_SPACING);
                 let rt = new Vec3(posCell.x + Constants.CELL_FIGHTER_SPACING, posCell.y, posCell.z - Constants.CELL_FIGHTER_SPACING);

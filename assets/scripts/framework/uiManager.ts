@@ -69,7 +69,8 @@ export class UIManager {
                     script2.show.apply(script2, args);
                     cb && cb(script2);
                 } else {
-                    throw `查找不到脚本文件${scriptName}`;
+                    //异步/复用路径里抛异常会让整局直接崩掉且无法被上层捕获，这里改为明确报错
+                    console.error(`[UIManager] 查找不到脚本文件${scriptName}，请检查 ${panelPath} 预制体上的脚本组件`);
                 }
 
                 return;
@@ -104,7 +105,7 @@ export class UIManager {
                 script2.show.apply(script2, args);
                 cb && cb(script2);
             } else {
-                throw `查找不到脚本文件${scriptName}`;
+                console.error(`[UIManager] 查找不到脚本文件${scriptName}，请检查 ${panelPath} 预制体上的脚本组件`);
             }
 
             if (isCloseBeforeShow) {

@@ -61,20 +61,18 @@ export class ClientEvent {
     public static dispatchEvent (eventName: string, ...args: any) {
         let handlerList = ClientEvent._handlers[eventName];
 
-        let args1 = [];
-        let i;
-        for (i = 1; i < arguments.length; i++) {
-            args1.push(arguments[i]);
-        }
-
         if (!handlerList) {
             return;
         }
 
-        for (i = 0; i < handlerList.length; i++) {
-            let objHandler = handlerList[i];
-            if (objHandler.handler) {
-                objHandler.handler.apply(objHandler.target, args1);
+        //遍历快照：监听回调里可能会 off() 掉其它监听（引导系统的 WAIT_EVENT 就是这样），
+        //直接遍历原数组会因为 splice 而漏掉后面的监听
+        let arrSnapshot = handlerList.slice();
+
+        for (let i = 0; i < arrSnapshot.length; i++) {
+            let objHandler = arrSnapshot[i];
+            if (objHandler && objHandler.handler) {
+                objHandler.handler.apply(objHandler.target, args);
             }
         }
     };

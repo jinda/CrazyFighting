@@ -264,13 +264,16 @@ export class ResourceUtil {
       "datas/" + fileName,
       null,
       function (err: any, content: TextAsset) {
-        if (err) {
-          error(err.message || err);
+        //失败也必须回调：原来这里直接 return，导致上层（localConfig）的完成计数永远到不了终点，
+        //表现为首屏黑屏卡死且没有任何提示
+        if (err || !content || typeof content.text !== "string") {
+          let errorInfo = err ? (err.message || err) : `text data invalid: ${fileName}`;
+          error(errorInfo);
+          cb(new Error(errorInfo), "");
           return;
         }
 
-        let text: string = content.text;
-        cb(err, text);
+        cb(null, content.text);
       },
     );
   }

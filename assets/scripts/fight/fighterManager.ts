@@ -66,6 +66,9 @@ export class FighterManager extends Component {
   private _outRay1: any = new geometry.Ray(); //射线
   private _curTouchPos: Vec2 = new Vec2(); //touchMove触摸移动的位置
 
+  //物理步长累加器：按固定步长推进物理世界，避免设备帧率影响物理速度
+  private _physicsAccumulator: number = 0;
+
   onEnable() {
     ClientEvent.on(Constants.EVENT_NAME.FIGHT_START, this._fightStart, this);
     ClientEvent.on(Constants.EVENT_NAME.FIGHT_RESET, this._fightReset, this);
@@ -159,6 +162,7 @@ export class FighterManager extends Component {
     this._preTime = 0;
     this._curTime = 0;
     this._timeScale = 1;
+    this._physicsAccumulator = 0;
 
     //第1关特殊处理
     this.cameraFollow.initCamera(PlayerData.instance.playerInfo.level === 1);
@@ -1354,12 +1358,32 @@ export class FighterManager extends Component {
 
   update(deltaTime: number) {
     // Your update function goes here.
-    if (this.isGameStart) {
-      this._checkTimeScale(deltaTime);
+    //暂停/结束时物理世界不步进，并清空累加器，避免恢复后一次性补步进
+    if (!this.isGameStart || this.isGamePause || this.isGameOver) {
+      this._physicsAccumulator = 0;
+      return;
+    }
 
-      if (this._world) {
-        //参数：1、逻辑帧的时间长度（1秒30帧），2、速度计算迭代次数（迭代的次数越多，碰撞传导的速度越快），3、位移计算迭代次数（迭代的次数越多，解决刚体重叠的速度越快）
-        this._world.Step(0.034, 6, 2);
+    this._checkTimeScale(deltaTime);
+
+    if (this._world) {
+      //固定步长 + 累加器：物理推进只与真实时间有关，不受设备帧率影响
+      this._physicsAccumulator += deltaTime;
+
+      let steps = 0;
+      //参数：1、逻辑帧的时间长度（1秒30帧），2、速度计算迭代次数（迭代的次数越多，碰撞传导的速度越快），3、位移计算迭代次数（迭代的次数越多，解决刚体重叠的速度越快）
+      while (
+        this._physicsAccumulator >= Constants.PHYSICS_STEP &&
+        steps < Constants.PHYSICS_MAX_STEPS
+      ) {
+        this._world.Step(Constants.PHYSICS_STEP, 6, 2);
+        this._physicsAccumulator -= Constants.PHYSICS_STEP;
+        steps++;
+      }
+
+      if (steps >= Constants.PHYSICS_MAX_STEPS) {
+        //严重卡顿（例如切后台回来）时丢弃剩余时间，避免追帧雪崩
+        this._physicsAccumulator = 0;
       }
     }
   }
