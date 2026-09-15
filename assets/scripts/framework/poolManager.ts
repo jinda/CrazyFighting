@@ -1,5 +1,5 @@
 import { _decorator, Prefab, Node, instantiate, NodePool } from "cc";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("PoolManager")
 export class PoolManager {
@@ -10,8 +10,8 @@ export class PoolManager {
     // @property
     // serializableDummy = 0;
 
-    private _dictPool: any = {}
-    private _dictPrefab: any = {}
+    private _dictPool: any = {};
+    private _dictPrefab: any = {};
 
     static _instance: PoolManager;
     /* class member could be defined like this */
@@ -21,7 +21,7 @@ export class PoolManager {
     // @property
     // serializableDummy = 0;
 
-    static get instance () {
+    static get instance() {
         if (this._instance) {
             return this._instance;
         }
@@ -33,14 +33,14 @@ export class PoolManager {
     /**
      * 根据预设从对象池中获取对应节点
      */
-    public getNode (prefab: Prefab, parent: Node) {
+    public getNode(prefab: Prefab, parent: Node) {
         let name = prefab.name;
-         //@ts-ignore
-         if (!prefab.position) {
+        //@ts-ignore
+        if (!prefab.position) {
             //@ts-ignore
             name = prefab.data.name;
         }
-        
+
         this._dictPrefab[name] = prefab;
         let node = null;
         if (this._dictPool.hasOwnProperty(name)) {
@@ -67,11 +67,11 @@ export class PoolManager {
     /**
      * 将对应节点放回对象池中
      */
-    public putNode (node: Node) {
+    public putNode(node: Node) {
         if (!node) {
             return;
         }
-        let name = node.name; 
+        let name = node.name;
         let pool = null;
         if (this._dictPool.hasOwnProperty(name)) {
             //已有对应的对象池
@@ -88,7 +88,7 @@ export class PoolManager {
     /**
      * 根据名称，清除对应对象池
      */
-    public clearPool (name: string) {
+    public clearPool(name: string) {
         if (this._dictPool.hasOwnProperty(name)) {
             let pool = this._dictPool[name];
             pool.clear();

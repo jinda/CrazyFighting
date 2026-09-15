@@ -1,4 +1,19 @@
-import { _decorator, Component, Node, SpriteFrame, UITransformComponent, Vec3, view, Tween, SpriteComponent, Color, EventTouch, find, rect, tween } from "cc";
+import {
+    _decorator,
+    Component,
+    Node,
+    SpriteFrame,
+    UITransformComponent,
+    Vec3,
+    view,
+    Tween,
+    SpriteComponent,
+    Color,
+    EventTouch,
+    find,
+    rect,
+    tween,
+} from "cc";
 import { ClientEvent } from "../../framework/clientEvent";
 import { GuideManager } from "./guideManager";
 const { ccclass, property } = _decorator;
@@ -6,52 +21,52 @@ const { ccclass, property } = _decorator;
 @ccclass("guide")
 export class guide extends Component {
     @property(Node)
-    public ndBackground: Node = null!;//黑色背景
+    public ndBackground: Node = null!; //黑色背景
 
     @property(Node)
-    public ndMask: Node = null!;//遮罩节点
+    public ndMask: Node = null!; //遮罩节点
 
     @property(Node)
-    public ndHand: Node = null!;//手势节点
+    public ndHand: Node = null!; //手势节点
 
     @property(Node)
-    public ndFrame: Node = null!;//可操作区域/可视区节点
+    public ndFrame: Node = null!; //可操作区域/可视区节点
 
     @property(SpriteFrame)
-    public sfForce: SpriteFrame = null!;//图标1
+    public sfForce: SpriteFrame = null!; //图标1
 
     @property(SpriteFrame)
-    public sfUnForce: SpriteFrame = null!;//图标2
+    public sfUnForce: SpriteFrame = null!; //图标2
 
-    private _subGuideInfo: any = null!;//子引导步骤内容
-    private _ndTarget: Node = null!;//目标节点
-    private _targetContent: any = null!;//目标区域和位置
-    private _refreshPosTimer: number = null!;//定时器
-    private _spHand: SpriteComponent = null!;//手势节点的sprite组件
-    private _ndRecvEvent: Node = null!;//接收事件的节点
-    private _curWaitEvent: string = null!;//事件
-    private _curWaitResetEvent: string = null!;//事件
-    private _isForce: boolean = true;//是否强制指引，就是他不能做其他操作，一定必须点那个之后才能继续
-    private _isSkipByAnyWhere: boolean = false;//点击任何区域跳过
-    private _isHideBlack: boolean = false;//隐藏黑色背景
-    private _isTouchStart: boolean = false;//是否开始点击
-    private _isDragStart: boolean = false;//是否开始拖动
-    private _isTouch: boolean = false;//是否点击
-    private _isShowAni: boolean = false;//是否播放缓动效果
-    private _isPlayingAni: boolean = false;//是否正在播放缓动效果
-    private _tweenFrame: any = null!;//缓动对象
-    private _tweenHand: any = null!;//缓动对象
-    private _tweenDrag: any = null!;//缓动对象
-    private _tweenFade: any = null!;//缓动对象
-    private _colorHand: Color = new Color(255, 255, 255, 255);//手势节点颜色
-    private _oldPos: Vec3 = new Vec3();//老位置
-    private _endPos: Vec3 = new Vec3();//结束位置
-    private _dragScale1: Vec3 = new Vec3(1, 1, 1);//缩放大小1
-    private _dragScale2: Vec3 = new Vec3(1.2, 1.2, 1.2);//缩放大小2
-    private _handPos1: Vec3 = new Vec3();//手势节点缓动位置1
-    private _handPos2: Vec3 = new Vec3();//手势节点缓动位置2
-    private _touchPos1: Vec3 = new Vec3();//触碰位置1
-    private _touchPos2: Vec3 = new Vec3();//触碰位置2
+    private _subGuideInfo: any = null!; //子引导步骤内容
+    private _ndTarget: Node = null!; //目标节点
+    private _targetContent: any = null!; //目标区域和位置
+    private _refreshPosTimer: number = null!; //定时器
+    private _spHand: SpriteComponent = null!; //手势节点的sprite组件
+    private _ndRecvEvent: Node = null!; //接收事件的节点
+    private _curWaitEvent: string = null!; //事件
+    private _curWaitResetEvent: string = null!; //事件
+    private _isForce: boolean = true; //是否强制指引，就是他不能做其他操作，一定必须点那个之后才能继续
+    private _isSkipByAnyWhere: boolean = false; //点击任何区域跳过
+    private _isHideBlack: boolean = false; //隐藏黑色背景
+    private _isTouchStart: boolean = false; //是否开始点击
+    private _isDragStart: boolean = false; //是否开始拖动
+    private _isTouch: boolean = false; //是否点击
+    private _isShowAni: boolean = false; //是否播放缓动效果
+    private _isPlayingAni: boolean = false; //是否正在播放缓动效果
+    private _tweenFrame: any = null!; //缓动对象
+    private _tweenHand: any = null!; //缓动对象
+    private _tweenDrag: any = null!; //缓动对象
+    private _tweenFade: any = null!; //缓动对象
+    private _colorHand: Color = new Color(255, 255, 255, 255); //手势节点颜色
+    private _oldPos: Vec3 = new Vec3(); //老位置
+    private _endPos: Vec3 = new Vec3(); //结束位置
+    private _dragScale1: Vec3 = new Vec3(1, 1, 1); //缩放大小1
+    private _dragScale2: Vec3 = new Vec3(1.2, 1.2, 1.2); //缩放大小2
+    private _handPos1: Vec3 = new Vec3(); //手势节点缓动位置1
+    private _handPos2: Vec3 = new Vec3(); //手势节点缓动位置2
+    private _touchPos1: Vec3 = new Vec3(); //触碰位置1
+    private _touchPos2: Vec3 = new Vec3(); //触碰位置2
 
     start() {
         this._enableIntercept(true);
@@ -96,7 +111,7 @@ export class guide extends Component {
      * 展示界面
      * @param subGuideInfo 子引导步骤内容
      * @param isShowAni 是否播放缓动效果
-     * @returns 
+     * @returns
      */
     public show(subGuideInfo: any, isShowAni: boolean = true) {
         this._subGuideInfo = subGuideInfo;
@@ -111,7 +126,8 @@ export class guide extends Component {
         if (subGuideInfo.getNodeFun) {
             let getNodeFun = subGuideInfo.getNodeFun.nodeFun;
             this._ndTarget = getNodeFun.apply(subGuideInfo.getNodeFun.nodeOwner, subGuideInfo.getNodeFun.nodeParam);
-        } else if (subGuideInfo.getPosFun) { //如果有getNodeFun(用于搜索位置的函数)，获取目标位置和区域
+        } else if (subGuideInfo.getPosFun) {
+            //如果有getNodeFun(用于搜索位置的函数)，获取目标位置和区域
             let getPosFun = subGuideInfo.getPosFun.posFun;
             this._targetContent = getPosFun.apply(subGuideInfo.getPosFun.posOwner, subGuideInfo.getPosFun.posParam);
         }
@@ -200,7 +216,7 @@ export class guide extends Component {
 
     /**
      * 根据目标节点或者目标位置来设置遮罩区域、手势引导、可操作区域节点状态
-     * @returns 
+     * @returns
      */
     private _updatePosByTargetNode() {
         let maskPos = null;
@@ -303,12 +319,14 @@ export class guide extends Component {
             this._isPlayingAni = true;
 
             tween(UIComNdMask)
-            .to(0.5, { width: width, height: height })
-            .call(() => {
-                this._isPlayingAni = false;
-            }).start();
+                .to(0.5, { width: width, height: height })
+                .call(() => {
+                    this._isPlayingAni = false;
+                })
+                .start();
 
-            this._tweenFrame = new Tween(UIComNdFrame).to(0.5, { width: width, height: height })
+            this._tweenFrame = new Tween(UIComNdFrame)
+                .to(0.5, { width: width, height: height })
                 .delay(1)
                 .call(() => {
                     this.ndBackground.active = false;
@@ -329,7 +347,7 @@ export class guide extends Component {
 
     /**
      * 展示合并操作
-     * @returns 
+     * @returns
      */
     private _showCombineHand() {
         this.ndHand.active = true;
@@ -379,7 +397,10 @@ export class guide extends Component {
             .call(() => {
                 this.ndHand.position = posStart;
                 this._spHand.color = Color.WHITE;
-            }).union().repeatForever().start();
+            })
+            .union()
+            .repeatForever()
+            .start();
     }
 
     /**
@@ -407,7 +428,11 @@ export class guide extends Component {
             return;
         }
 
-        if (this._subGuideInfo.isIntroduction && !this._subGuideInfo.isShowHandOnTips && !this._subGuideInfo.isShowHandOnFrame) {
+        if (
+            this._subGuideInfo.isIntroduction &&
+            !this._subGuideInfo.isShowHandOnTips &&
+            !this._subGuideInfo.isShowHandOnFrame
+        ) {
             this.ndHand.active = false;
             return;
         }
@@ -427,7 +452,7 @@ export class guide extends Component {
         let winSize = view.getViewportRect();
 
         let UIComHand = this.ndHand.getComponent(UITransformComponent) as UITransformComponent;
-        
+
         //手势节点长宽
         let size = UIComHand.contentSize;
 
@@ -435,8 +460,8 @@ export class guide extends Component {
             pos.x = winSize.width / 2 - size.width;
         }
 
-        if (pos.y < - (winSize.height / 2 - size.height)) {
-            pos.y = - (winSize.height / 2 - size.height);
+        if (pos.y < -(winSize.height / 2 - size.height)) {
+            pos.y = -(winSize.height / 2 - size.height);
         }
 
         this.ndHand.setPosition(pos);
@@ -466,8 +491,8 @@ export class guide extends Component {
 
     /**
      * 本节点touchStart事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onBgTouchStart(event: EventTouch) {
         if (this._isPlayingAni) {
@@ -494,15 +519,18 @@ export class guide extends Component {
 
     /**
      * 本节点touchMove事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onBgTouchMove(event: EventTouch) {
         if (this._isPlayingAni) {
             return;
         }
 
-        if (this._isTouchStart && (this._subGuideInfo.combineGuide || this._checkIsTouchNode(event, this._targetContent))) {
+        if (
+            this._isTouchStart &&
+            (this._subGuideInfo.combineGuide || this._checkIsTouchNode(event, this._targetContent))
+        ) {
             if (this._ndRecvEvent) {
                 this._simTouchByEvent(Node.EventType.TOUCH_MOVE, event, this._ndRecvEvent);
             }
@@ -517,8 +545,8 @@ export class guide extends Component {
 
     /**
      * 本节点touchCancel事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onBgTouchCancel(event: EventTouch) {
         if (this._isPlayingAni) {
@@ -536,8 +564,8 @@ export class guide extends Component {
 
     /**
      * 本节点touchEnd事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onBgTouchEnd(event: EventTouch) {
         if (this._isPlayingAni) {
@@ -576,9 +604,9 @@ export class guide extends Component {
 
     /**
      * 检查是否点击到目标节点/区域
-     * @param touchEvent 
-     * @param content 
-     * @returns 
+     * @param touchEven
+     * @param conten
+     * @returns
      */
     private _checkIsTouchNode(touchEvent: EventTouch, content: any) {
         if (!content) {
@@ -589,7 +617,12 @@ export class guide extends Component {
         this._touchPos2.set(content.pos.x, content.pos.y, 0);
         let posContent = this.node.getComponent(UITransformComponent)?.convertToWorldSpaceAR(this._touchPos2) as Vec3;
         //操作区域
-        let box = rect(posContent.x - content.width / 2, posContent.y - content.height / 2, content.width, content.height);
+        let box = rect(
+            posContent.x - content.width / 2,
+            posContent.y - content.height / 2,
+            content.width,
+            content.height,
+        );
         //检查触摸点是否包含在目标范围内
         if (box.contains(pos)) {
             return true;
@@ -600,15 +633,13 @@ export class guide extends Component {
 
     /**
      * 可操作区域节点touchStart事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onTouchStart(event: EventTouch) {
         if (this._isPlayingAni) {
             return;
         }
-
-        console.log("shadows touchStart");
 
         if (this._isTouch) {
             return;
@@ -619,18 +650,16 @@ export class guide extends Component {
             this._simTouchByEvent(Node.EventType.TOUCH_START, event, this._ndTarget);
         }
     }
-    
+
     /**
      * 可操作区域节点touchEnd事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onTouchEnd(event: EventTouch) {
         if (this._isPlayingAni) {
             return;
         }
-
-        console.log("shadows touchEnd");
 
         if (this._isTouch) {
             return;
@@ -647,15 +676,13 @@ export class guide extends Component {
 
     /**
      * 可操作区域节点touchCancel事件回调
-     * @param event 
-     * @returns 
+     * @param even
+     * @returns
      */
     private _onTouchCancel(event: EventTouch) {
         if (this._isPlayingAni) {
             return;
         }
-
-        console.log("shadows touchCancel");
 
         //获取目前所要点击的节点，派发点击事件
         if (this._ndTarget) {
@@ -665,13 +692,13 @@ export class guide extends Component {
 
     /**
      * 模拟点击
-     * @param type 
-     * @param oldEvent 
-     * @param node 
+     * @param type
+     * @param oldEven
+     * @param node
      */
     private _simTouchByEvent(type: any, oldEvent: EventTouch, node?: Node) {
-        if (typeof (oldEvent.getTouches) !== "function") {
-            console.error("oldEvent.getTouches is not a function!type(" + typeof (oldEvent.getTouches) + ")");
+        if (typeof oldEvent.getTouches !== "function") {
+            console.error("oldEvent.getTouches is not a function!type(" + typeof oldEvent.getTouches + ")");
         }
 
         // if (cc.sys.isNative && type === cc.Node.EventType.TOUCH_END) {

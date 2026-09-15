@@ -9,20 +9,13 @@ const { ccclass, property } = _decorator;
 //在线奖励脚本
 @ccclass("homeUIOnline")
 export class homeUIOnline extends Component {
-    /* class member could be defined like this */
-    // dummy = '';
-
-    /* use `property` decorator if your want the member to be serializable */
-    // @property
-    // serializableDummy = 0;
-
     @property(LabelComponent)
-    public lbGold: LabelComponent = null!;//金币文本组件
+    public lbGold: LabelComponent = null!; //金币文本组件
 
     @property(homeUI)
-    public home: homeUI = null!;//homeUI脚本
+    public home: homeUI = null!; //homeUI脚本
 
-    start () {
+    start() {
         // Your initialization goes here.
 
         GameLogic.startOnlineReward();
@@ -30,28 +23,27 @@ export class homeUIOnline extends Component {
         this._updateReward();
     }
 
-    onEnable () {
+    onEnable() {
         ClientEvent.on(Constants.EVENT_NAME.UPDATE_ONLINE_REWARD, this._updateReward, this);
     }
 
-    onDisable () {
+    onDisable() {
         ClientEvent.off(Constants.EVENT_NAME.UPDATE_ONLINE_REWARD, this._updateReward, this);
     }
 
     /*
      * 更新在线奖励的值
      */
-    private _updateReward () {
+    private _updateReward() {
         this.lbGold.string = PlayerData.instance.getOnlineReward().toString();
     }
 
     /**
      * 点击领取按钮
      */
-    public onBtnOnlineClick () {
+    public onBtnOnlineClick() {
         //显示奖励界面
-        UIManager.instance.showDialog('home/online', [()=>{
-        }]);
+        UIManager.instance.showDialog("home/online", [() => {}]);
 
         this.home.hideHand();
     }

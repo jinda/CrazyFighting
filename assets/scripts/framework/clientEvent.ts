@@ -1,5 +1,5 @@
 import { _decorator } from "cc";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("ClientEvent")
 export class ClientEvent {
@@ -11,8 +11,8 @@ export class ClientEvent {
      * @param {function} handler 监听函数
      * @param {object} target 监听目标
      */
-    public static on (eventName: string, handler: Function, target: any) {
-        let objHandler: {} = {handler: handler, target: target};
+    public static on(eventName: string, handler: Function, target: any) {
+        let objHandler: {} = { handler: handler, target: target };
         let handlerList: Array<any> = ClientEvent._handlers[eventName];
         if (!handlerList) {
             handlerList = [];
@@ -29,7 +29,7 @@ export class ClientEvent {
         handlerList.push(objHandler);
 
         return handlerList.length;
-    };
+    }
 
     /**
      * 取消监听
@@ -37,7 +37,7 @@ export class ClientEvent {
      * @param {function} handler 监听函数
      * @param {object} target 监听目标
      */
-    public static off (eventName: string, handler: Function, target: any) {
+    public static off(eventName: string, handler: Function, target: any) {
         let handlerList = ClientEvent._handlers[eventName];
 
         if (!handlerList) {
@@ -51,14 +51,14 @@ export class ClientEvent {
                 break;
             }
         }
-    };
+    }
 
     /**
      * 分发事件
      * @param {string} eventName 分发事件名
      * @param  {...any} params 分发事件参数
      */
-    public static dispatchEvent (eventName: string, ...args: any) {
+    public static dispatchEvent(eventName: string, ...args: any) {
         let handlerList = ClientEvent._handlers[eventName];
 
         if (!handlerList) {
@@ -75,5 +75,5 @@ export class ClientEvent {
                 objHandler.handler.apply(objHandler.target, args);
             }
         }
-    };
+    }
 }

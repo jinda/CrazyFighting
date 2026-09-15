@@ -3,7 +3,6 @@ const { ccclass } = _decorator;
 
 @ccclass
 export default class Time {
-
     /**
      * 格式化日期
      * @method formatDate
@@ -17,19 +16,22 @@ export default class Time {
      *                              yyyy-MM-dd hh:mm:ss 或 yyyy年MM月dd日 hh时mm分ss秒
      *                              dd天 hh:mm:ss
      */
-    public static formatDate (date: Date, fmt: string) {
+    public static formatDate(date: Date, fmt: string) {
         const o: any = {
-            'M+': date.getMonth() + 1, // 月份
-            'd+': date.getDate(), // 日
-            'h+': date.getHours(), // 小时
-            'm+': date.getMinutes(), // 分
-            's+': date.getSeconds(), // 秒
-            'q+': Math.floor((date.getMonth() + 3) / 3), // 季度
-            'S': date.getMilliseconds(), // 毫秒
+            "M+": date.getMonth() + 1, // 月份
+            "d+": date.getDate(), // 日
+            "h+": date.getHours(), // 小时
+            "m+": date.getMinutes(), // 分
+            "s+": date.getSeconds(), // 秒
+            "q+": Math.floor((date.getMonth() + 3) / 3), // 季度
+            S: date.getMilliseconds(), // 毫秒
         };
 
-        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, (`${date.getFullYear()}`).substr(4 - RegExp.$1.length));
-        for (const k in o) { if (new RegExp(`(${k})`).test(fmt)) fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? (o[k]) : ((`00${o[k]}`).substr((`${o[k]}`).length))); }
+        if (/(y+)/.test(fmt)) fmt = fmt.replace(RegExp.$1, `${date.getFullYear()}`.substr(4 - RegExp.$1.length));
+        for (const k in o) {
+            if (new RegExp(`(${k})`).test(fmt))
+                fmt = fmt.replace(RegExp.$1, RegExp.$1.length === 1 ? o[k] : `00${o[k]}`.substr(`${o[k]}`.length));
+        }
         return fmt;
     }
 
@@ -41,7 +43,7 @@ export default class Time {
      * @returns {number}
      * @method getDaysBySeconds
      */
-    public static getDaysBySeconds (seconds: number) {
+    public static getDaysBySeconds(seconds: number) {
         return Math.floor(seconds / Time.SECONDS_PER_DAY);
     }
 
@@ -51,16 +53,16 @@ export default class Time {
      * @returns {number}
      * @method getSecondsFromDays
      */
-    public static getSecondsFromDays (days: number) {
+    public static getSecondsFromDays(days: number) {
         return days * Time.SECONDS_PER_DAY;
     }
 
     /**
      * 根据时间戳获取date数据
      * @param {number} time  时间戳
-     * @returns {Date} 
+     * @returns {Date}
      **/
-    public static getDateInfo (time: number) {
+    public static getDateInfo(time: number) {
         return new Date(time);
     }
 
@@ -71,9 +73,9 @@ export default class Time {
      */
     public static getTimeStamp(isMillisecond: boolean) {
         if (isMillisecond) {
-            return (new Date()).getTime();
+            return new Date().getTime();
         }
-        return Math.floor((new Date()).getTime() / 1000);
+        return Math.floor(new Date().getTime() / 1000);
     }
 
     /**
@@ -83,7 +85,7 @@ export default class Time {
      * @returns {Date}
      * @method convertToDate
      */
-    public static convertToDate (timeStamp: string|number, isMillisecond: boolean) {
+    public static convertToDate(timeStamp: string | number, isMillisecond: boolean) {
         timeStamp = Number(timeStamp);
         timeStamp = Math.floor(timeStamp);
 
@@ -99,45 +101,45 @@ export default class Time {
      * @param date 时间
      * @method formatDayToEnglish
      */
-    public static formatDayToEnglish (date: Date) {
+    public static formatDayToEnglish(date: Date) {
         let month;
         let day;
         switch (date.getMonth()) {
             case 0:
-                month = 'January';
+                month = "January";
                 break;
             case 1:
-                month = ' February';
+                month = " February";
                 break;
             case 2:
-                month = 'March';
+                month = "March";
                 break;
             case 3:
-                month = 'April';
+                month = "April";
                 break;
             case 4:
-                month = 'May';
+                month = "May";
                 break;
             case 5:
-                month = 'June';
+                month = "June";
                 break;
             case 6:
-                month = 'July';
+                month = "July";
                 break;
             case 7:
-                month = 'August';
+                month = "August";
                 break;
             case 8:
-                month = 'September';
+                month = "September";
                 break;
             case 9:
-                month = 'October';
+                month = "October";
                 break;
             case 10:
-                month = 'November';
+                month = "November";
                 break;
             case 11:
-                month = 'December';
+                month = "December";
                 break;
             default:
         }
@@ -151,7 +153,7 @@ export default class Time {
         } else {
             day = `${date.getDate()}th`;
         }
-        let r = '';
+        let r = "";
         r += `${day} `;
         r += `${month},`;
         r += `${date.getFullYear()}`;
@@ -160,7 +162,7 @@ export default class Time {
 
     /**
      * 获取指定日期在当年的第几周
-     * @param {Date} dt
+     * @param {Date} d
      * @returns {number} 第几周
      * @method getWeekOfYear
      */
@@ -168,7 +170,7 @@ export default class Time {
         const d1 = dt;
         const d2 = new Date(dt.getFullYear(), 0, 1);
         const d = Math.round((d1.getTime() - d2.getTime()) / 86400000);
-        return Math.ceil((d + ((d2.getDay() + 1) - 1)) / 7);
+        return Math.ceil((d + (d2.getDay() + 1 - 1)) / 7);
     }
 
     /**
@@ -219,7 +221,11 @@ export default class Time {
         const date = new Date(time * (isMillisecond ? 1 : 1000));
         const today = new Date();
         // 如果是今天注册
-        return date.getDate() === today.getDate() && date.getMonth() === today.getMonth() && date.getFullYear() === today.getFullYear();
+        return (
+            date.getDate() === today.getDate() &&
+            date.getMonth() === today.getMonth() &&
+            date.getFullYear() === today.getFullYear()
+        );
     }
 
     /**
@@ -228,12 +234,12 @@ export default class Time {
      * @param {String|Number} end 结束时间。带有时区信息
      * @method isNowValid
      */
-    public static isNowValid (start: string|number, end: string|number) {
+    public static isNowValid(start: string | number, end: string | number) {
         const startTime = new Date(start);
         const endTime = new Date(end);
         let result = false;
 
-        if (`${startTime.getDate()}` !== 'NaN' && `${endTime.getDate()}` !== 'NaN') {
+        if (`${startTime.getDate()}` !== "NaN" && `${endTime.getDate()}` !== "NaN") {
             const curDate = new Date();
             result = curDate < endTime && curDate > startTime;
         }
@@ -246,7 +252,7 @@ export default class Time {
      * @returns {boolean}
      * @method isNewDay
      */
-    public static isNewDay (date: Date) {
+    public static isNewDay(date: Date) {
         const oldDate = new Date(date);
         const curDate = new Date();
 

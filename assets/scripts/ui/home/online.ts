@@ -1,4 +1,4 @@
-import { _decorator, Component, LabelComponent, SpriteFrame, SpriteComponent } from "cc";
+import { _decorator, Component, LabelComponent } from "cc";
 import { PlayerData } from "../../framework/playerData";
 import { GameLogic } from "../../framework/gameLogic";
 import { UIManager } from "../../framework/uiManager";
@@ -8,31 +8,24 @@ const { ccclass, property } = _decorator;
 //在线奖励脚本
 @ccclass("online")
 export class online extends Component {
-    /* class member could be defined like this */
-    // dummy = '';
-
-    /* use `property` decorator if your want the member to be serializable */
-    // @property
-    // serializableDummy = 0;
+    @property(LabelComponent)
+    public lbGold: LabelComponent = null!; //金币文本组件
 
     @property(LabelComponent)
-    public lbGold: LabelComponent = null!;//金币文本组件
+    public lbGoldDouble: LabelComponent = null!; //双倍金币文本组件
 
-    @property(LabelComponent)
-    public lbGoldDouble: LabelComponent = null!;//双倍金币文本组件
+    private _gold: number = 0; //金币数量
+    private _callback: Function = null!; //回调函数
 
-    private _gold: number = 0;//金币数量
-    private _callback: Function = null!;//回调函数
-
-    start () {
+    start() {
         // Your initialization goes here.
     }
 
     /**
      * 展示该界面
-     * @param callback 
+     * @param callback
      */
-    public show (callback: Function) {
+    public show(callback: Function) {
         this._callback = callback;
         this._gold = PlayerData.instance.getOnlineReward();
 
@@ -43,7 +36,7 @@ export class online extends Component {
     /**
      * 点击普通领取按钮
      */
-    public onBtnNormalClick () {
+    public onBtnNormalClick() {
         //显示奖励界面
         this.reward(false);
     }
@@ -52,7 +45,7 @@ export class online extends Component {
      * 点击双倍领取按钮
      * @memberof online
      */
-    public onBtnDoubleClick () {
+    public onBtnDoubleClick() {
         //双倍奖励
         this.reward(true);
     }
@@ -61,8 +54,8 @@ export class online extends Component {
      * 获得奖励
      * @param isDouble 是否双倍
      */
-    public reward (isDouble: boolean) {
-        GameLogic.addGold(isDouble? this._gold * 3 : this._gold);
+    public reward(isDouble: boolean) {
+        GameLogic.addGold(isDouble ? this._gold * 3 : this._gold);
 
         PlayerData.instance.reduceOnlineReward(this._gold);
 
@@ -75,15 +68,15 @@ export class online extends Component {
     /**
      * 点击关闭按钮
      */
-    public onBtnCloseClick () {
+    public onBtnCloseClick() {
         this._close();
     }
 
     /**
      * 关闭该界面
      */
-    private _close () {
-        UIManager.instance.hideDialog('home/online');
+    private _close() {
+        UIManager.instance.hideDialog("home/online");
         this._callback && this._callback();
     }
 

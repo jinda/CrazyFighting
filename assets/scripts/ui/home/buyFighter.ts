@@ -12,13 +12,13 @@ const { ccclass, property } = _decorator;
 @ccclass("buyFighter")
 export class buyFighter extends Component {
     @property(SpriteComponent)
-    public spCardDouble: SpriteComponent = null!;//士兵图标组件
+    public spCardDouble: SpriteComponent = null!; //士兵图标组件
 
-    private _fighterId: number = 0;//士兵编号/种类
-    private _pos: number = 0;//购买后士兵放在指定格子的位置
-    private _callback: Function = null!;//回调函数
+    private _fighterId: number = 0; //士兵编号/种类
+    private _pos: number = 0; //购买后士兵放在指定格子的位置
+    private _callback: Function = null!; //回调函数
 
-    start () {
+    start() {
         // Your initialization goes here.
     }
 
@@ -27,9 +27,9 @@ export class buyFighter extends Component {
      * @param fighterId 士兵编号/种类
      * @param pos 阵型上格子的位置
      * @param callback 回调函数
-     * @returns 
+     * @returns
      */
-    public show (fighterId: number, pos: number, callback: Function) {
+    public show(fighterId: number, pos: number, callback: Function) {
         this._fighterId = fighterId;
         this._pos = pos;
         this._callback = callback;
@@ -38,11 +38,11 @@ export class buyFighter extends Component {
             this.onBtnNormalClick();
             return;
         }
-        
-        let fighter = localConfig.instance.queryByID('fighter', this._fighterId.toString());
+
+        let fighter = localConfig.instance.queryByID("fighter", this._fighterId.toString());
 
         //展示对应卡片
-        ResourceUtil.getCard(fighter['type'], (err: any, sf: any)=>{
+        ResourceUtil.getCard(fighter["type"], (err: any, sf: any) => {
             if (this.spCardDouble.node.isValid) {
                 this.spCardDouble.spriteFrame = sf;
             }
@@ -52,10 +52,9 @@ export class buyFighter extends Component {
     /**
      * 点击购买按钮
      */
-    public onBtnNormalClick () {
-
+    public onBtnNormalClick() {
         //关闭自身界面
-        UIManager.instance.hideDialog('home/buyFighter');
+        UIManager.instance.hideDialog("home/buyFighter");
 
         //数据修改
         PlayerData.instance.addFighter(this._pos, this._fighterId);

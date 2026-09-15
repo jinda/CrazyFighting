@@ -1,0 +1,22 @@
+# 编辑器统一约定（VSCode / WebStorm / 其它 IDE 自动识别）
+# 与 .prettierrc 保持一致：缩进 4 空格、LF、去行尾空白、文件末尾留空行
+# 注意：tabWidth / indent_size 是"全仓统一缩进"的唯一开关，A/B/C/D 决策确定后两个文件一起改
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+insert_final_newline = true
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.md]
+trim_trailing_whitespace = false
+
+# Cocos Creator 生成的资源文件不要动格式（由编辑器接管）
+[*.meta]
+insert_final_newline = true
+
+[*.{prefab,scene,anim,effect}]
+trim_trailing_whitespace = false

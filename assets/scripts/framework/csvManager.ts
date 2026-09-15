@@ -1,29 +1,24 @@
 import { _decorator } from "cc";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 let CELL_DELIMITERS = [",", ";", "\t", "|", "^"];
 let LINE_DELIMITERS = ["\r\n", "\r", "\n"];
 
-let getter = function (index: any) {
-    return ("d[" + index + "]");
-};
-
-let getterCast = function(value: any, index: any, cast: any, d: any) {
-
+let getterCast = function (value: any, index: any, cast: any, d: any) {
     if (cast instanceof Array) {
         if (cast[index] === "number") {
             return Number(d[index]);
         } else if (cast[index] === "boolean") {
-            return d[index] === "true" ||  d[index] === "t" || d[index] === "1";
+            return d[index] === "true" || d[index] === "t" || d[index] === "1";
         } else {
             return d[index];
         }
     } else {
         if (!isNaN(Number(value))) {
             return Number(d[index]);
-        } else if (value == "false" || value == "true" || value == "t" || value == "f") {
-            return d[index] === "true" ||  d[index] === "t" || d[index] === "1";
+        } else if (value === "false" || value === "true" || value === "t" || value === "f") {
+            return d[index] === "true" || d[index] === "t" || d[index] === "1";
         } else {
             return d[index];
         }
@@ -34,15 +29,15 @@ let CSV = {
     //
 
     /* =========================================
-        * Constants ===============================
-        * ========================================= */
+     * Constants ===============================
+     * ========================================= */
 
     STANDARD_DECODE_OPTS: {
         skip: 0,
         limit: false,
         header: false,
         cast: false,
-        comment: ""
+        comment: "",
     },
 
     STANDARD_ENCODE_OPTS: {
@@ -50,7 +45,7 @@ let CSV = {
         newline: LINE_DELIMITERS[0],
         skip: 0,
         limit: false,
-        header: false
+        header: false,
     },
 
     quoteMark: '"',
@@ -58,8 +53,8 @@ let CSV = {
     quoteRegex: /"/g,
 
     /* =========================================
-        * Utility Functions =======================
-        * ========================================= */
+     * Utility Functions =======================
+     * ========================================= */
     assign: function () {
         let args = Array.prototype.slice.call(arguments);
         let base = args[0];
@@ -90,18 +85,18 @@ let CSV = {
         return limit === false ? len : limit;
     },
 
-    buildObjectConstructor: function(fields: any, sample: any, cast: any) {
-        return function(d: any) {
+    buildObjectConstructor: function (fields: any, sample: any, cast: any) {
+        return function (d: any) {
             let object: any = new Object();
-            let setter = function(attr: any, value: any) {
-                return object[attr] = value;
+            let setter = function (attr: any, value: any) {
+                return (object[attr] = value);
             };
             if (cast) {
-                fields.forEach(function(attr: any, idx: number) {
+                fields.forEach(function (attr: any, idx: number) {
                     setter(attr, getterCast(sample[idx], idx, cast, d));
                 });
             } else {
-                fields.forEach(function(attr: any, idx: number) {
+                fields.forEach(function (attr: any, idx: number) {
                     setter(attr, getterCast(sample[idx], idx, null, d));
                 });
             }
@@ -111,18 +106,18 @@ let CSV = {
         };
     },
 
-    buildArrayConstructor: function(fields: any, sample: any, cast: any) {
-        return function(d: any) {
+    buildArrayConstructor: function (fields: any, sample: any, cast: any) {
+        return function (d: any) {
             let row = new Array(sample.length);
-            let setter = function(idx: any, value: any) {
-                return row[idx] = value;
+            let setter = function (idx: any, value: any) {
+                return (row[idx] = value);
             };
             if (cast) {
-                fields.forEach(function(attr: any, idx: number) {
+                fields.forEach(function (attr: any, idx: number) {
                     setter(attr, getterCast(sample[idx], idx, cast, d));
                 });
             } else {
-                fields.forEach(function(attr: any, idx: number) {
+                fields.forEach(function (attr: any, idx: number) {
                     setter(attr, getterCast(sample[idx], idx, null, d));
                 });
             }
@@ -172,7 +167,8 @@ let CSV = {
 
         function cells(lines: any) {
             let line = lines.shift();
-            if (line.indexOf('"') >= 0) {// 含引号
+            if (line.indexOf('"') >= 0) {
+                // 含引号
 
                 // 找到这行完整的数据, 找到对称的双引号
                 let lastIndex = 0;
@@ -220,7 +216,6 @@ let CSV = {
                     }
 
                     if (value === '"' && quoteCount % 2 === 0) {
-
                         if (line[numKey + 1] === opts.delimiter || numKey + 1 === length) {
                             end = numKey;
                             item = line.substring(start, end);
@@ -228,7 +223,6 @@ let CSV = {
                             start = end + 2;
                             end = start;
                         }
-
                     }
 
                     if (value === opts.delimiter && quoteCount % 2 === 0) {
@@ -244,7 +238,6 @@ let CSV = {
                             end = start;
                         }
                     }
-
                 }
 
                 end = length;
@@ -285,7 +278,6 @@ let CSV = {
     },
 
     safeParse: function (text: any, opts: any, fn: Function) {
-        let delimiter = opts.delimiter;
         let newline = opts.newline;
 
         let lines = text.split(newline);
@@ -311,7 +303,7 @@ let CSV = {
         return row.join(delimiter);
     },
 
-    encodeArrays: function(coll: any, opts: any, fn: Function) {
+    encodeArrays: function (coll: any, opts: any, fn: Function) {
         let delimiter = opts.delimiter;
         let newline = opts.newline;
 
@@ -326,7 +318,7 @@ let CSV = {
         return true;
     },
 
-    encodeObjects: function (coll: any, opts: any, fn:Function) {
+    encodeObjects: function (coll: any, opts: any, fn: Function) {
         let delimiter = opts.delimiter;
         let newline = opts.newline;
         let header;
@@ -385,8 +377,7 @@ let CSV = {
         }
 
         // modify by jl 由表自行控制不要含有双引号.提高解析效率
-        return this.unsafeParse(text, opts, fn) &&
-            (rows.length > 0 ? rows : true);
+        return this.unsafeParse(text, opts, fn) && (rows.length > 0 ? rows : true);
     },
 
     encode: function (coll: any, opts: any, fn: Function) {
@@ -407,9 +398,11 @@ let CSV = {
             coll = coll.slice(opts.skip);
         }
 
-        return (this.getType(coll[0]) === "Array" ? this.encodeArrays : this.encodeObjects)(coll, opts, fn) &&
-            (lines.length > 0 ? lines.join(opts.newline) : true);
-    }
+        return (
+            (this.getType(coll[0]) === "Array" ? this.encodeArrays : this.encodeObjects)(coll, opts, fn) &&
+            (lines.length > 0 ? lines.join(opts.newline) : true)
+        );
+    },
 };
 
 @ccclass("CSVManager")
@@ -418,7 +411,7 @@ export class CSVManager {
 
     static _instance: CSVManager;
 
-    static get instance () {
+    static get instance() {
         if (this._instance) {
             return this._instance;
         }
@@ -426,12 +419,12 @@ export class CSVManager {
         this._instance = new CSVManager();
         return this._instance;
     }
-    private _csvTables:any = {};
-    private _csvTableForArr:any = {};
-    private _tableCast:any = {};
-    private _tableComment:any = {};
+    private _csvTables: any = {};
+    private _csvTableForArr: any = {};
+    private _tableCast: any = {};
+    private _tableComment: any = {};
 
-    addTable (tableName:string, tableContent:string, force?:boolean) {
+    addTable(tableName: string, tableContent: string, force?: boolean) {
         if (this._csvTables[tableName] && !force) {
             return;
         }
@@ -453,12 +446,12 @@ export class CSVManager {
         //this.csvTables[tableName].initFromText(tableContent);
     }
 
-        /**
+    /**
      * 根据表名获取表的所有内容
      * @param {string} tableName  表名
      * @returns {object} 表内容
      */
-    getTableArr (tableName:string) {
+    getTableArr(tableName: string) {
         return this._csvTableForArr[tableName];
     }
 
@@ -467,7 +460,7 @@ export class CSVManager {
      * @param {string} tableName  表名
      * @returns {object} 表内容
      */
-    getTable (tableName:string) {
+    getTable(tableName: string) {
         return this._csvTables[tableName];
     }
 
@@ -478,7 +471,7 @@ export class CSVManager {
      * @param {any} value 值
      * @returns {Object} 一条表内容
      */
-    queryOne (tableName:string, key:string, value:any) {
+    queryOne(tableName: string, key: string, value: any) {
         let table = this.getTable(tableName);
         if (!table) {
             return null;
@@ -505,7 +498,7 @@ export class CSVManager {
      * @param {string}ID
      * @returns {Object} 一条表内容
      */
-    queryByID (tableName:string, ID:string) {
+    queryByID(tableName: string, ID: string) {
         //@ts-ignore
         return this.queryOne(tableName, null, ID);
     }
@@ -517,7 +510,7 @@ export class CSVManager {
      * @param {any} value 值
      * @returns {Object}
      */
-    queryAll (tableName:string, key:string, value:any) {
+    queryAll(tableName: string, key: string, value: any) {
         let table = this.getTable(tableName);
         if (!table || !key) {
             return null;
@@ -542,9 +535,9 @@ export class CSVManager {
      * @param {string} tableName 表名
      * @param {string} key  列名
      * @param {Array}values 数值
-     * @returns 
+     * @returns
      */
-    queryIn (tableName:string, key:string, values:Array<any>) {
+    queryIn(tableName: string, key: string, values: Array<any>) {
         let table = this.getTable(tableName);
         if (!table || !key) {
             return null;
@@ -567,9 +560,9 @@ export class CSVManager {
      * 选出符合条件的数据。condition key 为表格的key，value 为值的数组。返回的object，key 为数据在表格的ID，value为具体数据
      * @param {string} tableName 表名
      * @param {any} condition 筛选条件
-     * @returns 
+     * @returns
      */
-    queryByCondition (tableName:string, condition: any) {
+    queryByCondition(tableName: string, condition: any) {
         if (condition.constructor !== Object) {
             return null;
         }
@@ -589,7 +582,7 @@ export class CSVManager {
             let fit = true;
             for (let j = 0; j < keysLength; j++) {
                 let key = keys[j];
-                fit = fit && (condition[key] === item[key]) && !ret[tableKeys[i]];
+                fit = fit && condition[key] === item[key] && !ret[tableKeys[i]];
             }
 
             if (fit) {
@@ -602,12 +595,12 @@ export class CSVManager {
 
     /**
      * 选出第一个符合条件的数据。condition key 为表格的key，value 为值的数组。返回的object，key 为数据在表格的ID，value为具体数据
-     * 
+     *
      * @param tableName 表名
      * @param condition 筛选条件
-     * @returns 
+     * @returns
      */
-    queryOneByCondition (tableName:string, condition: any) {
+    queryOneByCondition(tableName: string, condition: any) {
         if (condition.constructor !== Object) {
             return null;
         }
@@ -616,7 +609,7 @@ export class CSVManager {
         if (!table) {
             return null;
         }
-        
+
         let keys = Object.keys(condition);
         let keysLength = keys.length;
 
@@ -626,7 +619,7 @@ export class CSVManager {
             let fit = true;
             for (let j = 0; j < keysLength; j++) {
                 let key = keys[j];
-                fit = fit && (condition[key] === item[key]);
+                fit = fit && condition[key] === item[key];
             }
 
             if (fit) {

@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, LabelComponent, SpriteComponent, SpriteFrame, Vec3, Tween, WidgetComponent } from "cc";
+import { _decorator, Component, Node, LabelComponent, SpriteComponent, SpriteFrame, Vec3, Tween } from "cc";
 import { GameLogic } from "../../framework/gameLogic";
 import { PlayerData } from "../../framework/playerData";
 import { fightUI } from "./fightUI";
@@ -16,44 +16,44 @@ export class balance extends Component {
     // serializableDummy = 0;
 
     @property(SpriteComponent)
-    public spResultBg: SpriteComponent = null!;//胜负结果图标组件
+    public spResultBg: SpriteComponent = null!; //胜负结果图标组件
 
     @property(SpriteComponent)
-    public spResultTitle: SpriteComponent = null!;//胜负结果标题
+    public spResultTitle: SpriteComponent = null!; //胜负结果标题
 
     @property(Node)
-    public ndHalo: Node = null!;//亮光节点，胜利时用到
+    public ndHalo: Node = null!; //亮光节点，胜利时用到
 
     @property(SpriteFrame)
-    public sfBgWin: SpriteFrame = null!;//胜利图标
+    public sfBgWin: SpriteFrame = null!; //胜利图标
 
     @property(SpriteFrame)
-    public sfBgFailed: SpriteFrame = null!;//失败图标
+    public sfBgFailed: SpriteFrame = null!; //失败图标
 
     @property(SpriteFrame)
-    public sfTitleWin: SpriteFrame = null!;//胜利标题
+    public sfTitleWin: SpriteFrame = null!; //胜利标题
 
     @property(SpriteFrame)
-    public sfTitleFailed: SpriteFrame = null!;//失败标题
+    public sfTitleFailed: SpriteFrame = null!; //失败标题
 
     @property(LabelComponent)
-    public lbGold: LabelComponent = null!;//金币文本组件
+    public lbGold: LabelComponent = null!; //金币文本组件
 
     @property(LabelComponent)
-    public lbLevel: LabelComponent = null!;//等级文本组件
+    public lbLevel: LabelComponent = null!; //等级文本组件
 
-    private _rewardCoin: number = 0;//奖励的金币数量
-    private _isWin: boolean = false;//是否胜利
-    private _parent: fightUI = null!;//fightUI脚本
-    private _tweenRotate: any = null!;//缓动对象
-    private _oriEuler: Vec3 = new Vec3();//当前角度
-    private _targetEuler: Vec3 = new Vec3(0, 0, -360);//目标角度
+    private _rewardCoin: number = 0; //奖励的金币数量
+    private _isWin: boolean = false; //是否胜利
+    private _parent: fightUI = null!; //fightUI脚本
+    private _tweenRotate: any = null!; //缓动对象
+    private _oriEuler: Vec3 = new Vec3(); //当前角度
+    private _targetEuler: Vec3 = new Vec3(0, 0, -360); //目标角度
 
-    start () {
+    start() {
         // Your initialization goes here.
     }
 
-    onDisable () {
+    onDisable() {
         //重置缓动对象
         if (this._tweenRotate) {
             this._tweenRotate.stop();
@@ -66,9 +66,9 @@ export class balance extends Component {
      * @param isWin 是否胜利
      * @param coin 金币值
      * @param parent fightUI脚本
-     * @returns 
+     * @returns
      */
-    public show (isWin: boolean, coin: number, parent: fightUI) {
+    public show(isWin: boolean, coin: number, parent: fightUI) {
         let sfBg = this.sfBgWin;
         let sfTitle = this.sfTitleWin;
 
@@ -93,11 +93,11 @@ export class balance extends Component {
             this._oriEuler.set(0, 0, 0);
             this.ndHalo.eulerAngles = this._oriEuler;
             this._tweenRotate = new Tween(this.ndHalo)
-                    .by(2, {eulerAngles: this._targetEuler})
-                    .repeatForever()
-                    .start();
+                .by(2, { eulerAngles: this._targetEuler })
+                .repeatForever()
+                .start();
 
-            let levelInfo = localConfig.instance.queryByID('level', PlayerData.instance.playerInfo.level.toString());
+            let levelInfo = localConfig.instance.queryByID("level", PlayerData.instance.playerInfo.level.toString());
             if (levelInfo && levelInfo.gold) {
                 coin += levelInfo.gold;
             }
@@ -124,7 +124,7 @@ export class balance extends Component {
     /**
      * 点击再来一局
      */
-    public onBtnNextClick () {
+    public onBtnNextClick() {
         this.reward(false); //奖励并返回主界面
     }
 
@@ -132,8 +132,8 @@ export class balance extends Component {
      * 下发奖励
      * @param isDouble 是否双倍
      */
-    public reward (isDouble: boolean) {
-        let reward = isDouble?this._rewardCoin*3:this._rewardCoin;
+    public reward(isDouble: boolean) {
+        let reward = isDouble ? this._rewardCoin * 3 : this._rewardCoin;
 
         //增加金币
         GameLogic.addGold(reward);
@@ -144,7 +144,7 @@ export class balance extends Component {
         }
 
         //关闭界面，回到开始界面
-        UIManager.instance.hideDialog('fight/balance');
+        UIManager.instance.hideDialog("fight/balance");
         this._parent.reset();
     }
 

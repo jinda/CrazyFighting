@@ -1,14 +1,12 @@
 import { _decorator, find, isValid } from "cc";
-import { PoolManager } from "./poolManager";
 import { ResourceUtil } from "./resourcesUtils";
 const { ccclass } = _decorator;
 
-const SHOW_STR_INTERVAL_TIME = 800;
 @ccclass("UIManager")
 export class UIManager {
-    private _dictSharedPanel: any = {}
-    private _dictLoading: any = {}
-    private _arrPopupDialog: any = []
+    private _dictSharedPanel: any = {};
+    private _dictLoading: any = {};
+    private _arrPopupDialog: any = [];
 
     private static _instance: UIManager;
 
@@ -23,7 +21,7 @@ export class UIManager {
 
     /**
      * 检查当前界面是否正在展示
-     * @param panelPath 
+     * @param panelPath
      */
     public isDialogVisible(panelPath: string) {
         if (!this._dictSharedPanel.hasOwnProperty(panelPath)) {
@@ -37,8 +35,8 @@ export class UIManager {
 
     /**
      * 显示单例界面
-     * @param {String} panelPath 
-     * @param {Array} args 
+     * @param {String} panelPath
+     * @param {Array} args
      * @param {Function} cb 回调函数，创建完毕后回调
      */
     public showDialog(panelPath: string, args?: any, cb?: Function) {
@@ -46,9 +44,8 @@ export class UIManager {
             return;
         }
 
-        let idxSplit = panelPath.lastIndexOf('/');
+        let idxSplit = panelPath.lastIndexOf("/");
         let scriptName = panelPath.slice(idxSplit + 1);
-
 
         if (!args) {
             args = [];
@@ -117,28 +114,28 @@ export class UIManager {
 
     /**
      * 隐藏单例界面
-     * @param {String} panelPath 
+     * @param {String} panelPath
      * @param {fn} callback
      */
     public hideDialog(panelPath: string, callback?: Function) {
         if (this._dictSharedPanel.hasOwnProperty(panelPath)) {
             let panel = this._dictSharedPanel[panelPath];
             if (panel && isValid(panel)) {
-                let ani = panel.getComponent('animationUI');
+                let ani = panel.getComponent("animationUI");
                 if (ani) {
                     ani.close(() => {
                         panel.parent = null;
-                        if (callback && typeof callback === 'function') {
+                        if (callback && typeof callback === "function") {
                             callback();
                         }
                     });
                 } else {
                     panel.parent = null;
-                    if (callback && typeof callback === 'function') {
+                    if (callback && typeof callback === "function") {
                         callback();
                     }
                 }
-            } else if (callback && typeof callback === 'function') {
+            } else if (callback && typeof callback === "function") {
                 callback();
             }
         }
@@ -148,16 +145,16 @@ export class UIManager {
 
     /**
      * 将弹窗加入弹出窗队列
-     * @param {string} panelPath 
-     * @param {string} scriptName 
-     * @param {*} param 
+     * @param {string} panelPath
+     * @param {string} scriptName
+     * @param {*} param
      */
     public pushToPopupSeq(panelPath: string, scriptName: string, param: any) {
         let popupDialog = {
             panelPath: panelPath,
             scriptName: scriptName,
             param: param,
-            isShow: false
+            isShow: false,
         };
 
         this._arrPopupDialog.push(popupDialog);
@@ -167,16 +164,16 @@ export class UIManager {
 
     /**
      * 将弹窗加入弹出窗队列
-     * @param {number} index 
-     * @param {string} panelPath 
-     * @param {string} scriptName 
-     * @param {*} param 
+     * @param {number} index
+     * @param {string} panelPath
+     * @param {string} scriptName
+     * @param {*} param
      */
     public insertToPopupSeq(index: number, panelPath: string, param: any) {
         let popupDialog = {
             panelPath: panelPath,
             param: param,
-            isShow: false
+            isShow: false,
         };
 
         this._arrPopupDialog.splice(index, 0, popupDialog);
@@ -185,7 +182,7 @@ export class UIManager {
 
     /**
      * 将弹窗从弹出窗队列中移除
-     * @param {string} panelPath 
+     * @param {string} panelPath
      */
     public shiftFromPopupSeq(panelPath: string) {
         this.hideDialog(panelPath, () => {
@@ -193,7 +190,7 @@ export class UIManager {
                 this._arrPopupDialog.shift();
                 this._checkPopupSeq();
             }
-        })
+        });
     }
 
     /**

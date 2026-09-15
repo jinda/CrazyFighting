@@ -1,7 +1,7 @@
-import { FighterManager } from './fighterManager';
+import { FighterManager } from "./fighterManager";
 import { _decorator, Component, Vec3, CameraComponent, Tween, lerp, CCInteger, Node } from "cc";
 import { GameLogic } from "../framework/gameLogic";
-import { Fighter } from './fighter';
+import { Fighter } from "./fighter";
 //相机脚本
 const { ccclass, property } = _decorator;
 @ccclass("Follow")
@@ -13,30 +13,30 @@ export class Follow extends Component {
     // @property
     // serializableDummy = 0;
     @property(CameraComponent)
-    public camera:CameraComponent = null!;//相机组件
+    public camera: CameraComponent = null!; //相机组件
 
-    @property({type: CCInteger})
-    public originFov: number = 40;//相机视角大小
+    @property({ type: CCInteger })
+    public originFov: number = 40; //相机视角大小
 
-    private _manager: FighterManager = null!;//“管理所有士兵”的脚本
-    private _posTween: Vec3 = new Vec3();//缓动的目标位置
-    private _rotateTween: Vec3 = new Vec3();//缓动的目标角度
-    private _tweenMove: any = null!;//移动缓动对象
-    private _tweenRotate: any = null!;//角度缓动对象
-    private _tweenHeight: any = null!;//高度缓动对象
-    private _orthoHeight: {value: number} = {value: 0}//相机视角高度
-    private _originPosAfterStart: Vec3 = new Vec3(-16, 22, 16);//开始游戏后相机的目标位置
-    private _isStartFollow: boolean = false;//相机是否开启跟随
-    private _adjustCoolTime: number = 3;//3秒后才开始计算目标高度
-    private _targetHeight: number = -1;//相机目标高度
-    private _nextPos: Vec3 = new Vec3();//相机下一步位置
-    private _targetPos: Vec3 = null!;//目标位置
+    private _manager: FighterManager = null!; //“管理所有士兵”的脚本
+    private _posTween: Vec3 = new Vec3(); //缓动的目标位置
+    private _rotateTween: Vec3 = new Vec3(); //缓动的目标角度
+    private _tweenMove: any = null!; //移动缓动对象
+    private _tweenRotate: any = null!; //角度缓动对象
+    private _tweenHeight: any = null!; //高度缓动对象
+    private _orthoHeight: { value: number } = { value: 0 }; //相机视角高度
+    private _originPosAfterStart: Vec3 = new Vec3(-16, 22, 16); //开始游戏后相机的目标位置
+    private _isStartFollow: boolean = false; //相机是否开启跟随
+    private _adjustCoolTime: number = 3; //3秒后才开始计算目标高度
+    private _targetHeight: number = -1; //相机目标高度
+    private _nextPos: Vec3 = new Vec3(); //相机下一步位置
+    private _targetPos: Vec3 = null!; //目标位置
 
-    onLoad () {
+    onLoad() {
         GameLogic.mainCamera = this.camera;
     }
 
-    start () {
+    start() {
         // Your initialization goes here.
     }
 
@@ -46,7 +46,7 @@ export class Follow extends Component {
      * @param {boolean} isFirstLevel
      * @memberof Follow
      */
-    public initCamera (isFirstLevel: boolean) {
+    public initCamera(isFirstLevel: boolean) {
         //当前视角
         this.node.setWorldPosition(-27.6, 21, 0);
         this.node.setWorldRotationFromEuler(-60, -90, 0);
@@ -89,32 +89,37 @@ export class Follow extends Component {
 
     /**
      * 游戏开始后设置相机的位置和角度
-     * @param manager 
+     * @param manager
      */
-    public startGame (manager: FighterManager) {
+    public startGame(manager: FighterManager) {
         this._manager = manager;
         this.node.getWorldPosition(this._posTween);
         this._rotateTween.set(this.node.eulerAngles);
         this._orthoHeight.value = this.camera.orthoHeight;
-        
+
         //不直接修改node，只为了更方便调试
-        this._tweenMove = new Tween(this._posTween).to(1, {x: this._originPosAfterStart.x, y: this._originPosAfterStart.y, z:this._originPosAfterStart.z}).call(()=>{
-            this._tweenMove = null;
+        this._tweenMove = new Tween(this._posTween)
+            .to(1, { x: this._originPosAfterStart.x, y: this._originPosAfterStart.y, z: this._originPosAfterStart.z })
+            .call(() => {
+                this._tweenMove = null;
 
-            this._targetPos = null!;
-            this._isStartFollow = true;
-            this._adjustCoolTime = 3;//开始
-        }).start();
+                this._targetPos = null!;
+                this._isStartFollow = true;
+                this._adjustCoolTime = 3; //开始
+            })
+            .start();
 
-        this._tweenRotate = new Tween(this._rotateTween).to(1, {x: -45, y: -45, z: 0}).call(()=>{
-            this._tweenRotate = null;
-        }).start();
+        this._tweenRotate = new Tween(this._rotateTween)
+            .to(1, { x: -45, y: -45, z: 0 })
+            .call(() => {
+                this._tweenRotate = null;
+            })
+            .start();
     }
 
-    update (deltaTime: number) {
+    update(deltaTime: number) {
         // Your update function goes here.
         if (this._tweenMove) {
-
             //更新相机位置和角度
             this.node.setWorldPosition(this._posTween);
             this.node.setWorldRotationFromEuler(this._rotateTween.x, this._rotateTween.y, this._rotateTween.z);
@@ -124,10 +129,16 @@ export class Follow extends Component {
             if (!this._manager.isGameOver) {
                 this._adjustCoolTime -= deltaTime;
 
-                if (this._adjustCoolTime < 0) { //每隔0.5秒计算所有士兵的区域边界
+                if (this._adjustCoolTime < 0) {
+                    //每隔0.5秒计算所有士兵的区域边界
                     this._adjustCoolTime = 0.5;
-                    let cnt = 0, sumX = 0, sumZ = 0;
-                    let minX = 999999, maxX = -999999, minZ = 999999, maxZ = -999999;
+                    let cnt = 0,
+                        sumX = 0,
+                        sumZ = 0;
+                    let minX = 999999,
+                        maxX = -999999,
+                        minZ = 999999,
+                        maxZ = -999999;
                     for (let team in this._manager.dictFighter) {
                         let dict = this._manager.dictFighter[team];
                         for (let identity in dict) {
@@ -141,7 +152,7 @@ export class Follow extends Component {
                             //算出最小x
                             if (minX > posX) {
                                 minX = posX;
-                            } 
+                            }
 
                             //算出最大x
                             if (maxX < posX) {
@@ -151,8 +162,8 @@ export class Follow extends Component {
                             //算出最大z
                             if (minZ > posZ) {
                                 minZ = posZ;
-                            } 
-                            
+                            }
+
                             //算出最大z
                             if (maxZ < posZ) {
                                 maxZ = posZ;
@@ -162,25 +173,30 @@ export class Follow extends Component {
 
                     let offsetX = maxX - minX;
                     let offsetZ = maxZ - minZ;
-                    
+
                     // console.log(offsetX, offsetZ);
-                    this._targetPos = new Vec3(this._originPosAfterStart.x + offsetX / 2 + minX, this._originPosAfterStart.y, this._originPosAfterStart.z + offsetZ / 2 + minZ);
+                    this._targetPos = new Vec3(
+                        this._originPosAfterStart.x + offsetX / 2 + minX,
+                        this._originPosAfterStart.y,
+                        this._originPosAfterStart.z + offsetZ / 2 + minZ,
+                    );
 
                     //边长（由面积算出的平方根）
-                    let  distance = Math.sqrt(offsetX*offsetX + offsetZ*offsetZ);
+                    let distance = Math.sqrt(offsetX * offsetX + offsetZ * offsetZ);
 
                     //相机目标高度（目前的一个转换规则，但不是很贴合）
-                    this._targetHeight = Math.round(distance * 4); 
-                    this._targetHeight = this._targetHeight < this.originFov - 10 ? this.originFov - 10: this._targetHeight;
-                    
-                } else if (this._targetPos) {//如果有目标位置，则相机位置和相机视角大小慢慢过渡过去
+                    this._targetHeight = Math.round(distance * 4);
+                    this._targetHeight =
+                        this._targetHeight < this.originFov - 10 ? this.originFov - 10 : this._targetHeight;
+                } else if (this._targetPos) {
+                    //如果有目标位置，则相机位置和相机视角大小慢慢过渡过去
 
                     //士兵存活数量
                     let surviveNum = 0;
 
                     for (const key in this._manager.dictFighter) {
                         const team = this._manager.dictFighter[key];
-                        
+
                         for (const identity in team) {
                             const ndFighter = team[identity] as Node;
                             const scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
@@ -201,7 +217,7 @@ export class Follow extends Component {
                             let height = lerp(this.camera.fov, this._targetHeight, 1 * deltaTime);
                             this.camera.fov = height;
                         }
-                    } 
+                    }
                 }
             } else {
                 this._isStartFollow = false;

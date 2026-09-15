@@ -1,8 +1,8 @@
 import { _decorator, Node, AudioClip, AudioSource, game, director } from "cc";
 import { StorageManager } from "./storageManager";
-import { Lodash } from './lodash';
+import { Lodash } from "./lodash";
 import { ResourceUtil } from "./resourcesUtils";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 interface AudioData {
     source: AudioSource;
@@ -35,9 +35,9 @@ export class AudioManager {
 
     public init() {
         if (this._persistRootNode) return; //避免切换场景初始化报错
-        this._persistRootNode = new Node('audio');
+        this._persistRootNode = new Node("audio");
         director.getScene()!.addChild(this._persistRootNode);
-        game.addPersistRootNode(this._persistRootNode)
+        game.addPersistRootNode(this._persistRootNode);
 
         this.musicVolume = this.getAudioSetting(true) ? 0.8 : 0;
         this.soundVolume = this.getAudioSetting(false) ? 1 : 0;
@@ -65,14 +65,14 @@ export class AudioManager {
     public getAudioSetting(isMusic: boolean) {
         let state;
         if (isMusic) {
-            state = StorageManager.instance.getGlobalData('music');
+            state = StorageManager.instance.getGlobalData("music");
         } else {
-            state = StorageManager.instance.getGlobalData('sound');
+            state = StorageManager.instance.getGlobalData("sound");
         }
 
         // console.log('Config for [' + (isMusic ? 'Music' : 'Sound') + '] is ' + state);
 
-        return !state || state === 'true' ? true : false;
+        return !state || state === "true" ? true : false;
     }
 
     /**
@@ -80,8 +80,8 @@ export class AudioManager {
      * @param {String} name 音乐名称可通过Constant.AUDIO_MUSIC 获取
      * @param {Boolean} loop 是否循环播放
      */
-     public playMusic(name: string, loop: boolean) {
-        let path = 'audio/music/' + name;
+    public playMusic(name: string, loop: boolean) {
+        let path = "audio/music/" + name;
         //微信特殊处理，除一开场的音乐，其余的放在子包里头
         // if (name !== 'click') {
         //     path =  path; //微信特殊处理，除一开场的音乐，其余的放在子包里头
@@ -111,7 +111,7 @@ export class AudioManager {
         }
 
         //音效一般是多个的，不会只有一个
-        let path = 'audio/sound/';
+        let path = "audio/sound/";
         // if (name !== 'click') {
         //     path = path; //微信特殊处理，除一开场的音乐，其余的放在子包里头
         // }
@@ -173,8 +173,6 @@ export class AudioManager {
 
     //看广告时先将音乐暂停
     public pauseAll() {
-        console.log("pause all music!!!");
-
         for (let item in this.audios) {
             if (this.audios.hasOwnProperty(item)) {
                 let audio = this.audios[item];
@@ -194,22 +192,22 @@ export class AudioManager {
 
     public openMusic() {
         this.setMusic(0.8);
-        StorageManager.instance.setGlobalData('music', 'true');
+        StorageManager.instance.setGlobalData("music", "true");
     }
 
     public closeMusic() {
         this.setMusic(0);
-        StorageManager.instance.setGlobalData('music', 'false');
+        StorageManager.instance.setGlobalData("music", "false");
     }
 
     public openSound() {
         this.setSound(1);
-        StorageManager.instance.setGlobalData('sound', 'true');
+        StorageManager.instance.setGlobalData("sound", "true");
     }
 
     public closeSound() {
         this.setSound(0);
-        StorageManager.instance.setGlobalData('sound', 'false');
+        StorageManager.instance.setGlobalData("sound", "false");
     }
 
     public setSound(flag: number) {
@@ -235,7 +233,7 @@ export class AudioManager {
         }
     }
 
-    public playWeaponSound (weapon: string) {
+    public playWeaponSound(weapon: string) {
         if (!this.dictWeaponSoundIndex[weapon]) {
             this.dictWeaponSoundIndex[weapon] = 1;
         } else {

@@ -1,0 +1,20 @@
+# 统一行尾符，避免 CRLF/LF 混用造成的"整文件 diff"抖动
+# 现状：lodash.ts 全 CRLF，其余文件全 LF（详见代码规范审核报告）
+* text=auto eol=lf
+
+# 二进制/大文件不做行尾转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.mp3 binary
+*.ogg binary
+*.fbx binary
+*.FBX binary
+*.bin binary
+
+# Cocos 编辑器生成的序列化文件不做行尾/空白归一，避免污染 meta
+*.prefab -text
+*.scene -text
+*.anim -text
+*.effect -text

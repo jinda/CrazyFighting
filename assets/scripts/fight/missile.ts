@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3, Prefab, ParticleSystemComponent, Material, ModelComponent, CCBoolean } from "cc";
+import { _decorator, Component, Node, Vec3, Prefab, ParticleSystemComponent, ModelComponent, CCBoolean } from "cc";
 import { PoolManager } from "../framework/poolManager";
 import { Fighter } from "./fighter";
 const { ccclass, property } = _decorator;
@@ -9,26 +9,24 @@ export class Missile extends Component {
     public pfTrail: Prefab = null!; //拖尾
 
     @property(ModelComponent)
-    public model: ModelComponent = null!;//武器模型（暂无用到）
+    public model: ModelComponent = null!; //武器模型（暂无用到）
 
     @property(CCBoolean)
-    public isAutoRotate: boolean = false;//武器是否朝向下一个目标位置
+    public isAutoRotate: boolean = false; //武器是否朝向下一个目标位置
 
-    private totalTime: number = -1;//飞行时间
-    private currentTime: number = 0;//当前飞行时间
-    private maxHeight: number = 0;//表示此次飞行最大高度
-    private posOffset: Vec3 = new Vec3();//起点和终点的向量差
-    private posStart: Vec3 = new Vec3();//起点
-    private endCb: Function = null!;//到达目标位置后的回调函数
-    private attackTarget: Fighter = null!;//攻击的敌人（的脚本）
-    private ndTrail: Node = null!;//拖尾节点
-    private rotateCoolTime: number = 0;//旋转角度的冷却时间
-    private _targetPos: Vec3 = new Vec3();//当前目标位置
-    private _nextTargetPos: Vec3 = new Vec3();//下次目标位置
+    private totalTime: number = -1; //飞行时间
+    private currentTime: number = 0; //当前飞行时间
+    private maxHeight: number = 0; //表示此次飞行最大高度
+    private posOffset: Vec3 = new Vec3(); //起点和终点的向量差
+    private posStart: Vec3 = new Vec3(); //起点
+    private endCb: Function = null!; //到达目标位置后的回调函数
+    private attackTarget: Fighter = null!; //攻击的敌人（的脚本）
+    private ndTrail: Node = null!; //拖尾节点
+    private rotateCoolTime: number = 0; //旋转角度的冷却时间
+    private _targetPos: Vec3 = new Vec3(); //当前目标位置
+    private _nextTargetPos: Vec3 = new Vec3(); //下次目标位置
 
-    onLoad() {
-
-    }
+    onLoad() {}
 
     start() {
         // Your initialization goes here.
@@ -57,10 +55,9 @@ export class Missile extends Component {
      * @param posEnd 目标敌人位置
      * @param speed 投掷速度
      * @param attackTarget 攻击的敌人(的脚本)
-     * @param endCb 
+     * @param endCb
      */
     public throwMissile(posEnd: Vec3, speed: number, attackTarget: Fighter, endCb: Function) {
-
         //如果是飞行物，先缩小至0.3单位问题
         this.node.setScale(0.5, 0.5, 0.5);
         this.rotateCoolTime = 0;
@@ -125,7 +122,11 @@ export class Missile extends Component {
             let height = this.maxHeight * Math.cos(percent * Math.PI - Math.PI / 2);
 
             //设置目标位置
-            this._targetPos.set(this.posStart.x + this.posOffset.x * percent, this.posStart.y + height, this.posStart.z + this.posOffset.z * percent);
+            this._targetPos.set(
+                this.posStart.x + this.posOffset.x * percent,
+                this.posStart.y + height,
+                this.posStart.z + this.posOffset.z * percent,
+            );
 
             //设置武器位置
             this.node.setWorldPosition(this._targetPos);
@@ -137,12 +138,15 @@ export class Missile extends Component {
 
                     percent = Number(((this.currentTime + 0.1) / this.totalTime).toFixed(2));
                     if (percent < 1) {
-
-                        //下一个目标位置的高度 
+                        //下一个目标位置的高度
                         height = this.maxHeight * Math.cos(percent * Math.PI - Math.PI / 2);
 
                         //下一个目标位置
-                        this._nextTargetPos.set(this.posStart.x + this.posOffset.x * percent, this.posStart.y + height, this.posStart.z + this.posOffset.z * percent)
+                        this._nextTargetPos.set(
+                            this.posStart.x + this.posOffset.x * percent,
+                            this.posStart.y + height,
+                            this.posStart.z + this.posOffset.z * percent,
+                        );
 
                         //武器朝向下一个目标位置, 形成曲线飞行的感觉
                         this.node.forward = this._nextTargetPos.subtract(this._targetPos).normalize().negative();

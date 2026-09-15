@@ -1,0 +1,20 @@
+# Cocos Creator 生成目录与第三方库，禁止格式化
+library/
+temp/
+build/
+profiles/
+native/
+node_modules/
+extensions/
+
+# 第三方库（box2d 1MB 压缩产物、libs 目录）
+assets/scripts/libs/
+
+# Cocos 序列化 / 资源文件
+*.meta
+*.prefab
+*.scene
+*.anim
+*.effect
+*.json
+*.md

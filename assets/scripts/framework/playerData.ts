@@ -2,7 +2,7 @@ import { _decorator } from "cc";
 import Constants from "./constants";
 import { localConfig } from "./localConfig";
 import { StorageManager } from "./storageManager";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 //管理玩家数据脚本
 @ccclass("PlayerData")
 export class PlayerData {
@@ -13,21 +13,21 @@ export class PlayerData {
     // @property
     // serializableDummy = 0;
 
-    public serverTime: number = 0;      //服务端时间
-    public localTime: number = 0;       //本地时间
-    public userId: string = '';         //玩家ID
-    public playerInfo: any = null!;     //玩家数据
-    public isNewBee: boolean = false;    //是否是新手，默认非新手
-    public dataVersion: string = '';     //数据版本
-    public settings: any = {};           //杂项数据
-    public formation: any = {};          //编队{pos: fighterId}
-    public isLoadFinished: boolean = false;  //是否游戏载入完成
-    public waitingUnlock: number = -1;   //标记是否展示解锁界面，为-1则不展示
-    public waitingBuy: number = -1;      //标记刚解锁的可购买的士兵，为-1则
+    public serverTime: number = 0; //服务端时间
+    public localTime: number = 0; //本地时间
+    public userId: string = ""; //玩家ID
+    public playerInfo: any = null!; //玩家数据
+    public isNewBee: boolean = false; //是否是新手，默认非新手
+    public dataVersion: string = ""; //数据版本
+    public settings: any = {}; //杂项数据
+    public formation: any = {}; //编队{pos: fighterId}
+    public isLoadFinished: boolean = false; //是否游戏载入完成
+    public waitingUnlock: number = -1; //标记是否展示解锁界面，为-1则不展示
+    public waitingBuy: number = -1; //标记刚解锁的可购买的士兵，为-1则
     public isLastFightWin: boolean = true; //最近一次战斗是否胜利，默认是
-    
+
     //获取实例
-    public static get instance () {
+    public static get instance() {
         if (this._instance) {
             return this._instance;
         }
@@ -36,10 +36,10 @@ export class PlayerData {
         return this._instance;
     }
 
-    private static _instance: PlayerData;       
+    private static _instance: PlayerData;
 
     //获取金币
-    public get gold () {
+    public get gold() {
         return this.playerInfo.gold;
     }
 
@@ -74,7 +74,7 @@ export class PlayerData {
      * @returns
      * @memberof PlayerData
      */
-    public loadDataByKey (keyName: string) {
+    public loadDataByKey(keyName: string) {
         let ret = {};
         let str = StorageManager.instance.getConfigData(keyName);
         if (str) {
@@ -83,30 +83,30 @@ export class PlayerData {
             } catch (e) {
                 ret = {};
             }
-        } 
-        
+        }
+
         return ret;
     }
 
     /**
      * 创建玩家数据
-     * @param loginData 
+     * @param loginData
      */
-    public createPlayerInfo(loginData?:any) {
+    public createPlayerInfo(loginData?: any) {
         this.playerInfo = {
-            gold: 100,                          //金币数量
-            level: 1,                           //默认初始关卡
-            createDate: new Date(),             //记录创建时间
-            buyTimes: 0,                        //购买次数
-            buyCellTimes: 0,                    //购买格子的次数
-            unlock: [Constants.BASE_FIGHTER],   //已解锁士兵
-            onlineReward: 0,                    //在线奖励的数值
-            finishGuides: [],                   //完成的引导步骤
-            hasUsedFireBall: false              //是否使用过火球技能
+            gold: 100, //金币数量
+            level: 1, //默认初始关卡
+            createDate: new Date(), //记录创建时间
+            buyTimes: 0, //购买次数
+            buyCellTimes: 0, //购买格子的次数
+            unlock: [Constants.BASE_FIGHTER], //已解锁士兵
+            onlineReward: 0, //在线奖励的数值
+            finishGuides: [], //完成的引导步骤
+            hasUsedFireBall: false, //是否使用过火球技能
         };
-        
+
         this.isNewBee = true; //区分新老玩家
-        
+
         if (loginData) {
             for (let key in loginData) {
                 this.playerInfo[key] = loginData[key];
@@ -122,13 +122,13 @@ export class PlayerData {
     /**
      * 设置默认阵型
      */
-    public createDefaultFormation () {
+    public createDefaultFormation() {
         //默认阵型
         this.formation = {
             1: 101,
             2: 101,
-            3: 101
-        }
+            3: 101,
+        };
     }
 
     /**
@@ -137,17 +137,17 @@ export class PlayerData {
      * @param {String} key
      * @param {Number} value
      */
-    public updatePlayerInfo(key:string, value: any) {
+    public updatePlayerInfo(key: string, value: any) {
         let isChanged = false;
         if (this.playerInfo.hasOwnProperty(key)) {
-            if (typeof value === 'number') {
+            if (typeof value === "number") {
                 isChanged = true;
                 this.playerInfo[key] += value;
                 if (this.playerInfo[key] < 0) {
                     this.playerInfo[key] = 0;
                 }
                 //return;
-            } else if (typeof value === 'boolean' || typeof value === 'string') {
+            } else if (typeof value === "boolean" || typeof value === "string") {
                 isChanged = true;
                 this.playerInfo[key] = value;
             }
@@ -161,7 +161,7 @@ export class PlayerData {
     /**
      * 保存玩家数据
      */
-    public  savePlayerInfoToLocalCache() {
+    public savePlayerInfoToLocalCache() {
         StorageManager.instance.setConfigData(Constants.LOCAL_CACHE.PLAYER, JSON.stringify(this.playerInfo));
     }
 
@@ -178,16 +178,19 @@ export class PlayerData {
     public saveAll() {
         StorageManager.instance.setConfigDataWithoutSave(Constants.LOCAL_CACHE.PLAYER, JSON.stringify(this.playerInfo));
         StorageManager.instance.setConfigDataWithoutSave(Constants.LOCAL_CACHE.SETTINGS, JSON.stringify(this.settings));
-        StorageManager.instance.setConfigDataWithoutSave(Constants.LOCAL_CACHE.FORMATION, JSON.stringify(this.formation));
+        StorageManager.instance.setConfigDataWithoutSave(
+            Constants.LOCAL_CACHE.FORMATION,
+            JSON.stringify(this.formation),
+        );
         StorageManager.instance.setConfigData(Constants.LOCAL_CACHE.DATA_VERSION, this.dataVersion);
     }
 
     /**
      * 获取已完成的引导步骤
-     * @returns 
+     * @returns
      */
-    public getFinishGuide () {
-        if (this.playerInfo.hasOwnProperty('finishGuides')) {
+    public getFinishGuide() {
+        if (this.playerInfo.hasOwnProperty("finishGuides")) {
             return this.playerInfo.finishGuides;
         }
 
@@ -196,9 +199,9 @@ export class PlayerData {
 
     /**
      * 完成指定步骤的引导
-     * @param guideStep 
+     * @param guideStep
      */
-    public finishGuide (guideStep: any) {
+    public finishGuide(guideStep: any) {
         if (!this.playerInfo.finishGuides) {
             //@ts-ignore
             this.playerInfo.finishGuides = [];
@@ -213,7 +216,7 @@ export class PlayerData {
     /**
      * 同步服务器时间
      */
-    public syncServerTime (serverTime: number) {
+    public syncServerTime(serverTime: number) {
         this.serverTime = serverTime;
         this.localTime = Date.now();
     }
@@ -221,7 +224,7 @@ export class PlayerData {
     /**
      * 获取当前时间
      */
-    public getCurrentTime () {
+    public getCurrentTime() {
         let diffTime = Date.now() - this.localTime;
 
         return this.serverTime + diffTime;
@@ -230,7 +233,7 @@ export class PlayerData {
     /**
      * 清除数据
      */
-    public clear () {
+    public clear() {
         this.playerInfo = null!;
         this.settings = {};
         this.formation = {};
@@ -241,7 +244,7 @@ export class PlayerData {
      * 生成随机账户
      * @returns
      */
-    public generateRandomAccount () {
+    public generateRandomAccount() {
         this.userId = `${Date.now()}${0 | (Math.random() * 1000, 10)}`;
         StorageManager.instance.setUserId(this.userId);
     }
@@ -249,24 +252,24 @@ export class PlayerData {
     /**
      * 获得当前阵型战力
      */
-    public getFormationFight () {
+    public getFormationFight() {
         return this._getFormationFight(this.formation);
     }
-    
+
     /**
      * 获得当前阵型战力
-     * @param formation 
-     * @returns 
+     * @param formation
+     * @returns
      */
-    private _getFormationFight (formation: any) {
+    private _getFormationFight(formation: any) {
         let num = 0;
         for (let pos in formation) {
             let fighterId = formation[pos];
 
             if (fighterId > 0) {
-                let fighter = localConfig.instance.queryByID('fighter', fighterId);
-                num += fighter['num'] * fighter['fight'];
-            }   
+                let fighter = localConfig.instance.queryByID("fighter", fighterId);
+                num += fighter["num"] * fighter["fight"];
+            }
         }
 
         return num;
@@ -275,22 +278,22 @@ export class PlayerData {
     /**
      * 获得当前敌方战力
      */
-    public getCurLevelEnemyFight () {
+    public getCurLevelEnemyFight() {
         return this._getFormationFight(this.getCurLevelEnemy());
     }
 
     /**
      * 获取当前等级的敌人阵型
-     * @returns 
+     * @returns
      */
-    public getCurLevelEnemy () {
-        let levelInfo = localConfig.instance.queryByID('level', this.playerInfo.level.toString());
+    public getCurLevelEnemy() {
+        let levelInfo = localConfig.instance.queryByID("level", this.playerInfo.level.toString());
 
-        let arrEnemyInfo = levelInfo['formation'].split('_');
+        let arrEnemyInfo = levelInfo["formation"].split("_");
 
         let dictFormation: any = {};
         arrEnemyInfo.forEach((enemy: any) => {
-            let enemyInfo = enemy.split('#');
+            let enemyInfo = enemy.split("#");
             let fighterId = enemyInfo[0];
             let pos = enemyInfo[1];
 
@@ -303,10 +306,10 @@ export class PlayerData {
     /**
      * 通过关卡
      */
-    public passLevel () {
+    public passLevel() {
         //先判定当前是否有解锁的士兵
-        let levelInfo = localConfig.instance.queryByID('level', this.playerInfo.level.toString());
-        let unlock = levelInfo['unlock'];
+        let levelInfo = localConfig.instance.queryByID("level", this.playerInfo.level.toString());
+        let unlock = levelInfo["unlock"];
         if (unlock) {
             //有待解锁的士兵
             if (this.playerInfo.unlock.indexOf(unlock) === -1) {
@@ -330,8 +333,8 @@ export class PlayerData {
 
     /**
      * 获得已购买次数
-    */
-    private _getBuyTimes () {
+     */
+    private _getBuyTimes() {
         let times = 0;
         if (this.playerInfo.buyTimes) {
             times = this.playerInfo.buyTimes;
@@ -343,7 +346,7 @@ export class PlayerData {
     /**
      * 增加购买次数
      */
-    public addBuyTimes () {
+    public addBuyTimes() {
         if (this.playerInfo.buyTimes) {
             this.playerInfo.buyTimes++;
         } else {
@@ -356,7 +359,7 @@ export class PlayerData {
     /**
      * 获得购买士兵的价格
      */
-    public getBuyFighterPrice () {
+    public getBuyFighterPrice() {
         let times = this._getBuyTimes();
         let factor = 1.07;
         let sep = 13;
@@ -371,14 +374,14 @@ export class PlayerData {
     /**
      * 获得购买格子的价格
      */
-    public getBuyCellPrice () {
+    public getBuyCellPrice() {
         return Math.floor(100 * Math.pow(1.2, this.getBuyCellTimes()));
     }
 
     /**
      * 获得已购买格子次数
      */
-    public getBuyCellTimes () {
+    public getBuyCellTimes() {
         let times = 0;
         if (this.playerInfo.buyCellTimes) {
             times = this.playerInfo.buyCellTimes;
@@ -390,7 +393,7 @@ export class PlayerData {
     /**
      * 增加购买次数
      */
-    public  addBuyCellTimes () {
+    public addBuyCellTimes() {
         if (this.playerInfo.buyCellTimes) {
             this.playerInfo.buyCellTimes++;
         } else {
@@ -403,7 +406,7 @@ export class PlayerData {
     /**
      * 获得阵型上空闲格子的位置
      */
-    public getEmptyPos (): number {
+    public getEmptyPos(): number {
         for (let pos in this.formation) {
             if (this.formation[pos] === 0) {
                 return Number(pos);
@@ -416,7 +419,7 @@ export class PlayerData {
     /**
      * 获得已经解锁的士兵
      */
-    public getUnlockFighters (): [number] {
+    public getUnlockFighters(): [number] {
         if (this.playerInfo.unlock) {
             return this.playerInfo.unlock;
         }
@@ -427,8 +430,9 @@ export class PlayerData {
     /**
      * 随机获得可购买的士兵
      */
-    public getRandomBuyFighter (): number {
-        if (this.waitingBuy > 0) { //对于首次解锁，下次优先安排购买
+    public getRandomBuyFighter(): number {
+        if (this.waitingBuy > 0) {
+            //对于首次解锁，下次优先安排购买
             let ret = this.waitingBuy;
             this.waitingBuy = -1;
             return ret;
@@ -436,16 +440,16 @@ export class PlayerData {
 
         let unlock = this.getUnlockFighters();
 
-        return unlock[Math.floor(Math.random() * unlock.length)]
+        return unlock[Math.floor(Math.random() * unlock.length)];
     }
 
     /**
      * 添加士兵到阵型里面
      * @param pos 在第几个格子
      * @param fighterId 士兵编号/种类
-     * @returns 
+     * @returns
      */
-    public addFighter (pos: number, fighterId: number) {
+    public addFighter(pos: number, fighterId: number) {
         if (this.formation[pos] !== 0) {
             return false;
         }
@@ -453,21 +457,23 @@ export class PlayerData {
         this.formation[pos] = Number(fighterId); //强制转换成阵型，避免因为异常数据转成字符串了
 
         this.saveFormationToLocalCache();
+
+        return true;
     }
 
     /**
      * 根据格子获得对应位置上的士兵
-     * @param pos 
+     * @param pos
      */
-    public getFighterIdByCellPos (pos: number) {
+    public getFighterIdByCellPos(pos: number) {
         return this.formation[pos];
     }
 
     /**
      * 生成新的格子数据并添加到队列里面去
-     * @returns 
+     * @returns
      */
-    public addCell () {
+    public addCell() {
         let len = Object.keys(this.formation).length;
         //从数组里面取对应的位置
         let nextPos = Constants.UNLOCK_CELL_SEQ[len];
@@ -484,10 +490,10 @@ export class PlayerData {
 
     /**
      * 格子上的士兵数据互换
-     * @param cellA 
-     * @param cellB 
+     * @param cellA
+     * @param cellB
      */
-    public swapCell (cellA: number, cellB: number) {
+    public swapCell(cellA: number, cellB: number) {
         let tmp = this.formation[cellA];
         this.formation[cellA] = this.formation[cellB];
         this.formation[cellB] = tmp;
@@ -496,26 +502,29 @@ export class PlayerData {
 
     /**
      * 获得下一等级的士兵id
-     * @param fighterId 
+     * @param fighterId
      */
-    public getFighterNextId (fighterId: number): number {
-        let fighterInfo = localConfig.instance.queryByID('fighter', fighterId.toString());
-        
-        let next = localConfig.instance.queryOneByCondition('fighter', {level: fighterInfo.level+1, type: fighterInfo.type});
+    public getFighterNextId(fighterId: number): number {
+        let fighterInfo = localConfig.instance.queryByID("fighter", fighterId.toString());
+
+        let next = localConfig.instance.queryOneByCondition("fighter", {
+            level: fighterInfo.level + 1,
+            type: fighterInfo.type,
+        });
         if (next) {
             return Number(next.ID);
         }
-        
+
         return -1;
     }
 
     /**
      * 合并格子
-     * @param cellOld 
-     * @param cellTarget 
-     * @param nextId 
+     * @param cellOld
+     * @param cellTarge
+     * @param nextId
      */
-    public combineCell (cellOld: number, cellTarget: number, nextId: number) {
+    public combineCell(cellOld: number, cellTarget: number, nextId: number) {
         this.formation[cellOld] = 0;
         this.formation[cellTarget] = nextId;
 
@@ -524,14 +533,15 @@ export class PlayerData {
 
     /**
      * 更新在线奖励的奖励值
-     * @param times 
+     * @param times
      */
-    public updateOnlineReward (times = 1000) {
+    public updateOnlineReward(times = 1000) {
         if (!this.playerInfo.onlineReward) {
             this.playerInfo.onlineReward = 0;
         }
 
-        this.playerInfo.onlineReward += Constants.ONLINE.PROFIT_PER_SECOND * PlayerData.instance.getBuyFighterPrice() * times / 1000;
+        this.playerInfo.onlineReward +=
+            (Constants.ONLINE.PROFIT_PER_SECOND * PlayerData.instance.getBuyFighterPrice() * times) / 1000;
         this.playerInfo.onlineReward = Number(this.playerInfo.onlineReward.toFixed(2));
 
         this.savePlayerInfoToLocalCache();
@@ -539,9 +549,9 @@ export class PlayerData {
 
     /**
      * 获取在线奖励的值
-     * @returns 
+     * @returns
      */
-    public getOnlineReward (): number {
+    public getOnlineReward(): number {
         if (!this.playerInfo.onlineReward) {
             this.playerInfo.onlineReward = 0;
         }
@@ -551,9 +561,9 @@ export class PlayerData {
 
     /**
      * 更新领取后的在线奖励的奖励值
-     * @param money 
+     * @param money
      */
-    public reduceOnlineReward (money: number) {
+    public reduceOnlineReward(money: number) {
         if (!this.playerInfo.onlineReward) {
             this.playerInfo.onlineReward = 0;
         }
@@ -567,7 +577,7 @@ export class PlayerData {
     /**
      * 标记已经使用过大火球技能
      */
-    public markUseFireBall () {
+    public markUseFireBall() {
         this.playerInfo.hasUsedFireBall = true;
         this.savePlayerInfoToLocalCache();
     }
