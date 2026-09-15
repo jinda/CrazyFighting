@@ -284,7 +284,7 @@
         "mipfilter": "none",
         "anisotropy": 0,
         "isUuid": true,
-        "imageUuidOrDatabaseUri": "a5b0fa49-61b9-4149-845a-7036c159a4a4@48b02"
+        "imageUuidOrDatabaseUri": "8e8fdb9d-c607-4eb8-8cf3-79c2bed12099"
       },
       "ver": "1.0.22",
       "imported": true,
@@ -330,6 +330,7 @@
     "imageMetas": [
       {
         "name": "base_color_texture",
+        "remap": "8e8fdb9d-c607-4eb8-8cf3-79c2bed12099",
         "uri": "a5b0fa49-61b9-4149-845a-7036c159a4a4@48b02"
       }
     ],
