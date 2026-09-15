@@ -32,6 +32,12 @@ export class unlock extends Component {
 
         //TODO 设置图片
         ResourceUtil.getCard(fighter["type"], (err: any, sf: SpriteFrame) => {
+            //卡牌属于可降级资源：加载失败只记录，不把 null 赋给 spriteFrame
+            if (err || !sf) {
+                console.error("[unlock] card load failed: ", fighter["type"], err);
+                return;
+            }
+
             if (this.spCard.node.isValid) {
                 this.spCard.spriteFrame = sf;
             }

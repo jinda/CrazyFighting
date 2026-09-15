@@ -37,7 +37,7 @@ export class UIManager {
      * 显示单例界面
      * @param {String} panelPath
      * @param {Array} args
-     * @param {Function} cb 回调函数，创建完毕后回调
+     * @param {Function} cb 回调函数，创建完毕后回调；加载失败时回调 cb(null, err)
      */
     public showDialog(panelPath: string, args?: any, cb?: Function) {
         if (this._dictLoading[panelPath]) {
@@ -83,9 +83,15 @@ export class UIManager {
                 isCloseBeforeShow = true;
             }
 
+            //无论成功失败都必须复位 loading 状态，否则失败后无法重试
             this._dictLoading[panelPath] = false;
+
             if (err) {
-                console.error(err);
+                console.error(`[UIManager] 加载界面失败：${panelPath}`, err);
+                //向调用方返回错误：cb(脚本组件, 错误)，失败时脚本组件为 null
+                if (cb) {
+                    cb(null, err);
+                }
                 return;
             }
 

@@ -19,8 +19,9 @@ export class localConfig {
         return this._instance;
     }
 
-    private _callback: Function = null!;
-    private _errCallback: Function = null!;
+    //成功回调不接收错误参数；所有失败路径统一走 _finishLoad -> _errCallback
+    private _callback: () => void = null!;
+    private _errCallback: (err: Error) => void = null!;
     private _failList: string[] = [];
     private _isFinished: boolean = false;
     private _timeoutId: any = null;
@@ -29,18 +30,21 @@ export class localConfig {
 
     /**
      * 加载配置文件
-     * @param {Function}cb 回调函数
+     * @param cb 成功回调
+     * @param errCb 失败回调（超时/加载失败/空目录都会走到这里）
      */
-    public loadConfig(cb: Function, errCb?: Function) {
+    public loadConfig(cb: () => void, errCb?: (err: Error) => void) {
         this._callback = cb;
         this._errCallback = errCb || null!;
         this._failList = [];
         this._currentLoad = 0;
+        this._cntLoad = 0;
         this._isFinished = false;
 
         //兜底超时：即使资源层一个回调都不给，也不能让玩家永久停在黑屏
+        //超时必须走 _finishLoad 统一出口（走失败回调），禁止直接调用成功回调
         this._timeoutId = setTimeout(() => {
-            this._callback("load config timeout");
+            this._finishLoad("load config timeout");
         }, Constants.LOAD_CONFIG_TIMEOUT);
 
         this._loadCSV();
@@ -49,8 +53,13 @@ export class localConfig {
     private _loadCSV() {
         //新增数据表 请往该数组中添加....
         resources.loadDir("datas", (err: any, assets) => {
+            //迟到回调保护：超时/失败已结束后，迟到的资源结果不再进入完成流程
+            if (this._isFinished) {
+                return;
+            }
+
             if (err || !assets || !assets.length) {
-                this._callback(`loadDir datas failed: ${err}`);
+                this._finishLoad(`loadDir datas failed: ${err}`);
                 return;
             }
 
@@ -62,7 +71,7 @@ export class localConfig {
 
             //一张表都没有：直接走错误流程，避免上层一直等不到回调
             if (!arrCsvFiles.length) {
-                this._callback("no csv in datas");
+                this._finishLoad("no csv in datas");
                 return;
             }
 

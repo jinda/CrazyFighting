@@ -45,7 +45,9 @@ director.on(Director.EVENT_AFTER_SCENE_LAUNCH, () => {
             const lastAvailableLayer = availableLayers & ~(availableLayers - 1);
             val.cameraComponent!.visibility = lastAvailableLayer | (val.cameraComponent!.visibility & builtinLayerMask);
             setChildrenLayer(val.node, lastAvailableLayer);
-            usedLayer |= availableLayers;
+            //修复：原来把整个 availableLayers 都标记为已使用，导致存在多个常驻 Canvas 冲突时，
+            //后续 Canvas 拿不到正确的自定义 layer；这里只占用刚分配出去的 lastAvailableLayer
+            usedLayer |= lastAvailableLayer;
         }
     });
 });

@@ -16,6 +16,7 @@ export class online extends Component {
 
     private _gold: number = 0; //金币数量
     private _callback: Function = null!; //回调函数
+    private _claimed: boolean = false; //领取幂等标志：一次展示只允许领取一次，防双击重复发奖
 
     start() {
         // Your initialization goes here.
@@ -27,6 +28,7 @@ export class online extends Component {
      */
     public show(callback: Function) {
         this._callback = callback;
+        this._claimed = false; //每次重新展示都复位，允许下一次领取
         this._gold = PlayerData.instance.getOnlineReward();
 
         this.lbGold.string = this._gold.toString();
@@ -55,6 +57,12 @@ export class online extends Component {
      * @param isDouble 是否双倍
      */
     public reward(isDouble: boolean) {
+        //幂等保护：双击/同帧重复输入，只发一次奖
+        if (this._claimed) {
+            return;
+        }
+        this._claimed = true;
+
         GameLogic.addGold(isDouble ? this._gold * 3 : this._gold);
 
         PlayerData.instance.reduceOnlineReward(this._gold);

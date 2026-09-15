@@ -154,6 +154,12 @@ export class FormationCell extends Component {
         if (this._isShowSimilar) {
             if (!this._ndSimilar) {
                 ResourceUtil.getEffectPrefab("upLoop01", (err: any, pf: Prefab) => {
+                    //特效属于可降级资源：加载失败只记录，不 instantiate(null)
+                    if (err || !pf) {
+                        console.error("[FormationCell] effect load failed: upLoop01", err);
+                        return;
+                    }
+
                     if (!this.node.activeInHierarchy) {
                         return;
                     }
@@ -181,6 +187,12 @@ export class FormationCell extends Component {
      */
     public showCombineSucceed() {
         ResourceUtil.getEffectPrefab(`upClick`, (err: any, pf: Prefab) => {
+            //特效属于可降级资源：加载失败只记录，不 instantiate(null)
+            if (err || !pf) {
+                console.error("[FormationCell] effect load failed: upClick", err);
+                return;
+            }
+
             if (!this.node.activeInHierarchy) {
                 return;
             }
@@ -206,7 +218,9 @@ export class FormationCell extends Component {
      */
     public showSprint() {
         ResourceUtil.getEffectPrefab(`goBallistic01`, (err: any, pf: Prefab) => {
-            if (err) {
+            //特效属于可降级资源：加载失败只记录，不 instantiate(null)
+            if (err || !pf) {
+                console.error("[FormationCell] effect load failed: goBallistic01", err);
                 return;
             }
 

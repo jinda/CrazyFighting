@@ -44,6 +44,7 @@ export class balance extends Component {
 
     private _rewardCoin: number = 0; //奖励的金币数量
     private _isWin: boolean = false; //是否胜利
+    private _settled: boolean = false; //结算幂等标志：一次展示只允许结算一次，防双击/重入重复发奖
     private _parent: fightUI = null!; //fightUI脚本
     private _tweenRotate: any = null!; //缓动对象
     private _oriEuler: Vec3 = new Vec3(); //当前角度
@@ -112,6 +113,7 @@ export class balance extends Component {
 
         this._rewardCoin = coin;
         this._isWin = isWin;
+        this._settled = false; //每次重新展示都复位，允许下一次结算
 
         this._parent = parent;
 
@@ -133,6 +135,12 @@ export class balance extends Component {
      * @param isDouble 是否双倍
      */
     public reward(isDouble: boolean) {
+        //幂等保护：双击/同帧重复输入/动画关闭期间重入，只结算一次
+        if (this._settled) {
+            return;
+        }
+        this._settled = true;
+
         let reward = isDouble ? this._rewardCoin * 3 : this._rewardCoin;
 
         //增加金币

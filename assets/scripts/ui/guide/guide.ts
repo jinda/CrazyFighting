@@ -73,6 +73,36 @@ export class guide extends Component {
         this._enableBgBlock(true);
     }
 
+    onDisable() {
+        //统一清理：注销完成/重置事件、定时器和所有 Tween，避免节点隐藏/销毁后残留监听与缓动
+        if (this._curWaitEvent) {
+            ClientEvent.off(this._curWaitEvent, this._onFinishEventTrigger, this);
+            this._curWaitEvent = null!;
+        }
+
+        if (this._curWaitResetEvent) {
+            ClientEvent.off(this._curWaitResetEvent, this._onResetEventTrigger, this);
+            this._curWaitResetEvent = null!;
+        }
+
+        if (this._refreshPosTimer) {
+            clearInterval(this._refreshPosTimer);
+            this._refreshPosTimer = null!;
+        }
+
+        const aryTweens = [this._tweenFrame, this._tweenHand, this._tweenDrag, this._tweenFade];
+        aryTweens.forEach((t) => {
+            if (t) {
+                t.stop();
+            }
+        });
+        this._tweenFrame = null!;
+        this._tweenHand = null!;
+        this._tweenDrag = null!;
+        this._tweenFade = null!;
+        this._isPlayingAni = false;
+    }
+
     /**
      * 启动、拦截ndFrame节点触摸事件
      * @param {boolean} enable 是否开启
@@ -208,8 +238,16 @@ export class guide extends Component {
 
     private _onResetEventTrigger() {
         //如果触发了，就删除事件注册
+        //修复：原来这里错误地把 _curWaitEvent 置空，_curWaitResetEvent 残留导致 show() 时
+        //不会注销旧的监听，而是叠加注册，最终一次 finish 触发多次 _guideFinish
         ClientEvent.off(this._curWaitResetEvent, this._onResetEventTrigger, this);
-        this._curWaitEvent = null!;
+        this._curWaitResetEvent = null!;
+
+        //重置前显式注销完成事件，show() 内会重新注册
+        if (this._curWaitEvent) {
+            ClientEvent.off(this._curWaitEvent, this._onFinishEventTrigger, this);
+            this._curWaitEvent = null!;
+        }
 
         this.show(this._subGuideInfo, false);
     }

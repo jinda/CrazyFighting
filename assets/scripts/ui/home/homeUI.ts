@@ -516,6 +516,12 @@ export class homeUI extends Component {
         if (isShow) {
             if (!this._ndLevelTips) {
                 ResourceUtil.getUIPrefabRes("home/levelTips", (err: any, pf: Prefab) => {
+                    //提示属于可降级资源：加载失败只记录，不 instantiate(null)
+                    if (err || !pf) {
+                        console.error("[homeUI] levelTips load failed", err);
+                        return;
+                    }
+
                     //还需要展示
                     if (this._isShowLevelTips) {
                         if (!this._ndLevelTips) {

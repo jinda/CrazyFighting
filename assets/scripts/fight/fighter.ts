@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3, Tween, Prefab } from "cc";
+import { _decorator, Component, Node, Vec3, Tween, Prefab, isValid } from "cc";
 import { FighterRigidBody } from "./fighterRigidBody";
 import { FighterManager } from "./fighterManager";
 import Constants from "../framework/constants";
@@ -59,6 +59,7 @@ export class Fighter extends Component {
     private _isWaitingDamage: boolean = false; //等待伤害计算
     private _tweenDead: any = null!; //士兵阵亡缓动效果
     private _isAttacking: boolean = false; //是否正在攻击
+    private _loadGeneration: number = 0; //异步模型加载代次：每次 init() 递增，回收时失效，防止旧回调挂载到复用后的角色
     private _fightStartTargetPos: Vec3 = new Vec3(); //开始游戏后士兵到达的第一个位置
     private _nodeModel: Node = null!; //士兵模型
     private _fighterModel: FighterModel = null!; //士兵模型的脚本
@@ -66,7 +67,6 @@ export class Fighter extends Component {
     private _timeScale: number = 1; //时间缩放，用于加快攻击及移动速度, 也可以理解成游戏速度
     private _curPos: Vec3 = new Vec3(); //当前位置
     private _outPos: Vec3 = new Vec3(); //士兵阵亡后退的位置
-    private _deadPos: Vec3 = new Vec3(); //士兵阵亡后下沉的位置
     private _oriEuler: Vec3 = new Vec3(); //士兵初始欧拉角
     private _nowPos: Vec3 = new Vec3(); //士兵刚体当前位置
     private _targetPos: Vec3 = new Vec3(); //目标位置
@@ -150,10 +150,31 @@ export class Fighter extends Component {
         this.node.eulerAngles = this._oriEuler;
 
         //加载士兵对应模型
+        //代次保护：本角色在资源返回前可能被回收并复用给下一名角色，
+        //回调必须校验加载代次、identity 与节点有效性，避免旧模型挂到新角色
+        const loadGeneration = ++this._loadGeneration;
+        const curIdentity = identity;
         ResourceUtil.getFighterModel(this.fighterInfo.type, (err: any, pf: Prefab) => {
-            if (err) {
-                console.error("get fighter model failed!: ", err);
+            if (err || !pf) {
+                console.error("[Fighter] get fighter model failed!: ", err);
                 return;
+            }
+
+            //代次校验：本次初始化已被回收/重新初始化，或节点已失效时，迟到的加载结果直接丢弃
+            if (
+                loadGeneration !== this._loadGeneration ||
+                curIdentity !== this.identity ||
+                !isValid(this.node) ||
+                !this.ndModelParent
+            ) {
+                return;
+            }
+
+            //兜底：若此前仍有已挂载的旧模型（理论上 recycle 时已回收），先回池，避免同一角色挂两个模型导致泄漏
+            if (this._nodeModel) {
+                PoolManager.instance.putNode(this._nodeModel);
+                this._nodeModel = null!;
+                this._fighterModel = null!;
             }
 
             this._nodeModel = PoolManager.instance.getNode(pf, this.ndModelParent);
@@ -385,14 +406,12 @@ export class Fighter extends Component {
 
         Vec3.add(this._outPos, this._outPos, this.node.position);
 
-        this._deadPos.set(this._outPos);
-        this._deadPos.y = -2;
-
-        //士兵阵亡后退一个单位向量，停留0.8秒后下沉，最后回收士兵节点
+        //士兵阵亡后退一个单位向量，停留0.8秒后原地下沉2个单位，最后回收士兵节点
+        //修复：原来把绝对坐标 _deadPos 传给 .by()，导致 x/z 也被额外累加，角色会额外横移
         this._tweenDead = new Tween(this.node)
             .to(0.2, { position: this._outPos })
             .delay(0.8)
-            .by(1, { position: this._deadPos })
+            .by(1, { position: new Vec3(0, -2, 0) })
             .union()
             .call(() => {
                 this.recycle();
@@ -515,6 +534,14 @@ export class Fighter extends Component {
         }
 
         this.rigidBody.destroyBody();
+
+        //使当前代次的异步加载全部失效：本节点即将回池复用，旧回调不得再挂载模型/皇冠
+        this._loadGeneration++;
+
+        //通知模型组件取消未完成的异步加载（如皇冠）
+        if (this._fighterModel) {
+            this._fighterModel.reset();
+        }
 
         PoolManager.instance.putNode(this._nodeModel);
         this._nodeModel = null!;

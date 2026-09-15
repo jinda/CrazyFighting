@@ -88,6 +88,12 @@ export class AudioManager {
         // }
 
         ResourceUtil.loadRes(path, AudioClip, (err: any, clip: any) => {
+            //音频属于可降级资源：加载失败只记录，不把 null 传入播放器
+            if (err || !clip) {
+                console.error("[AudioManager] music load failed: ", name, err);
+                return;
+            }
+
             let source = this._getAudioSource(clip);
             let tmp: AudioData = {
                 source,
@@ -117,6 +123,12 @@ export class AudioManager {
         // }
 
         ResourceUtil.loadRes(path + name, AudioClip, (err: any, clip: any) => {
+            //音效属于可降级资源：加载失败只记录，不把 null 传入播放器
+            if (err || !clip) {
+                console.error("[AudioManager] sound load failed: ", name, err);
+                return;
+            }
+
             let source = this._getAudioSource(clip);
             let tmp: AudioData = {
                 source,

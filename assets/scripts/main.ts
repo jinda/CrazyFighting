@@ -6,6 +6,7 @@ import { GuideManager } from "./ui/guide/guideManager";
 import { GameLogic } from "./framework/gameLogic";
 import { ClientEvent } from "./framework/clientEvent";
 import { localConfig } from "./framework/localConfig";
+import { StorageManager } from "./framework/storageManager";
 import Constants from "./framework/constants";
 const { ccclass } = _decorator;
 //入口文件：挂载到fight场景的canvas节点下
@@ -36,12 +37,12 @@ export class main extends Component {
         //加载本地缓存数据
         PlayerData.instance.loadFromCache();
 
-        //加载csv 相关配置
+        //加载csv 相关配置（失败/超时统一走 errCb，成功回调不接收错误参数）
         localConfig.instance.loadConfig(
             () => {
                 this._loadFinish();
             },
-            (err: any) => {
+            (err: Error) => {
                 this._showLoadError(err);
             },
         );
@@ -63,6 +64,12 @@ export class main extends Component {
                 },
             });
         }
+    }
+
+    onDestroy() {
+        //场景销毁/退出时清理全局计时器：避免残留的 interval 在场景重建后继续叠加或后台空跑
+        GameLogic.stopOnlineReward();
+        StorageManager.instance.dispose();
     }
 
     /**

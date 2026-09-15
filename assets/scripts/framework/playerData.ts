@@ -65,6 +65,74 @@ export class PlayerData {
         this.settings = this.loadDataByKey(Constants.LOCAL_CACHE.SETTINGS);
 
         this.formation = this.loadDataByKey(Constants.LOCAL_CACHE.FORMATION);
+
+        //结构校验 + 缺省字段合并：损坏/旧版本存档不再带着半截数据进游戏
+        this._validateAndMigrate();
+    }
+
+    /**
+     * 存档结构校验、缺省字段合并与修复
+     * 只校验账号下的 player、formation 等关键字段，避免旧档/损坏档在关卡、阵型访问处崩溃
+     */
+    private _validateAndMigrate() {
+        //settings/formation 类型兜底
+        if (!this.settings || typeof this.settings !== "object" || Array.isArray(this.settings)) {
+            this.settings = {};
+        }
+
+        if (!this.formation || typeof this.formation !== "object" || Array.isArray(this.formation)) {
+            this.formation = {};
+        }
+
+        //playerInfo 缺失或类型异常：按新玩家重建（保留当前 userId，不重新生成账号）
+        if (!this.playerInfo || typeof this.playerInfo !== "object" || Array.isArray(this.playerInfo)) {
+            console.error("[PlayerData] playerInfo 缺失或类型异常，按新玩家重建");
+            this.createPlayerInfo();
+            return;
+        }
+
+        //缺省字段用默认值合并（不含 createDate：历史档里它是字符串，缺失时才补）
+        const aryDefaultKeys: [string, any][] = [
+            ["gold", 100],
+            ["level", 1],
+            ["buyTimes", 0],
+            ["buyCellTimes", 0],
+            ["unlock", [Constants.BASE_FIGHTER]],
+            ["onlineReward", 0],
+            ["finishGuides", []],
+            ["hasUsedFireBall", false],
+        ];
+
+        aryDefaultKeys.forEach(([key, defaultValue]) => {
+            if (this.playerInfo[key] === undefined || this.playerInfo[key] === null) {
+                console.warn(`[PlayerData] 存档缺少字段 ${key}，已用默认值补齐`);
+                this.playerInfo[key] = defaultValue;
+            }
+        });
+
+        if (this.playerInfo.createDate === undefined || this.playerInfo.createDate === null) {
+            this.playerInfo.createDate = new Date();
+        }
+
+        //数值字段类型校验：防止损坏档把数字存成字符串/NaN
+        if (typeof this.playerInfo.gold !== "number" || isNaN(this.playerInfo.gold)) {
+            this.playerInfo.gold = 100;
+        }
+        if (typeof this.playerInfo.level !== "number" || isNaN(this.playerInfo.level) || this.playerInfo.level < 1) {
+            this.playerInfo.level = 1;
+        }
+        if (typeof this.playerInfo.onlineReward !== "number" || isNaN(this.playerInfo.onlineReward)) {
+            this.playerInfo.onlineReward = 0;
+        }
+        if (!Array.isArray(this.playerInfo.unlock)) {
+            this.playerInfo.unlock = [Constants.BASE_FIGHTER];
+        }
+        if (!Array.isArray(this.playerInfo.finishGuides)) {
+            this.playerInfo.finishGuides = [];
+        }
+
+        //把修复结果写回本地，后续流程读取到的都是合法数据
+        this.saveAll();
     }
 
     /**
@@ -245,7 +313,9 @@ export class PlayerData {
      * @returns
      */
     public generateRandomAccount() {
-        this.userId = `${Date.now()}${0 | (Math.random() * 1000, 10)}`;
+        //修复：原表达式 `${Date.now()}${0 | (Math.random() * 1000, 10)}` 使用逗号运算符，后缀恒为 10，
+        //同一毫秒内生成两个账号会碰撞；改为真正的 0~999 随机后缀
+        this.userId = `${Date.now()}${Math.floor(Math.random() * 1000)}`;
         StorageManager.instance.setUserId(this.userId);
     }
 
@@ -542,6 +612,14 @@ export class PlayerData {
 
         this.playerInfo.onlineReward +=
             (Constants.ONLINE.PROFIT_PER_SECOND * PlayerData.instance.getBuyFighterPrice() * times) / 1000;
+
+        //在线奖励按“累计时长上限”封顶：挂机满 ONLINE.MAX_TIME(30分钟) 秒后不再累计，
+        //与 Constants.ONLINE 的注释语义保持一致
+        const maxReward = Constants.ONLINE.PROFIT_PER_SECOND * this.getBuyFighterPrice() * Constants.ONLINE.MAX_TIME;
+        if (this.playerInfo.onlineReward > maxReward) {
+            this.playerInfo.onlineReward = maxReward;
+        }
+
         this.playerInfo.onlineReward = Number(this.playerInfo.onlineReward.toFixed(2));
 
         this.savePlayerInfoToLocalCache();

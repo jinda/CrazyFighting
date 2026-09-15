@@ -22,6 +22,8 @@ export class StorageManager {
     private KEY_CONFIG: string = Constants.GAME_NAME;
     private _markSave: boolean = false;
     private _saveTimer: number = -1;
+    private _saveFailCount: number = 0; //连续写入失败次数，达到上限后停止重试（内存数据仍在，避免无限报错刷屏）
+    private static MAX_SAVE_RETRY: number = 5;
 
     start() {
         this._jsonData = {
@@ -31,16 +33,35 @@ export class StorageManager {
         let content = sys.localStorage.getItem(this.KEY_CONFIG);
 
         if (content && content.length) {
-            if (content.startsWith("@")) {
-                content = content.substring(1);
-                content = Util.decrypt(content);
-            }
+            const rawContent = content;
 
             try {
+                if (content.startsWith("@")) {
+                    content = content.substring(1);
+                    content = Util.decrypt(content);
+                }
+
                 //初始化操作
                 let jsonData = JSON.parse(content);
+                if (!jsonData || typeof jsonData !== "object" || Array.isArray(jsonData)) {
+                    throw new Error("save data is not a valid object");
+                }
+
                 this._jsonData = jsonData;
-            } catch (excepaiton) {}
+                this._saveFailCount = 0;
+            } catch (excepaiton) {
+                //解析/解密失败：不再静默吞掉。原始密文隔离到独立 key，避免坏档被下次 save() 覆盖，
+                //方便后续诊断或找回进度；内存中先用默认结构，游戏按新档继续
+                console.error(
+                    "[StorageManager] 存档解析失败，原始数据已隔离到 " + this.KEY_CONFIG + "_corrupted：",
+                    excepaiton,
+                );
+                try {
+                    sys.localStorage.setItem(this.KEY_CONFIG + "_corrupted", rawContent);
+                } catch (quotaEx) {
+                    console.error("[StorageManager] 隔离损坏存档失败：", quotaEx);
+                }
+            }
         }
 
         //每隔5秒保存一次数据，主要是为了保存最新在线时间，方便离线奖励时间判定
@@ -82,7 +103,8 @@ export class StorageManager {
         let account: string = this._jsonData.userId;
         if (this._jsonData[account]) {
             let value = this._jsonData[account][key];
-            return value ? value : "";
+            //用 nullish 判断替代 truthy 判断：合法的 0、false 不再被转成空字符串
+            return value ?? "";
         } else {
             log("no account can not load");
             return "";
@@ -171,7 +193,26 @@ export class StorageManager {
         let str = JSON.stringify(this._jsonData);
         let zipStr = "@" + Util.encrypt(str);
 
-        this._markSave = false;
-        sys.localStorage.setItem(this.KEY_CONFIG, zipStr);
+        try {
+            sys.localStorage.setItem(this.KEY_CONFIG, zipStr);
+
+            //只有写入成功才清除脏标记：配额满/平台写入失败时保留待保存状态，
+            //由 5 秒定时器继续重试；连续失败达到上限后停止重试，避免无限刷错
+            this._markSave = false;
+            this._saveFailCount = 0;
+        } catch (e) {
+            this._saveFailCount++;
+
+            if (this._saveFailCount >= StorageManager.MAX_SAVE_RETRY) {
+                //停止重试：本地进度可能无法继续保存，至少把现场打出来
+                console.error("[StorageManager] 存档连续写入失败，已停止自动重试：", e);
+                this._markSave = false;
+            } else {
+                console.error(
+                    `[StorageManager] 存档写入失败(${this._saveFailCount}/${StorageManager.MAX_SAVE_RETRY})，稍后重试：`,
+                    e,
+                );
+            }
+        }
     }
 }

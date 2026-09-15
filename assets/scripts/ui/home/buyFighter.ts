@@ -43,6 +43,12 @@ export class buyFighter extends Component {
 
         //展示对应卡片
         ResourceUtil.getCard(fighter["type"], (err: any, sf: any) => {
+            //卡牌属于可降级资源：加载失败只记录，不把 null 赋给 spriteFrame
+            if (err || !sf) {
+                console.error("[buyFighter] card load failed: ", fighter["type"], err);
+                return;
+            }
+
             if (this.spCardDouble.node.isValid) {
                 this.spCardDouble.spriteFrame = sf;
             }

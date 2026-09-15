@@ -12,13 +12,26 @@ export class GameLogic {
     public static isEnableVibrate: boolean = true; //是否开启震动
 
     /**
-     * 更新离线奖励
+     * 启动在线奖励计时
+     * 幂等启动：先停掉旧 timer，避免场景重建/重复初始化产生多个计时器
      */
     public static startOnlineReward() {
+        this.stopOnlineReward();
+
         this.onlineInterval = setInterval(() => {
             PlayerData.instance.updateOnlineReward(1000);
             ClientEvent.dispatchEvent(Constants.EVENT_NAME.UPDATE_ONLINE_REWARD);
         }, 1000);
+    }
+
+    /**
+     * 停止在线奖励计时（应用销毁/退出时调用）
+     */
+    public static stopOnlineReward() {
+        if (this.onlineInterval !== -1) {
+            clearInterval(this.onlineInterval);
+            this.onlineInterval = -1;
+        }
     }
 
     /**
@@ -40,7 +53,8 @@ export class GameLogic {
         switch (num) {
             case 1: //1个人
                 return [posCell];
-            case 2: { //另外：case 内直接声明变量会触发 ESLint no-case-declarations，这里用块作用域包裹 //物理射线结果的共享对象 hitPoint，原地修改会污染后续的格子判定，因此一律操作克隆对象。 //注意：不能用 posCell 原对象做加减。调用方（fighterManager._checkNewCell）传入的可能是 //2个人
+            case 2: {
+                //另外：case 内直接声明变量会触发 ESLint no-case-declarations，这里用块作用域包裹 //物理射线结果的共享对象 hitPoint，原地修改会污染后续的格子判定，因此一律操作克隆对象。 //注意：不能用 posCell 原对象做加减。调用方（fighterManager._checkNewCell）传入的可能是 //2个人
                 let posClone = posCell.clone();
                 let left = posCell.clone();
                 left.z -= Constants.CELL_FIGHTER_SPACING;

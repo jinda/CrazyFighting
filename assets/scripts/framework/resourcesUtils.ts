@@ -195,16 +195,45 @@ export class ResourceUtil {
      * @param parent 父节点
      */
     public static createUI(path: string, cb?: Function, parent?: Node) {
-        this.getUIPrefabRes(path, function (err: {}, prefab: Prefab) {
-            if (err) return;
-            let node: Node = instantiate(prefab);
+        this.getUIPrefabRes(path, (err: unknown, prefab: Prefab) => {
+            //每条路径必须恰好回调一次：错误时也必须回调，否则 UIManager 的 loading 状态
+            //永远无法复位，该界面永久锁死在“正在加载”且无法重试
+            if (err || !prefab) {
+                console.error("[ResourceUtil] create ui failed: ", path, err || "prefab is null");
+                if (cb) {
+                    cb(err || new Error(`create ui failed: prefab is null: ${path}`), null);
+                }
+                return;
+            }
+
+            let node: Node;
+            try {
+                node = instantiate(prefab);
+            } catch (e) {
+                console.error("[ResourceUtil] instantiate ui failed: ", path, e);
+                if (cb) {
+                    cb(e instanceof Error ? e : new Error(`instantiate ui failed: ${path}`), null);
+                }
+                return;
+            }
+
             node.setPosition(0, 0, 0);
             if (!parent) {
                 parent = find("Canvas") as Node;
             }
 
+            if (!parent) {
+                console.error("[ResourceUtil] create ui failed: Canvas not found: ", path);
+                if (cb) {
+                    cb(new Error(`create ui failed: Canvas not found: ${path}`), null);
+                }
+                return;
+            }
+
             parent.addChild(node);
-            cb && cb(null, node);
+            if (cb) {
+                cb(null, node);
+            }
         });
     }
 
