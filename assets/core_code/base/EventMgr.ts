@@ -1,0 +1,84 @@
+import { DoubleList } from "./DoubleList";
+
+/**
+ * 事件派发器，用于管理事件的派发和监听
+ *
+ *  */
+class EventManager {
+    private static _inst: EventManager;
+    public static get inst(): EventManager {
+        if (this._inst == null) {
+            this._inst = new EventManager();
+        }
+        return this._inst;
+    }
+
+    private _handlersMap: { [key: string]: DoubleList } = {};
+    public on(event: string, cb: Function, thisArg?: any, args?: [], once?: boolean) {
+        if (!event || !cb) {
+            return;
+        }
+
+        let handlers = this._handlersMap[event];
+        if (!handlers) {
+            handlers = this._handlersMap[event] = new DoubleList();
+        }
+
+        handlers.addToTail({
+            event: event,
+            cb: cb,
+            thisArg: thisArg,
+            once: once,
+            args: args,
+        });
+    }
+
+    public once(event: string, cb: Function, thisArg: any, args: []) {
+        this.on(event, cb, thisArg, args, true);
+    }
+
+    public off(event: string, cb: Function, thisArg?: any, once?: boolean) {
+        let handlers = this._handlersMap[event];
+        if (!handlers) {
+            return;
+        }
+
+        handlers.forEach((v) => {
+            let h = v.data;
+            if (h.cb == cb && h.thisArg == thisArg && h.once == once) {
+                v.dispose();
+                return true;
+            }
+        });
+    }
+
+    public clearAll(event?: string) {
+        if (event) {
+            let handlers = this._handlersMap[event];
+            handlers?.clear();
+            delete this._handlersMap[event];
+        } else {
+            for (let k in this._handlersMap) {
+                let handlers = this._handlersMap[k];
+                handlers?.clear();
+            }
+            this._handlersMap = {};
+        }
+    }
+
+    public emit(event: string, arg0?: any, arg1?: any, arg2?: any, arg3?: any, arg4?: any) {
+        let handlers = this._handlersMap[event];
+        if (!handlers || handlers.isEmpty) {
+            return;
+        }
+        let args = [arg0, arg1, arg2, arg3, arg4];
+        handlers.forEach((v) => {
+            let h = v.data;
+            if (h.event == event) {
+                h.cb.apply(h.thisArg, args);
+            }
+        });
+    }
+}
+
+export const EventMgr = EventManager.inst;

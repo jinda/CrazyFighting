@@ -5,7 +5,7 @@
   /* Add your custom configuration here. */
   "compilerOptions": {
     /* 脱离编辑器直接跑 `npm run typecheck` 时，需要显式声明 lib 才能解析引擎声明 */
-    "lib": ["ES2015", "DOM"],
+    "lib": ["ES2016", "DOM"],
     "skipLibCheck": true,
 
     /* 代码质量门禁（详见《代码规范审核报告》）：防止未使用符号与漏 return 回流 */

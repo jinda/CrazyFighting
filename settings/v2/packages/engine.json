@@ -6,7 +6,6 @@
     },
     "configs": {
       "migrationsConfig": {
-        "name": "迁移生成的配置",
         "cache": {
           "base": {
             "_value": true
@@ -174,7 +173,7 @@
             "_value": true
           },
           "procedural-animation": {
-            "_value": false
+            "_value": true
           },
           "custom-pipeline-post-process": {
             "_value": false
@@ -200,6 +199,7 @@
           }
         },
         "flags": {},
+        "name": "迁移生成的配置",
         "includeModules": [
           "2d",
           "3d",
@@ -217,6 +217,7 @@
           "particle",
           "physics-builtin",
           "primitive",
+          "procedural-animation",
           "profiler",
           "rich-text",
           "skeletal-animation",
