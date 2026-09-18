@@ -91,7 +91,7 @@ class PlatformManager {
      * @param startCb 开始播放回调
      * @param endCb 完成播放回调
      */
-    public showRewardedVideo(startCb: Function, endCb?: Function) {
+    public showRewardedVideo(startCb?: Function, endCb?: Function) {
         //暂停游戏
         egf.EventMgr.emit("GamePause");
         egf.AudioMgr.pause();
@@ -110,7 +110,7 @@ class PlatformManager {
     /**
      * 显示插屏广告
      */
-    public showInterstitialAd(startCb: Function, endCb?: Function) {
+    public showInterstitialAd(startCb?: Function, endCb?: Function) {
         this._sdkInterface?.showInterstitialAd(startCb, endCb);
     }
 

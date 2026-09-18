@@ -1,17 +1,26 @@
 import { sys } from "cc";
 import CryptoTS from "crypto-ts";
+import { ClientApi } from "./ClientApi";
+import { Constants } from "./Constants";
 const { AES } = CryptoTS;
 
 interface IGameInfo {
     deviceID: string;
     hasLoggedIn?: boolean; // 是否已经登录过
+    gold: number; //金币数量
+    level: number; //默认初始关卡
+    buyTimes: number; //购买次数
+    buyCellTimes: number; //购买格子的次数
+    unlock: Array<number>; //已解锁士兵
+    onlineReward: number; //在线奖励的数值
+    finishGuides: Array<number>; //完成的引导步骤
 }
 
 interface ISetting {
     musicVolume: number;
     soundVolume: number;
     language: string;
-    shakeSwith: boolean;
+    shakeSwith: number;
 }
 
 const AES_KEY = "eeffaif19822sf11156ff734fsefa9f0bb";
@@ -31,14 +40,19 @@ class LocalDataManager {
         musicVolume: 1,
         soundVolume: 1,
         language: "",
-        shakeSwith: true,
+        shakeSwith: 1,
     }; // 设置
 
     private _gameInfo: IGameInfo = {
         deviceID: "",
+        gold: 100, //金币数量
+        level: 1, //默认初始关卡
+        buyTimes: 0, //购买次数
+        buyCellTimes: 0, //购买格子的次数
+        unlock: [Constants.BASE_FIGHTER], //已解锁士兵
+        onlineReward: 0, //在线奖励的数值
+        finishGuides: [], //完成的引导步骤
     };
-
-    public guideStep: number = 0;
 
     public get Setting(): ISetting {
         return this._setting;
@@ -48,12 +62,22 @@ class LocalDataManager {
         return this._gameInfo;
     }
 
-    public loadData(id: number): void {
-        this.SettingStr += id;
-        this.GameInfoStr += id;
-
+    public loadData(): void {
         this.loadGameInfoData();
         this.loadSettingData();
+    }
+
+    public loadDataFromSever(): void {
+        this.loadServerData(this.GameInfoStr, (data: string) => {
+            this._gameInfo = egf.SafeJSON.parse(data) as IGameInfo;
+            //再次存档一次
+            this.saveGameInfoData();
+        });
+        this.loadServerData(this.SettingStr, (data: string) => {
+            this._setting = egf.SafeJSON.parse(data) as ISetting;
+            //再次存档一次
+            this.saveSettingData();
+        });
     }
 
     private loadGameInfoData() {
@@ -77,6 +101,9 @@ class LocalDataManager {
 
                 egf.AudioMgr.musicVolume = this._setting.musicVolume;
                 egf.AudioMgr.soundVolume = this._setting.soundVolume;
+
+                egf.Logger.log("language:", sys.language, sys.languageCode);
+                egf.i18nMgr.setLanguage(LocalDataMgr.Setting.language);
             } catch (error) {
                 egf.Logger.error("Failed to load and parse settings:", error);
             }
@@ -84,13 +111,59 @@ class LocalDataManager {
     }
 
     public saveGameInfoData() {
-        const encryptStr = AES.encrypt(egf.SafeJSON.stringify(this.GameInfo), AES_KEY).toString();
+        const encryptStr = AES.encrypt(egf.SafeJSON.stringify(this._gameInfo), AES_KEY).toString();
         sys.localStorage.setItem(this.GameInfoStr, encryptStr);
+        this.saveDataToServer(this.GameInfoStr, encryptStr);
     }
 
     public saveSettingData() {
-        const encryptStr = AES.encrypt(egf.SafeJSON.stringify(this.Setting), AES_KEY).toString();
+        const encryptStr = AES.encrypt(egf.SafeJSON.stringify(this._setting), AES_KEY).toString();
         sys.localStorage.setItem(this.SettingStr, encryptStr);
+        this.saveDataToServer(this.SettingStr, encryptStr);
+    }
+
+    public saveData() {
+        this.saveGameInfoData();
+        this.saveSettingData();
+    }
+
+    private loadServerData(key: string, cb: (data: string) => void) {
+        if (!ClientApi.inst.userInfo) {
+            egf.Logger.warn("请先登陆获取用户信息！");
+            return;
+        }
+        ClientApi.inst.getData(
+            key,
+            (data) => {
+                egf.Logger.log("loadServGameInfoData success:", data);
+                if (data?.value) {
+                    const decryptStr = AES.decrypt(data.value, AES_KEY).toString(CryptoTS.enc.Utf8);
+                    cb && cb(decryptStr);
+                } else {
+                    egf.Logger.log("loadServGameInfoData is null");
+                }
+            },
+            (errcode, errmsg) => {
+                egf.Logger.log("loadServGameInfoData error:", errmsg);
+            },
+        );
+    }
+
+    private saveDataToServer(key: string, encryptStr: string) {
+        if (!ClientApi.inst.userInfo) {
+            egf.Logger.warn("请先登陆获取用户信息！");
+            return;
+        }
+        ClientApi.inst.saveData(
+            key,
+            encryptStr,
+            () => {
+                egf.Logger.log("saveData success:", key);
+            },
+            (errcode, errmsg) => {
+                egf.Logger.log("saveData error:", errmsg);
+            },
+        );
     }
 }
 

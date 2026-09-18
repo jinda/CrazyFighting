@@ -1,19 +1,19 @@
 // import ResMgr from "../Managers/ResMgr";
-import { EDITOR, EDITOR_NOT_IN_PREVIEW, PREVIEW } from "cc/env";
+import { EDITOR_NOT_IN_PREVIEW } from "cc/env";
 import * as i18nLabel from "./i18n/i18nLabel";
 import * as i18nSprite from "./i18n/i18nSprite";
-import { Asset, JsonAsset, Label, SpriteFrame, assetManager, isValid } from "cc";
-import ResMgr from "./ResMgr";
+import { JsonAsset, Label, SpriteFrame, assetManager, isValid, sys } from "cc";
+import { ResMgr } from "./ResMgr";
 
 export enum ELanguage {
-    zh = "zh_cn", // 简体中文
+    "zh-cn" = "zh_cn", // 简体中文
     "zh-tw" = "zh_tw", // 繁体中文
     en = "en_us", // 英文
-    "hi-in" = "hi_in", // 印地语
-    "pt-br" = "pt_br", // 葡萄牙语
-    "es-es" = "es_es", // 西班牙语
-    "ar-sa" = "ar_sa", // 阿拉伯语
-    "ja-jp" = "ja_jp", // 日语
+    hi = "hi_in", // 印地语
+    pt = "pt_br", // 葡萄牙语
+    es = "es_es", // 西班牙语
+    ar = "ar_sa", // 阿拉伯语
+    ja = "ja_jp", // 日语
 }
 
 export enum ELanguageKey {
@@ -36,7 +36,7 @@ class i18nManager {
         return this._inst;
     }
 
-    private _language = "en_us"; // 当前语言
+    private _language = ELanguage[sys.languageCode as keyof typeof ELanguage]; // 当前语言
     private _labelArr: i18nLabel.i18nLabel[] = []; // i18nLabel 列表
     private _labelData: { [key: string]: string } = {}; // 文字配置
     private _spriteArr: i18nSprite.i18nSprite[] = []; // i18nSprite 列表
@@ -156,10 +156,10 @@ class i18nManager {
             });
         } else {
             let fullPath = "sprite/" + this._language + "/" + path + "/spriteFrame";
-            if (ResMgr.inst.isRemoteUrl(this._bundleName)) {
+            if (ResMgr.isRemoteUrl(this._bundleName)) {
                 fullPath = this._bundleName + this._language + "/" + path;
             }
-            ResMgr.inst.getAsset(this._bundleName, fullPath, cb, SpriteFrame);
+            ResMgr.getAsset(this._bundleName, fullPath, cb, SpriteFrame);
         }
     }
 
@@ -210,10 +210,10 @@ class i18nManager {
         } else {
             egf.Logger.log("reloadLabel:", this._language);
             let path = "label/" + this._language;
-            if (ResMgr.inst.isRemoteUrl(this._bundleName)) {
+            if (ResMgr.isRemoteUrl(this._bundleName)) {
                 path = this._bundleName + this._language + ".json";
             }
-            ResMgr.inst.getAsset(
+            ResMgr.getAsset(
                 this._bundleName,
                 path,
                 (data: JsonAsset) => {

@@ -1,8 +1,6 @@
 import { NetNode, NetConnectOptions, NetNodeState } from "./NetNode";
 import { CallbackObject, NetCallFunc, IProtocolHelper } from "./NetInterface";
-// import { WebTransportIO } from './WebTransportIO';
-// import { WebSock } from './WebSock';
-import { SocketIO } from "./SocketIO";
+import { WebSock } from "./WebSock";
 
 /*
  *   网络节点管理类
@@ -29,7 +27,7 @@ class NetManager {
      */
     public init(channelId?: number, protocolHelper?: IProtocolHelper, networkTips?: any): void {
         let netNode = new NetNode();
-        netNode.init(new SocketIO(), protocolHelper!, networkTips);
+        netNode.init(new WebSock(), protocolHelper!, networkTips);
         this.setNetNode(netNode, channelId);
     }
 

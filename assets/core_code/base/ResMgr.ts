@@ -21,11 +21,11 @@ interface ILoadTask {
 
 const oneLoadCount = 12; // 每次加载的最大资源数量 (increased for web browser HTTP/2 multiplexing)
 
-export default class ResMgr {
-    private static _inst: ResMgr;
-    public static get inst(): ResMgr {
+class ResManager {
+    private static _inst: ResManager;
+    public static get inst(): ResManager {
         if (this._inst == null) {
-            this._inst = new ResMgr();
+            this._inst = new ResManager();
         }
         return this._inst;
     }
@@ -473,3 +473,5 @@ export default class ResMgr {
         }
     }
 }
+
+export const ResMgr = ResManager.inst;

@@ -21,8 +21,8 @@ export enum EAdType {
 export interface SDKInterface {
     init(params?: any, cb?: Function): boolean;
     initAd(params?: any): boolean;
-    showRewardedVideo(startCb: Function, endCb?: Function): void;
-    showInterstitialAd(startCb: Function, endCb?: Function): void;
+    showRewardedVideo(startCb?: Function, endCb?: Function): void;
+    showInterstitialAd(startCb?: Function, endCb?: Function): void;
     /**
      * 设置 banner 广告显示/隐藏
      * @param visible true=显示, false=隐藏

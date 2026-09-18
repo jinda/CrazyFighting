@@ -31,8 +31,8 @@ import { UIMgr } from "./ui_framework/UIMgr";
 import { URLUtils } from "./base/URLUtils";
 import { Utils } from "./base/Utils";
 import { TweenUtils } from "./base/TweenUtils";
-import ResMgr from "./base/ResMgr";
-import { ELanguage, i18nMgr } from "./base/i18nMgr";
+import { ResMgr } from "./base/ResMgr";
+import { ELanguage, ELanguageKey, i18nMgr } from "./base/i18nMgr";
 import Logger from "./base/Logger";
 import { NetMgr } from "./network/NetMgr";
 import { DefStringProtocol, INetworkTips, NetData } from "./network/NetInterface";
@@ -47,7 +47,10 @@ import RedDotComponent from "./redDot/RedDotComponent";
 import { HttpEvent, HttpMgr } from "./network/HttpMgr";
 import { SimpleStateMachine, State, StateMachine } from "./fsm";
 import { Layout_Toast } from "./ui_framework/tips/Layout_Toast";
-import { UIToast } from "./ui_framework/tips/UIToast";
+import { UI_Toast } from "./ui_framework/tips/UI_Toast";
+import { SecureValue } from "./base/SecureValue";
+import { PoolMgr } from "./base/PoolMgr";
+import Time from "./base/time";
 
 const __egf__ = {
     ISceneInfo,
@@ -61,6 +64,7 @@ const __egf__ = {
     ResMgr,
     i18nMgr,
     ELanguage,
+    ELanguageKey,
     Logger,
     NetMgr,
     DefStringProtocol,
@@ -82,7 +86,7 @@ const __egf__ = {
     Layout_UIWaiting,
     UIWaiting,
     Layout_Toast,
-    UIToast,
+    UI_Toast,
     UIController,
     UILayers,
     UILayerNames,
@@ -104,6 +108,9 @@ const __egf__ = {
     SimpleStateMachine,
     StateMachine,
     State,
+    SecureValue,
+    PoolMgr,
+    Time,
 } as const;
 
 (globalThis as any)["egf"] = __egf__;
@@ -123,6 +130,7 @@ declare global {
                 ResMgr,
                 i18nMgr,
                 ELanguage,
+                ELanguageKey,
                 Logger,
                 NetMgr,
                 DefStringProtocol,
@@ -147,7 +155,7 @@ declare global {
                 Layout_UIWaiting,
                 UIWaiting,
                 Layout_Toast,
-                UIToast,
+                UI_Toast,
                 UIController,
                 UILayers,
                 UILayerNames,
@@ -171,6 +179,9 @@ declare global {
                 SimpleStateMachine,
                 StateMachine,
                 State,
+                SecureValue,
+                PoolMgr,
+                Time,
             };
         }
     }

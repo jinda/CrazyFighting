@@ -1,4 +1,4 @@
-import { AudioClip, JsonAsset, Prefab, Scene, SpriteFrame } from "cc";
+import { AudioClip, TextAsset, JsonAsset, Prefab, Scene, SpriteFrame } from "cc";
 
 var resPkg = {
     module_sounds: {
@@ -6,18 +6,18 @@ var resPkg = {
         urls: [],
     },
 
-    module_basic: [
+    module_game: [
         {
             assetType: Scene,
-            urls: ["scene_mainmenu/main_menu"],
+            urls: ["scene/fight"],
         },
         {
             assetType: Prefab,
-            urls: ["ui_waiting/UI_Waiting"],
+            urls: [],
         },
         {
-            assetType: JsonAsset,
-            urls: ["config/ItemConfig"],
+            assetType: TextAsset,
+            urls: ["datas/fighter", "datas/level"],
         },
     ],
     module_i18n: [
@@ -32,7 +32,7 @@ var resPkg = {
     ],
     module_extra: {
         assetType: Prefab,
-        urls: ["ui_setting/UI_Setting", "ui_tips/UI_Tips", "ui_alert/UI_Alert"],
+        urls: ["ui_alert/UI_Alert", "ui_common_tips/UI_CommonTips", "ui_toast/UI_Toast"],
     },
 };
 

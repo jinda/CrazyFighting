@@ -5,6 +5,7 @@ interface EnvConfig {
     remoteResUrl: string;
     platform: EPlatform;
     game_code: string;
+    version: string;
 }
 
 export const GetEnvConfig = (): EnvConfig => {

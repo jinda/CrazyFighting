@@ -25,7 +25,7 @@ export interface IUserInfo {
     /**
      * 玩家唯一 ID
      */
-    uid: number;
+    uid: string;
     /**
      * 昵称
      */

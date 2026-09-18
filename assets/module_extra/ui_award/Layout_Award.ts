@@ -4,17 +4,17 @@ const { ccclass, property } = _decorator;
 @ccclass("Layout_Award")
 export class Layout_Award extends Component {
     @property(Button)
-    btnBack: Button;
+    btnBack: Button = null!;
     @property(Button)
-    btnGet: Button;
+    btnGet: Button = null!;
     @property(Button)
-    btnDoubleGet: Button;
+    btnDoubleGet: Button = null!;
     @property(Label)
-    labelContent: Label;
+    labelContent: Label = null!;
     @property(Label)
-    labelCoin: Label;
+    labelCoin: Label = null!;
     @property(Node)
-    nodeAd: Node;
+    nodeAd: Node = null!;
 
     public showInfo(bOnline: boolean, coin: number, bDailyGift: boolean) {
         if (bOnline) {

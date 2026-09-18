@@ -3,26 +3,26 @@ const { ccclass, property } = _decorator;
 
 @ccclass("Layout_Setting")
 export class Layout_Setting extends Component {
-  @property(Button)
-  btnClose: Button;
-  @property(Button)
-  btnMenu: Button;
-  @property(Button)
-  btnRestart: Button;
-  @property(Button)
-  btnContinue: Button;
-  @property(Button)
-  btnLanguage: Button;
+    @property(Button)
+    btnClose: Button = null!;
+    @property(Button)
+    btnMenu: Button = null!;
+    @property(Button)
+    btnRestart: Button = null!;
+    @property(Button)
+    btnContinue: Button = null!;
+    @property(Button)
+    btnLanguage: Button = null!;
 
-  @property(Toggle)
-  tgMusic: Toggle;
-  @property(Toggle)
-  tgEffect: Toggle;
-  @property(Toggle)
-  tgShake: Toggle;
+    @property(Toggle)
+    tgMusic: Toggle = null!;
+    @property(Toggle)
+    tgEffect: Toggle = null!;
+    @property(Toggle)
+    tgShake: Toggle = null!;
 
-  @property(Label)
-  labelVer: Label;
-  @property(Label)
-  labelLanguage: Label;
+    @property(Label)
+    labelVer: Label = null!;
+    @property(Label)
+    labelLanguage: Label = null!;
 }
