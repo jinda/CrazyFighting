@@ -288,4 +288,9 @@ export class Constants {
         UPGRADE: 1, //升级
         EXCHANGE: 2, //交换
     };
+
+    /**
+     * 排行榜玩法标识（对应服务器后台配置的 mode）
+     */
+    static LeaderboardMode = "crazyfight_level";
 }

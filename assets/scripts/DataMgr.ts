@@ -2,7 +2,7 @@
  * 网络数据管理器
  */
 
-import { Vec3 } from "cc";
+import { Camera, Vec3 } from "cc";
 import { IUserInfo } from "./apiInterface";
 import { Constants } from "./Constants";
 
@@ -33,6 +33,8 @@ class DataManager {
     public userData: IUserInfo | null = null; // 用户数据
     public onlineGetTime: number = 0; // 在线奖励获取时间
     public bBannerAd: boolean = false; // 是否显示banner
+    public isDebugMode: boolean = false; // 调试模式
+    public mainCamera: Camera = null!; //相机组件
 
     /**
      * 根据人数获取士兵位置
@@ -40,7 +42,7 @@ class DataManager {
      * @param num
      * @returns
      */
-    public static getFighterPosByNum(posCell: Vec3, num: number) {
+    public getFighterPosByNum(posCell: Vec3, num: number) {
         switch (num) {
             case 1: //1个人
                 return [posCell];

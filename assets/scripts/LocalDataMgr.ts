@@ -14,6 +14,7 @@ interface IGameInfo {
     unlock: Array<number>; //已解锁士兵
     onlineReward: number; //在线奖励的数值
     finishGuides: Array<number>; //完成的引导步骤
+    formation: { [key: number]: number }; //阵型
 }
 
 interface ISetting {
@@ -52,6 +53,7 @@ class LocalDataManager {
         unlock: [Constants.BASE_FIGHTER], //已解锁士兵
         onlineReward: 0, //在线奖励的数值
         finishGuides: [], //完成的引导步骤
+        formation: { 1: 101, 2: 101, 3: 101 },
     };
 
     public get Setting(): ISetting {
@@ -164,6 +166,32 @@ class LocalDataManager {
                 egf.Logger.log("saveData error:", errmsg);
             },
         );
+    }
+
+    /**
+     * 格子上的士兵数据互换
+     * @param cellA
+     * @param cellB
+     */
+    public swapCell(cellA: number, cellB: number) {
+        let tmp = this.GameInfo.formation[cellA];
+        this.GameInfo.formation[cellA] = this.GameInfo.formation[cellB];
+        this.GameInfo.formation[cellB] = tmp;
+
+        this.saveGameInfoData();
+    }
+
+    /**
+     * 合并格子
+     * @param cellOld
+     * @param cellTarge
+     * @param nextId
+     */
+    public combineCell(cellOld: number, cellTarget: number, nextId: number) {
+        this.GameInfo.formation[cellOld] = 0;
+        this.GameInfo.formation[cellTarget] = nextId;
+
+        this.saveGameInfoData();
     }
 }
 
