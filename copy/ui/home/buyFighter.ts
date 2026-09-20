@@ -7,6 +7,8 @@ import Constants from "../../framework/constants";
 import { ClientEvent } from "../../framework/clientEvent";
 import { ResourceUtil } from "../../framework/resourcesUtils";
 import { localConfig } from "../../framework/localConfig";
+import { DataMgr } from "../../DataMgr";
+import { LocalDataMgr } from "../../LocalDataMgr";
 const { ccclass, property } = _decorator;
 //购买士兵界面
 @ccclass("buyFighter")

@@ -156,7 +156,6 @@ export class homeUI extends Component {
     }
 
     onEnable() {
-        ClientEvent.on(Constants.EVENT_NAME.UPDATE_GOLD, this._updateGold, this);
         ClientEvent.on(Constants.EVENT_NAME.UPDATE_FORMATION, this._updateFormation, this);
         ClientEvent.on(Constants.EVENT_NAME.UPDATE_LEVEL, this._updateLevel, this);
         ClientEvent.on(Constants.EVENT_NAME.SHOW_LEVEL_TIPS, this._showLevelTips, this);

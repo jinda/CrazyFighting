@@ -1129,7 +1129,7 @@
       "__id__": 41
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 43
@@ -1249,9 +1249,9 @@
     "_enableOutline": true,
     "_outlineColor": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 92,
+      "g": 49,
+      "b": 24,
       "a": 255
     },
     "_outlineWidth": 2,
@@ -1393,7 +1393,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -103.16000366210938,
+      "x": -154.74000549316406,
       "y": 0,
       "z": 0
     },
@@ -1493,9 +1493,9 @@
     "_enableOutline": true,
     "_outlineColor": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 92,
+      "g": 49,
+      "b": 24,
       "a": 255
     },
     "_outlineWidth": 2,
@@ -1637,7 +1637,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 0,
+      "x": -51.58000183105469,
       "y": 0,
       "z": 0
     },
@@ -1737,9 +1737,9 @@
     "_enableOutline": true,
     "_outlineColor": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 92,
+      "g": 49,
+      "b": 24,
       "a": 255
     },
     "_outlineWidth": 2,
@@ -1881,7 +1881,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 103.16000366210938,
+      "x": 51.58000183105469,
       "y": 0,
       "z": 0
     },
@@ -1981,9 +1981,9 @@
     "_enableOutline": true,
     "_outlineColor": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 92,
+      "g": 49,
+      "b": 24,
       "a": 255
     },
     "_outlineWidth": 2,
@@ -2125,7 +2125,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 206.32000732421875,
+      "x": 154.74000549316406,
       "y": 0,
       "z": 0
     },
@@ -2225,9 +2225,9 @@
     "_enableOutline": true,
     "_outlineColor": {
       "__type__": "cc.Color",
-      "r": 0,
-      "g": 0,
-      "b": 0,
+      "r": 92,
+      "g": 49,
+      "b": 24,
       "a": 255
     },
     "_outlineWidth": 2,
@@ -2354,7 +2354,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 495.8000183105469,
+      "width": 392.6400146484375,
       "height": 100
     },
     "_anchorPoint": {

@@ -2,6 +2,7 @@ import { Layout_UI_HUD } from "./Layout_HUD";
 import { UI_Award, UI_Help, UI_HUD, UI_Setting } from "../../scripts/UIDef";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { DataMgr } from "../../scripts/DataMgr";
+import { Vec3 } from "cc";
 
 @egf_class(ModuleDef.EXTRA, UI_HUD)
 export class UI_HUD_Impl extends egf.UIController {
@@ -71,9 +72,12 @@ export class UI_HUD_Impl extends egf.UIController {
         egf.AudioMgr.playOneShot("tap");
     }
 
-    private showCoinFly(coin: number) {
+    private showCoinFly(params: any) {
         let layout = this.layout as Layout_UI_HUD;
         egf.AudioMgr.playOneShot("getCoin");
+        const coin = params.coin;
+        const pos = params.pos ? params.pos : Vec3.ZERO;
+        layout.nodeCoin.position = pos;
         egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.btnCoin.node.worldPosition, coin);
     }
     private showStaminaFly(coin: number) {

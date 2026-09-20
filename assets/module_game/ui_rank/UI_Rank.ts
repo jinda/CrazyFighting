@@ -65,11 +65,11 @@ export class UI_Rank extends egf.UIController {
     clickRank(btn: any, type: string) {
         this._type = type;
         let layout = this.layout as Layout_Rank;
-        layout.labelDay.color = new Color().fromHEX(type == "day" ? "#FFFFFF" : "#584543");
-        layout.labelMonth.color = new Color().fromHEX(type == "month" ? "#FFFFFF" : "#584543");
-        layout.labelWeekly.color = new Color().fromHEX(type == "weekly" ? "#FFFFFF" : "#584543");
-        layout.labelAll.color = new Color().fromHEX(type == "all" ? "#FFFFFF" : "#584543");
-        layout.labelFriend.color = new Color().fromHEX(type == "friend" ? "#FFFFFF" : "#584543");
+        layout.labelDay.color = new Color().fromHEX(type == "day" ? "#FFFFFF" : "#6F6047");
+        layout.labelMonth.color = new Color().fromHEX(type == "month" ? "#FFFFFF" : "#6F6047");
+        layout.labelWeekly.color = new Color().fromHEX(type == "weekly" ? "#FFFFFF" : "#6F6047");
+        layout.labelAll.color = new Color().fromHEX(type == "all" ? "#FFFFFF" : "#6F6047");
+        layout.labelFriend.color = new Color().fromHEX(type == "friend" ? "#FFFFFF" : "#6F6047");
 
         layout.scrollView.node.active = false;
         layout.nodeSubContentView.active = false;

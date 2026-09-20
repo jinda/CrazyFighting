@@ -25,15 +25,15 @@ export interface IUserInfo {
     /**
      * 玩家唯一 ID
      */
-    uid: string;
+    uid?: string;
     /**
      * 昵称
      */
-    nickname: string;
+    nickname?: string;
     /**
      * 头像 URL
      */
-    avatar: string;
+    avatar?: string;
     /**
      * 等级
      */

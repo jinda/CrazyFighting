@@ -293,4 +293,9 @@ export class Constants {
      * 排行榜玩法标识（对应服务器后台配置的 mode）
      */
     static LeaderboardMode = "crazyfight_level";
+
+    // 技能CD时间
+    static SkillCD = 10;
+    // 观看视频可领取金币数量
+    static awardCoin = 100;
 }

@@ -18,7 +18,7 @@ import { DataMgr } from "db://assets/scripts/DataMgr";
 import { Fighter } from "./Fighter";
 import { FormationCell } from "./FormationCell";
 import { LocalDataMgr } from "db://assets/scripts/LocalDataMgr";
-import { GameCfg } from "./GameConfig";
+import { GameMgr } from "./GameMgr";
 
 const { ccclass, property } = _decorator;
 //“管理所有士兵”的脚本
@@ -111,7 +111,7 @@ export class FighterManager extends Component {
         this._fightReset();
 
         //首次进来的话检查下是否处于新手引导第一关，直接开始
-        if (DataMgr.userData!.level === 1) {
+        if (DataMgr.level === 1) {
             //第一关就直接认定为新手引导关卡，直接开始游戏
             this._fightStart(1.5);
         }
@@ -143,7 +143,7 @@ export class FighterManager extends Component {
         this._physicsAccumulator = 0;
 
         //第1关特殊处理
-        this.cameraFollow.initCamera(DataMgr.userData!.level === 1);
+        this.cameraFollow.initCamera(DataMgr.level === 1);
 
         //重置敌我双方士兵状态
         for (const team in this.dictFighter) {
@@ -198,7 +198,7 @@ export class FighterManager extends Component {
             }
 
             //获取敌方士兵阵型
-            let enemyFormation = this.getCurLevelEnemy();
+            let enemyFormation = GameMgr.getCurLevelEnemy();
 
             for (let pos in enemyFormation) {
                 arrEnemy[pos] = enemyFormation[pos];
@@ -530,7 +530,7 @@ export class FighterManager extends Component {
             let size = view.getCanvasSize();
 
             //如果胜利，则利用射线检测，在屏幕中央的地板位置播放胜利特效
-            DataMgr.mainCamera.screenPointToRay(size.width / 2, size.height / 2, outRay);
+            GameMgr.mainCamera.screenPointToRay(size.width / 2, size.height / 2, outRay);
             PhysicsSystem.instance.raycastClosest(outRay, Constants.COLLIDER_GROUP.PLANE, 50, false);
             const hitPoint = PhysicsSystem.instance.raycastClosestResult.hitPoint;
 
@@ -661,7 +661,7 @@ export class FighterManager extends Component {
      * @param pos
      */
     private _checkSelectCell(pos: Vec2) {
-        DataMgr.mainCamera.screenPointToRay(pos.x, pos.y, this._outRay1);
+        GameMgr.mainCamera.screenPointToRay(pos.x, pos.y, this._outRay1);
         let isCheck = PhysicsSystem.instance.raycastClosest(this._outRay1, Constants.COLLIDER_GROUP.PLANE, 50, false);
 
         if (isCheck) {
@@ -677,7 +677,7 @@ export class FighterManager extends Component {
 
                 let fighterId = cell.fighterId;
                 //士兵的下一等级
-                let next = this.getFighterNextId(fighterId);
+                let next = GameMgr.getFighterNextId(fighterId);
                 //检查士兵是否可以合成更高级的士兵
                 if (next > 0) {
                     this._hideAllSimilar();
@@ -725,7 +725,7 @@ export class FighterManager extends Component {
         this._curTouchPos.set(touchPos);
 
         if (this._currentSelect >= 0) {
-            DataMgr.mainCamera.screenPointToRay(touchPos.x, touchPos.y, this._outRay1);
+            GameMgr.mainCamera.screenPointToRay(touchPos.x, touchPos.y, this._outRay1);
             //是否点击到地面
             let isCheck = PhysicsSystem.instance.raycastClosest(
                 this._outRay1,
@@ -737,7 +737,7 @@ export class FighterManager extends Component {
                 //得到在地面的触摸点
                 let hitPoint = PhysicsSystem.instance.raycastClosestResult.hitPoint;
                 //根据人数获取到士兵位置
-                let arrPos = DataMgr.getFighterPosByNum(hitPoint, this._arySelectFighterIdentity.length);
+                let arrPos = GameMgr.getFighterPosByNum(hitPoint, this._arySelectFighterIdentity.length);
 
                 //选中的格子上的战士的位置始终和到当前触摸点位置保持一致, 但此时坐标并没有真正更新过来
                 for (let idx = 0; idx < arrPos.length; idx++) {
@@ -863,7 +863,7 @@ export class FighterManager extends Component {
         //更新目标格子上的士兵
         if (cellTarget.aryIdentity.length > 0) {
             this._tempPos.set(cellTarget.node.worldPosition);
-            let arrPos = DataMgr.getFighterPosByNum(this._tempPos, cellTarget.aryIdentity.length);
+            let arrPos = GameMgr.getFighterPosByNum(this._tempPos, cellTarget.aryIdentity.length);
 
             cellTarget.aryIdentity.forEach((identity: any, index: number) => {
                 let fighter = this.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
@@ -876,7 +876,7 @@ export class FighterManager extends Component {
         //更新玩家拖拽/选中的格子上的士兵
         if (cellSelect.aryIdentity.length > 0) {
             this._tempPos.set(cellSelect.node.worldPosition);
-            let arrPos = DataMgr.getFighterPosByNum(this._tempPos, cellSelect.aryIdentity.length);
+            let arrPos = GameMgr.getFighterPosByNum(this._tempPos, cellSelect.aryIdentity.length);
 
             cellSelect.aryIdentity.forEach((identity: any, index: number) => {
                 let fighter = this.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
@@ -896,7 +896,7 @@ export class FighterManager extends Component {
      */
     private _combineCell(cellSelect: FormationCell, cellTarget: FormationCell) {
         //下一等级的士兵
-        let nextId = this.getFighterNextId(cellSelect.fighterId);
+        let nextId = GameMgr.getFighterNextId(cellSelect.fighterId);
 
         //有找到，可升级
         if (nextId > 0) {
@@ -930,7 +930,7 @@ export class FighterManager extends Component {
             //玩家手中拖拽的格子的脚本
             let cellSelect = this._dictCell[this._currentSelect].getComponent(FormationCell) as FormationCell;
 
-            DataMgr.mainCamera.screenPointToRay(pos.x, pos.y, this._outRay1);
+            GameMgr.mainCamera.screenPointToRay(pos.x, pos.y, this._outRay1);
 
             let isCheck = PhysicsSystem.instance.raycastClosest(
                 this._outRay1,
@@ -1052,7 +1052,7 @@ export class FighterManager extends Component {
             let percent = Constants.FIRE_BALL_DAMAGE_PERCENT;
 
             //如果关卡小于20关则伤害百分比为100%
-            if (DataMgr.userData!.level < 20) {
+            if (DataMgr.level < 20) {
                 percent = 1;
             }
 
@@ -1089,7 +1089,7 @@ export class FighterManager extends Component {
         let ndCell = this._dictCell[2];
 
         let ndCanvas = find("Canvas") as Node;
-        DataMgr.mainCamera.convertToUINode(ndCell.getWorldPosition(), ndCanvas, this._outPos);
+        GameMgr.mainCamera.convertToUINode(ndCell.getWorldPosition(), ndCanvas, this._outPos);
 
         //获取适合的点击点
         let cellStart = -1,
@@ -1111,8 +1111,8 @@ export class FighterManager extends Component {
             cellEnd = 2;
         }
 
-        DataMgr.mainCamera.convertToUINode(arrCell[cellStart].getWorldPosition(), ndCanvas, this._startPos);
-        DataMgr.mainCamera.convertToUINode(arrCell[cellEnd].getWorldPosition(), ndCanvas, this._endPos);
+        GameMgr.mainCamera.convertToUINode(arrCell[cellStart].getWorldPosition(), ndCanvas, this._startPos);
+        GameMgr.mainCamera.convertToUINode(arrCell[cellEnd].getWorldPosition(), ndCanvas, this._endPos);
 
         //视窗裁剪区域
         let viewSize = view.getViewportRect();
@@ -1238,77 +1238,5 @@ export class FighterManager extends Component {
                 this._physicsAccumulator = 0;
             }
         }
-    }
-
-    /**
-     * 获得当前阵型战力
-     */
-    public getFormationFight() {
-        let formation = LocalDataMgr.GameInfo.formation;
-        return this._getFormationFight(formation);
-    }
-
-    /**
-     * 获得当前阵型战力
-     * @param formation
-     * @returns
-     */
-    private _getFormationFight(formation: any) {
-        let num = 0;
-        for (let pos in formation) {
-            let fighterId = formation[pos];
-
-            if (fighterId > 0) {
-                let fighter = GameCfg.queryByID("fighter", fighterId);
-                num += fighter["num"] * fighter["fight"];
-            }
-        }
-
-        return num;
-    }
-
-    /**
-     * 获得当前敌方战力
-     */
-    public getCurLevelEnemyFight() {
-        return this._getFormationFight(this.getCurLevelEnemy());
-    }
-
-    /**
-     * 获取当前等级的敌人阵型
-     * @returns
-     */
-    public getCurLevelEnemy() {
-        let levelInfo = GameCfg.queryByID("level", DataMgr.userData!.level.toString());
-
-        let arrEnemyInfo = levelInfo["formation"].split("_");
-
-        let dictFormation: { [key: number]: number } = {};
-        arrEnemyInfo.forEach((enemy: any) => {
-            let enemyInfo = enemy.split("#");
-            let fighterId = enemyInfo[0];
-            let pos = enemyInfo[1];
-
-            dictFormation[pos] = fighterId;
-        });
-
-        return dictFormation;
-    }
-    /**
-     * 获得下一等级的士兵id
-     * @param fighterId
-     */
-    public getFighterNextId(fighterId: number): number {
-        let fighterInfo = GameCfg.queryByID("fighter", fighterId.toString());
-
-        let next = GameCfg.queryOneByCondition("fighter", {
-            level: fighterInfo.level + 1,
-            type: fighterInfo.type,
-        });
-        if (next) {
-            return Number(next.ID);
-        }
-
-        return -1;
     }
 }

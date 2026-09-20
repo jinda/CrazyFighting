@@ -1,7 +1,7 @@
 import { _decorator, Component, Vec3, CameraComponent, Tween, lerp, CCInteger, Node } from "cc";
 import { Fighter } from "./Fighter";
 import { FighterManager } from "./FighterManager";
-import { DataMgr } from "db://assets/scripts/DataMgr";
+import { GameMgr } from "./GameMgr";
 
 //相机脚本
 const { ccclass, property } = _decorator;
@@ -34,7 +34,7 @@ export class Follow extends Component {
     private _targetPos: Vec3 = null!; //目标位置
 
     onLoad() {
-        DataMgr.mainCamera = this.camera;
+        GameMgr.mainCamera = this.camera;
     }
 
     start() {

@@ -2,15 +2,17 @@ import { sys } from "cc";
 import CryptoTS from "crypto-ts";
 import { ClientApi } from "./ClientApi";
 import { Constants } from "./Constants";
+import { DataMgr } from "./DataMgr";
 const { AES } = CryptoTS;
 
 interface IGameInfo {
     deviceID: string;
     hasLoggedIn?: boolean; // 是否已经登录过
-    gold: number; //金币数量
+    coin: number; //金币数量
     level: number; //默认初始关卡
-    buyTimes: number; //购买次数
-    buyCellTimes: number; //购买格子的次数
+    coinLv: number; // 金币等级
+    fighterLv: number; // 战士等级
+    landLv: number; // 土地等级
     unlock: Array<number>; //已解锁士兵
     onlineReward: number; //在线奖励的数值
     finishGuides: Array<number>; //完成的引导步骤
@@ -46,10 +48,11 @@ class LocalDataManager {
 
     private _gameInfo: IGameInfo = {
         deviceID: "",
-        gold: 100, //金币数量
-        level: 1, //默认初始关卡
-        buyTimes: 0, //购买次数
-        buyCellTimes: 0, //购买格子的次数
+        coin: 100, //金币数量
+        level: 0, //默认初始关卡
+        coinLv: 0,
+        fighterLv: 0,
+        landLv: 0,
         unlock: [Constants.BASE_FIGHTER], //已解锁士兵
         onlineReward: 0, //在线奖励的数值
         finishGuides: [], //完成的引导步骤
@@ -88,6 +91,9 @@ class LocalDataManager {
             try {
                 const decryptStr = AES.decrypt(encryptStr, AES_KEY).toString(CryptoTS.enc.Utf8);
                 this._gameInfo = egf.SafeJSON.parse(decryptStr) as IGameInfo;
+                DataMgr.coin = this._gameInfo.coin ?? 0;
+                DataMgr.level = this._gameInfo.level ?? 0;
+                egf.Logger.log("loadGameInfoData:", this._gameInfo);
             } catch (error) {
                 egf.Logger.error("Failed to load and parse gameinfo:", error);
             }
@@ -191,6 +197,110 @@ class LocalDataManager {
         this.GameInfo.formation[cellOld] = 0;
         this.GameInfo.formation[cellTarget] = nextId;
 
+        this.saveGameInfoData();
+    }
+
+    /**
+     * 生成新的格子数据并添加到队列里面去
+     * @returns
+     */
+    public addCell() {
+        const len = Object.keys(this.GameInfo.formation).length;
+        //从数组里面取对应的位置
+        let nextPos = Constants.UNLOCK_CELL_SEQ[len];
+        //如果超过24个，则位置的值网上累加
+        if (len >= Constants.UNLOCK_CELL_SEQ.length) {
+            nextPos = len;
+        }
+
+        //刚生成的格子上默认没有士兵
+        this.GameInfo.formation[nextPos] = 0;
+        this.saveGameInfoData();
+        return nextPos;
+    }
+
+    /**
+     * 获得已经解锁的士兵
+     */
+    public getUnlockFighters(): number[] {
+        if (this._gameInfo.unlock) {
+            return this._gameInfo.unlock;
+        }
+
+        return [Constants.BASE_FIGHTER];
+    }
+    /**
+     * 获得阵型上空闲格子的位置
+     */
+    public getEmptyPos(): number {
+        for (let pos in this._gameInfo.formation) {
+            if (this._gameInfo.formation[pos] === 0) {
+                return Number(pos);
+            }
+        }
+
+        return -1;
+    }
+
+    /**
+     * 添加士兵到阵型里面
+     * @param pos 在第几个格子
+     * @param fighterId 士兵编号/种类
+     * @returns
+     */
+    public addFighter(pos: number, fighterId: number) {
+        if (this._gameInfo.formation[pos] !== 0) {
+            return false;
+        }
+
+        this._gameInfo.formation[pos] = Number(fighterId); //强制转换成阵型，避免因为异常数据转成字符串了
+
+        this.saveGameInfoData();
+
+        return true;
+    }
+
+    /**
+     * 获得购买士兵的价格
+     */
+    public getBuyFighterPrice() {
+        let fighterLv = this._gameInfo.fighterLv;
+        let factor = 1.07;
+        let sep = 13;
+
+        if (fighterLv < sep) {
+            return 30 + 10 * fighterLv;
+        } else {
+            return 30 + 10 * sep + Math.round(30 * Math.pow(factor, fighterLv - sep));
+        }
+    }
+
+    /**
+     * 获得购买格子的价格
+     */
+    public getBuyCellPrice() {
+        return Math.floor(100 * Math.pow(1.2, this._gameInfo.landLv));
+    }
+
+    /**
+     * 获得购买金币加成价格
+     */
+    public getBuyCoinPrice() {
+        return Math.floor(100 * Math.pow(1.2, this._gameInfo.coinLv));
+    }
+
+    public upgradeCoin() {
+        this._gameInfo.coinLv++;
+        this.saveGameInfoData();
+    }
+
+    public upgradeFighter() {
+        this._gameInfo.fighterLv++;
+        this.saveGameInfoData();
+    }
+
+    public upgradeLand() {
+        this._gameInfo.landLv++;
         this.saveGameInfoData();
     }
 }
