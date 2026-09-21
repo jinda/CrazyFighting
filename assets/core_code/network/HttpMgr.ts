@@ -25,7 +25,7 @@ class HttpManager {
     /** 单例模式 */
     private networkTips: INetworkTips | null = null;
 
-    private static _inst: HttpManager;
+    private static _inst: HttpManager | null = null;
     public static get inst(): HttpManager {
         if (this._inst == null) {
             this._inst = new HttpManager();

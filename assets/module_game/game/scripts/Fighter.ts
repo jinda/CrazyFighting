@@ -1,11 +1,11 @@
 import { _decorator, Component, Node, Vec3, Tween, Prefab, isValid } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
 import { Effect } from "./Effect";
-import { FighterManager } from "./FighterManager";
 import { FighterModel } from "./FighterModel";
 import { FighterRigidBody } from "./FighterRigidBody";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
 import { PlatformMgr } from "db://assets/scripts/SDK/PlatformMgr";
+import { GameMgr } from "./GameMgr";
 
 //敌我双方士兵脚本
 const { ccclass, property } = _decorator;
@@ -46,7 +46,6 @@ export class Fighter extends Component {
     }
 
     private _moveStartCostTime: number = 0; //计算出移动到_posFightStartTarget这个位置所需的时间
-    private _manager: FighterManager = null!; //“管理所有士兵”的脚本
     private _attackRange: number = 0.8; //攻击范围
     private _hp: number = 0; //当前血量
     private _damage: number = 0; //伤害值
@@ -95,17 +94,9 @@ export class Fighter extends Component {
      * @param manager 管理所有士兵的脚本
      * @param cellPos 对应的格子
      */
-    public init(
-        identity: number,
-        team: number,
-        fighterInfo: any,
-        posWorld: Vec3,
-        world: any,
-        manager: FighterManager,
-        cellPos: number,
-    ) {
+    public init(identity: number, team: number, fighterInfo: any, posWorld: Vec3, cellPos: number) {
         this.rigidBody = this.getComponent(FighterRigidBody) as FighterRigidBody;
-        this.rigidBody.initBody(world, 0.3);
+        this.rigidBody.initBody(GameMgr.world, 0.3);
         this.rigidBody.setWorldPosition(posWorld);
 
         //开启刚体数据同步
@@ -128,7 +119,6 @@ export class Fighter extends Component {
         this._isWaitingDamage = false;
         this._isAttacking = false;
         this._isPlayingChairEffect = false;
-        this._manager = manager;
 
         this._enterStatus(Constants.FIGHTER_STATUS.IDLE);
 
@@ -153,7 +143,8 @@ export class Fighter extends Component {
         //回调必须校验加载代次、identity 与节点有效性，避免旧模型挂到新角色
         const loadGeneration = ++this._loadGeneration;
         const curIdentity = identity;
-        egf.ResMgr.getAsset(ModuleDef.GAME, `prefab/model/man/${this.fighterInfo.type}`, (pf: Prefab) => {
+        const modelName = Constants.FIGHTER_MODEL[Number(this.fighterInfo.type)];
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/model/man/${modelName}`, (pf: Prefab) => {
             //代次校验：本次初始化已被回收/重新初始化，或节点已失效时，迟到的加载结果直接丢弃
             if (
                 loadGeneration !== this._loadGeneration ||
@@ -254,19 +245,19 @@ export class Fighter extends Component {
         //现将速度清除掉
         // this.rigidBody.resetPhysical();
 
-        if (this._manager.isGameOver) {
+        if (GameMgr.isGameOver) {
             return;
         }
 
-        let ndTarget = this._manager.getNearestEnemy(this);
+        let ndTarget = GameMgr.getNearestEnemy(this);
 
         //如果找不到敌人
         if (!ndTarget || !ndTarget.isValid) {
             //进入待机状态
             this._enterStatus(Constants.FIGHTER_STATUS.IDLE);
 
-            this._manager.checkWin(this.team);
-            if (!this._manager.isGameOver) {
+            GameMgr.checkWin(this.team);
+            if (!GameMgr.isGameOver) {
                 //待机3s在搜寻下？？
                 this.scheduleOnce(this._findEnemy, 3);
             }
@@ -289,7 +280,7 @@ export class Fighter extends Component {
         }
 
         if (effect) {
-            egf.ResMgr.getAsset(ModuleDef.GAME, `prefabs/effect/${effect}`, (pf: Prefab) => {
+            egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/effect/${effect}`, (pf: Prefab) => {
                 let ndEffect = egf.PoolMgr.getNode(pf, this.node);
                 let effect = ndEffect.getComponent(Effect);
 
@@ -408,7 +399,7 @@ export class Fighter extends Component {
             })
             .start();
 
-        this._manager.onSomeoneDead(this);
+        GameMgr.onSomeoneDead(this);
     }
 
     /**
@@ -455,13 +446,13 @@ export class Fighter extends Component {
                     //触发特效
                     if (this.fightType === Constants.FIGHTER_TYPE.ARCHER) {
                         //弓箭手
-                        this._manager.effectGroup.playBombEffect(posTarget);
+                        GameMgr.effectGroup.playBombEffect(posTarget);
                     } else if (!target._isPlayingChairEffect) {
                         //如果目标没有正在播放被击中特效，则生成新特效
 
                         //小丑、枪兵暂用同一个特效
                         target._isPlayingChairEffect = true;
-                        this._manager.effectGroup.playChairEffect(posTarget, () => {
+                        GameMgr.effectGroup.playChairEffect(posTarget, () => {
                             target._isPlayingChairEffect = false;
                         });
                     }
@@ -469,7 +460,7 @@ export class Fighter extends Component {
                     //单个士兵被击中后，如果范围伤害属性大于0，则该士兵和以该士兵为中心的指定范围内的同队士兵受到攻击，否则只有该士兵受到攻击
                     let range = this.fighterInfo["damageRange"] / 100;
                     if (range > 0) {
-                        let arrTargets = this._manager.getEnemyAroundRange(this.team, target.node.position, range);
+                        let arrTargets = GameMgr.getEnemyAroundRange(this.team, target.node.position, range);
 
                         arrTargets.forEach((enemy) => {
                             enemy.onDamage(this._damage, this.identity);
@@ -485,7 +476,7 @@ export class Fighter extends Component {
                 //近战攻击
                 let range = this.fighterInfo["damageRange"] / 100;
                 if (range > 0) {
-                    let arrTargets = this._manager.getEnemyAroundRange(this.team, this.target.node.position, range);
+                    let arrTargets = GameMgr.getEnemyAroundRange(this.team, this.target.node.position, range);
 
                     arrTargets.forEach((enemy) => {
                         enemy.onDamage(this._damage, this.identity);
@@ -542,7 +533,7 @@ export class Fighter extends Component {
 
     update(deltaTime: number) {
         // Your update function goes here.
-        if (this.isDead || this._manager.isGamePause) {
+        if (this.isDead || GameMgr.isGamePause) {
             return;
         }
 
@@ -666,9 +657,9 @@ export class Fighter extends Component {
 
                 if (this._moveTime > 0.1) {
                     // 检查游戏是否结束
-                    if (!this._manager.isGameOver) {
+                    if (!GameMgr.isGameOver) {
                         //超过一定时间，检测下附近是否有可攻击目标
-                        let ndTarget: any = this._manager.getNearestEnemy(this) as Node;
+                        let ndTarget: any = GameMgr.getNearestEnemy(this) as Node;
 
                         if (ndTarget) {
                             //目标敌人的刚体半径

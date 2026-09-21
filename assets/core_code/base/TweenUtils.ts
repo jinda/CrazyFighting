@@ -18,7 +18,7 @@ export class TweenUtils {
         targetPos: Vec3,
         r: number = 100,
         count: number = 5,
-        nodePool?: NodePool,
+        nodePool?: NodePool | null,
         callback?: Function,
     ) {
         // 以某点为圆心，生成圆周上等分点的坐标
@@ -72,11 +72,12 @@ export class TweenUtils {
         });
 
         // 执行金币落袋的动画
+        const time = (6 / count) * 0.1;
         coinNodeList.forEach((item, idx) => {
             item.node.scale = v3(0, 0, 0);
             tween(item.node)
                 .to(0.3, { worldPosition: item.mdPos, scale: v3(orgScaleX, orgScaleX) })
-                .delay(idx * 0.1)
+                .delay(idx * time)
                 .to(0.5, {
                     worldPosition: item.edPos,
                     scale: v3(orgScaleX / 2, orgScaleX / 2),

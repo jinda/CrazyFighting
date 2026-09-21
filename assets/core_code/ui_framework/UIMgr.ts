@@ -31,7 +31,7 @@ class UIUpdater extends Component {
  *
  * */
 class UIManager {
-    private static _inst: UIManager;
+    private static _inst: UIManager | null = null;
     public static get inst(): UIManager {
         if (this._inst == null) {
             this._inst = new UIManager();
@@ -39,13 +39,13 @@ class UIManager {
         return this._inst;
     }
 
-    private _uiCanvas: Node;
-    private _uiRoot: Node;
+    private _uiCanvas: Node | null = null;
+    private _uiRoot: Node | null = null;
 
     private createFullScreenNode() {
-        let canvas = this._uiCanvas.getComponent(UITransform)!;
+        let canvas = this._uiCanvas?.getComponent(UITransform)!;
         let node = new Node();
-        node.layer = this._uiCanvas.layer;
+        node.layer = this._uiCanvas!.layer;
         let uiTransform = node.addComponent(UITransform);
         uiTransform.width = canvas.width;
         uiTransform.height = canvas.height;
@@ -107,7 +107,7 @@ class UIManager {
     }
 
     public getLayerNode(layerIndex: number): Node {
-        return this._uiRoot.children[layerIndex] || this._uiRoot;
+        return this._uiRoot!.children[layerIndex] || this._uiRoot;
     }
 
     public closeAll() {
@@ -285,13 +285,13 @@ class UIManager {
 
     public hideLayerLowerUI(layer: number) {
         for (let i = 0; i < layer; ++i) {
-            this._uiRoot.children[i].active = false;
+            this._uiRoot!.children[i].active = false;
         }
     }
 
     public showLayerLowerUI(layer: number) {
         for (let i = 0; i < layer; ++i) {
-            this._uiRoot.children[i].active = true;
+            this._uiRoot!.children[i].active = true;
         }
     }
 
@@ -309,7 +309,7 @@ class UIManager {
     }
 
     public getUICanvas(): Node {
-        return this._uiCanvas;
+        return this._uiCanvas!;
     }
 }
 

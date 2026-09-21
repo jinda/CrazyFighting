@@ -2,7 +2,7 @@ import { _decorator, Component, Node, Button, Label, instantiate, Color, find, S
 
 const { ccclass, property } = _decorator;
 
-export interface selectNames {
+export interface ISelectNames {
     name1: string;
     name2?: string;
     color?: string;
@@ -28,7 +28,7 @@ export class Layout_DownSelect extends Component {
 
     private _selectId: number | string = 0;
 
-    showInfo(selectId: number | string, selects: selectNames[] = [], cb: (selectId: number | string) => void) {
+    showInfo(selectId: number | string, selects: ISelectNames[] = [], cb: (selectId: number | string) => void) {
         this._selectId = selectId;
         // clog.log('Layout_DownSelect showInfo', this.node.name, idx, selects);
         const idx = selects.findIndex((select) => select.selectId == selectId);

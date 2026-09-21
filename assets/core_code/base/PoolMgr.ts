@@ -13,7 +13,7 @@ class PoolManager {
     private _dictPool: any = {};
     private _dictPrefab: any = {};
 
-    static _inst: PoolManager;
+    static _inst: PoolManager | null = null;
     /* class member could be defined like this */
     // dummy = '';
 

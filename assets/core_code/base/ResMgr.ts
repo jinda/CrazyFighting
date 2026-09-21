@@ -22,7 +22,7 @@ interface ILoadTask {
 const oneLoadCount = 12; // 每次加载的最大资源数量 (increased for web browser HTTP/2 multiplexing)
 
 class ResManager {
-    private static _inst: ResManager;
+    private static _inst: ResManager | null = null;
     public static get inst(): ResManager {
         if (this._inst == null) {
             this._inst = new ResManager();

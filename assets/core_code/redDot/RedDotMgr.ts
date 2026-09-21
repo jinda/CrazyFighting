@@ -9,7 +9,7 @@ export class RedDotMgr {
     /** 生成的结点表 */
     nodeMap: { [key: string]: RedDotNode } = {};
 
-    private static _inst: RedDotMgr;
+    private static _inst: RedDotMgr | null = null;
     public static get inst(): RedDotMgr {
         if (this._inst == null) {
             this._inst = new RedDotMgr();
@@ -18,10 +18,7 @@ export class RedDotMgr {
     }
 
     init() {
-        if (this.nodeMap == null) {
-            // this.nodeMap = this._createWithConfig(RedDotStaticConfig);
-            this.nodeMap[this.nodeRoot.name] = this.nodeRoot;
-        }
+        this.nodeMap[this.nodeRoot.name!] = this.nodeRoot;
     }
 
     /**
@@ -78,7 +75,7 @@ export class RedDotMgr {
             node.clearResult_Children();
             node.clearResult_Parent();
             this.nodeRoot.getResult();
-            EventMgr.inst.emit(EVENT_RED_DOT_REFRESH);
+            EventMgr.emit(EVENT_RED_DOT_REFRESH);
         }
     }
 }

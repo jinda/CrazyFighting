@@ -66,14 +66,14 @@ export class Layout_Menu extends Component {
     private bCanOnline: boolean = false;
 
     public showInfo(enemyPower: number) {
-        this.labelLevel.string = DataMgr.level.toString();
+        this.labelLevel.string = egf.i18nMgr.getText("第#0关", [DataMgr.level.toString()]);
         this.labelEnemyPower.string = enemyPower.toString();
 
         this.stopPointer();
         this.nodePointer.eulerAngles = v3(0, 0, egf.Utils.getRandomInt(-70, 70));
         tween(this.nodePointer)
-            .to(1, { eulerAngles: v3(0, 0, -70) })
-            .to(1, { eulerAngles: v3(0, 0, 70) })
+            .to(0.8, { eulerAngles: v3(0, 0, -70) })
+            .to(0.8, { eulerAngles: v3(0, 0, 70) })
             .union()
             .repeatForever()
             .start();

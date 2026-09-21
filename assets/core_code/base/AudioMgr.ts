@@ -9,7 +9,7 @@ import { Node, AudioSource, AudioClip, resources, director, assetManager } from 
 
 const EFFECT_NUM = 8;
 class AudioManager {
-    private static _inst: AudioManager;
+    private static _inst: AudioManager | null = null;
     public static get inst(): AudioManager {
         if (this._inst == null) {
             this._inst = new AudioManager();
@@ -28,23 +28,26 @@ class AudioManager {
     constructor() {
         //@en create a node as audioMgr
         //@zh 创建一个节点作为 audioMgr
-        let audioMgr = new Node();
-        audioMgr.name = "__audioMgr__";
+        let audioMgr = director.getScene()?.getChildByName("__audioMgr__");
+        if (!audioMgr) {
+            audioMgr = new Node();
+            audioMgr.name = "__audioMgr__";
 
-        //@en add to the scene.
-        //@zh 添加节点到场景
-        director.getScene()?.addChild(audioMgr);
+            //@en add to the scene.
+            //@zh 添加节点到场景
+            director.getScene()?.addChild(audioMgr);
 
-        //@en make it as a persistent node, so it won't be destroied when scene change.
-        //@zh 标记为常驻节点，这样场景切换的时候就不会被销毁了
-        director.addPersistRootNode(audioMgr);
+            //@en make it as a persistent node, so it won't be destroied when scene change.
+            //@zh 标记为常驻节点，这样场景切换的时候就不会被销毁了
+            director.addPersistRootNode(audioMgr);
+        }
 
         //@en add AudioSource componrnt to play audios.
         //@zh 添加 AudioSource 组件，用于播放音频。
-        this._musicSource = audioMgr.addComponent(AudioSource);
+        this._musicSource = audioMgr?.getComponent(AudioSource) || audioMgr!.addComponent(AudioSource);
 
         for (var i = 0; i < EFFECT_NUM; i++) {
-            var as = audioMgr.addComponent(AudioSource);
+            var as = audioMgr!.getComponent(AudioSource) || audioMgr!.addComponent(AudioSource);
             this._effectSources.push(as);
             as.volume = this._soundVolume;
         }

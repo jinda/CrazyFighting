@@ -5,7 +5,7 @@ import { DoubleList } from "./DoubleList";
  *
  *  */
 class EventManager {
-    private static _inst: EventManager;
+    private static _inst: EventManager | null = null;
     public static get inst(): EventManager {
         if (this._inst == null) {
             this._inst = new EventManager();

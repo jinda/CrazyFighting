@@ -27,7 +27,7 @@ var resPkg = {
         },
         {
             assetType: SpriteFrame,
-            urls: ["sprite/en_us/img_title/spriteFrame", "sprite/en_us/img_title/spriteFrame"],
+            urls: ["sprite/en_us/logo/spriteFrame", "sprite/en_us/logo/spriteFrame"],
         },
     ],
     module_extra: {

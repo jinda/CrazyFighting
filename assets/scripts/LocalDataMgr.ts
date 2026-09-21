@@ -28,7 +28,7 @@ interface ISetting {
 
 const AES_KEY = "eeffaif19822sf11156ff734fsefa9f0bb";
 class LocalDataManager {
-    private static _inst: LocalDataManager;
+    private static _inst: LocalDataManager | null = null;
     public static get inst(): LocalDataManager {
         if (this._inst == null) {
             this._inst = new LocalDataManager();
@@ -50,9 +50,9 @@ class LocalDataManager {
         deviceID: "",
         coin: 100, //金币数量
         level: 0, //默认初始关卡
-        coinLv: 0,
-        fighterLv: 0,
-        landLv: 0,
+        coinLv: 1,
+        fighterLv: 1,
+        landLv: 1,
         unlock: [Constants.BASE_FIGHTER], //已解锁士兵
         onlineReward: 0, //在线奖励的数值
         finishGuides: [], //完成的引导步骤

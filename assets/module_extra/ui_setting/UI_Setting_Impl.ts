@@ -25,7 +25,6 @@ export class UI_Setting_Impl extends UI_Setting {
         this.onButtonEvent(layout.btnMenu, this.clickMenu, this);
         this.onButtonEvent(layout.btnRestart, this.clickRestart, this);
         this.onButtonEvent(layout.btnContinue, this.clickContinue, this);
-        this.onButtonEvent(layout.btnLanguage, this.clickLanguage, this);
 
         let Setting = LocalDataMgr.Setting;
         layout.tgMusic.isChecked = Setting.musicVolume == 1 ? true : false;
@@ -37,19 +36,28 @@ export class UI_Setting_Impl extends UI_Setting {
         this.onToggleEvent(layout.tgShake, this.onShake, this);
 
         params = params || {};
-        layout.btnMenu.node.active = params.bGame;
-        layout.btnRestart.node.active = params.bGame;
-        layout.btnContinue.node.active = params.bGame;
+        layout.nodeBottom.active = params.bGame;
 
         const { version } = GetEnvConfig();
         layout.labelVer.string = egf.i18nMgr.getText("版本") + ":" + version;
 
+        const langSelects: any = [];
+        Object.keys(egf.ELanguageKey).forEach((lang) => {
+            langSelects.push({
+                name1: egf.ELanguageKey[lang as keyof typeof egf.ELanguageKey],
+                selectId: lang,
+            });
+        });
+        layout.languageSelect.showInfo(egf.i18nMgr.language, langSelects, (selectId) => {
+            egf.AudioMgr.playOneShot("tap");
+            LocalDataMgr.Setting.language = selectId as string;
+            egf.i18nMgr.setLanguage(selectId as string);
+            LocalDataMgr.saveSettingData();
+        });
         if (randomRangeInt(0, 2) == 0) {
             PlatformMgr.showInterstitialAd();
         }
 
-        const lan = LocalDataMgr.Setting.language;
-        layout.labelLanguage.string = egf.ELanguageKey[lan as keyof typeof egf.ELanguageKey];
         egf.EventMgr.emit("GamePause");
     }
     protected onDispose(): void {

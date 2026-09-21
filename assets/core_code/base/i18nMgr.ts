@@ -28,7 +28,7 @@ export enum ELanguageKey {
 }
 
 class i18nManager {
-    private static _inst: i18nManager;
+    private static _inst: i18nManager | null = null;
     public static get inst(): i18nManager {
         if (this._inst == null) {
             this._inst = new i18nManager();
@@ -52,7 +52,7 @@ class i18nManager {
 
     private checkInit() {
         if (!this._language) {
-            this.setLanguage("en_us");
+            this.setLanguage(this._language);
         }
     }
 
@@ -63,15 +63,11 @@ class i18nManager {
         return this._language;
     }
 
-    public isRussian() {
-        return this._language === "ru_ru";
-    }
-
     public setLanguage(language: string) {
-        if (this._language === language && Object.keys(this._labelData).length !== 0) {
+        if ((this._language === language && Object.keys(this._labelData).length !== 0) || !language) {
             return;
         }
-        this._language = language || this._language;
+        this._language = language as ELanguage;
         egf.Logger.log("current language:", this._language);
 
         this.reloadLabel();

@@ -19,7 +19,7 @@ export interface IMaintenance {
 }
 
 class DataManager {
-    private static _inst: DataManager;
+    private static _inst: DataManager | null = null;
     public static get inst(): DataManager {
         if (this._inst == null) {
             this._inst = new DataManager();
@@ -68,8 +68,8 @@ class DataManager {
 
     public nextLevel() {
         this.userData.level++;
-        LocalDataMgr.GameInfo.level = this.userData.level;
-        LocalDataMgr.saveGameInfoData();
+        // LocalDataMgr.GameInfo.level = this.userData.level;
+        // LocalDataMgr.saveGameInfoData();
     }
 }
 

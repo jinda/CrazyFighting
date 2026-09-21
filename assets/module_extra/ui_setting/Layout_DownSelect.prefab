@@ -51,8 +51,8 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 80,
-      "y": -88.551,
+      "x": 107.70033722365582,
+      "y": -14.133401979607925,
       "z": 0
     },
     "_lrot": {
@@ -528,8 +528,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 240,
-      "height": 50
+      "width": 270,
+      "height": 65
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -565,7 +565,7 @@
       "a": 202
     },
     "_spriteFrame": {
-      "__uuid__": "0c40c789-a466-4c9c-8ccb-7d2a536c694e@f9941",
+      "__uuid__": "a5d86b99-ba5d-4875-97a7-e5bbbaae074d@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
@@ -767,7 +767,7 @@
     "_overflow": 2,
     "_enableWrapText": true,
     "_font": {
-      "__uuid__": "6035d31b-7f04-4ca6-98d4-e0385d566819",
+      "__uuid__": "208bc5b9-d022-4776-b8d4-3a29132b729c",
       "__expectedType__": "cc.TTFFont"
     },
     "_isSystemFontUsed": false,
@@ -780,9 +780,9 @@
     "_enableOutline": true,
     "_outlineColor": {
       "__type__": "cc.Color",
-      "r": 22,
-      "g": 27,
-      "b": 38,
+      "r": 15,
+      "g": 35,
+      "b": 48,
       "a": 255
     },
     "_outlineWidth": 2,
@@ -929,7 +929,7 @@
     "_overflow": 0,
     "_enableWrapText": true,
     "_font": {
-      "__uuid__": "6035d31b-7f04-4ca6-98d4-e0385d566819",
+      "__uuid__": "208bc5b9-d022-4776-b8d4-3a29132b729c",
       "__expectedType__": "cc.TTFFont"
     },
     "_isSystemFontUsed": false,
@@ -1207,8 +1207,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 240,
-      "height": 50
+      "width": 270,
+      "height": 65
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1257,7 +1257,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 90.826,
+      "x": 100.979,
       "y": -1.986,
       "z": 0
     },
@@ -1270,8 +1270,8 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 1,
-      "y": -1,
+      "x": 0.8,
+      "y": 0.8,
       "z": 1
     },
     "_mobility": 0,
@@ -1298,8 +1298,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 23,
-      "height": 19
+      "width": 62,
+      "height": 62
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1335,12 +1335,12 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "90a36c65-d057-4b17-8a8d-3d319ad27af7@f9941",
+      "__uuid__": "9df7cf53-c38e-458f-8738-15862e22a7ec@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 0,
+    "_sizeMode": 1,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -1440,8 +1440,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 240,
-      "height": 10
+      "width": 290,
+      "height": 20
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1477,7 +1477,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "202a22f7-e171-49f9-a082-3e3a57f28401@f9941",
+      "__uuid__": "a5d86b99-ba5d-4875-97a7-e5bbbaae074d@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 1,
@@ -1521,8 +1521,8 @@
     "_startAxis": 0,
     "_paddingLeft": 0,
     "_paddingRight": 0,
-    "_paddingTop": 5,
-    "_paddingBottom": 5,
+    "_paddingTop": 10,
+    "_paddingBottom": 10,
     "_spacingX": 0,
     "_spacingY": 0,
     "_verticalDirection": 1,
@@ -1582,8 +1582,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 240,
-      "height": 48
+      "width": 270,
+      "height": 65
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1619,7 +1619,7 @@
       "a": 255
     },
     "_spriteFrame": {
-      "__uuid__": "0c40c789-a466-4c9c-8ccb-7d2a536c694e@f9941",
+      "__uuid__": "a5d86b99-ba5d-4875-97a7-e5bbbaae074d@f9941",
       "__expectedType__": "cc.SpriteFrame"
     },
     "_type": 1,
@@ -1715,6 +1715,7 @@
     "btnBack": {
       "__id__": 7
     },
+    "sprite1": null,
     "label1": {
       "__id__": 27
     },
@@ -1742,7 +1743,6 @@
       "__id__": 0
     },
     "fileId": "3381ep5rVF9ZPA6wZKYiM2",
-    "instance": null,
     "targetOverrides": null
   }
 ]

@@ -437,6 +437,10 @@
     "__prefab": {
       "__id__": 17
     },
+    "pfFighter": {
+      "__uuid__": "93bb7ace-496c-48ec-8a98-12317d927e63",
+      "__expectedType__": "cc.Prefab"
+    },
     "ndCell": {
       "__id__": 2
     },

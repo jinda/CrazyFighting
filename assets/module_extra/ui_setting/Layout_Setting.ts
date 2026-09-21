@@ -1,4 +1,5 @@
-import { _decorator, Button, Component, Toggle, Label } from "cc";
+import { _decorator, Button, Component, Toggle, Label, Node } from "cc";
+import { Layout_DownSelect } from "./Layout_DownSelect";
 const { ccclass, property } = _decorator;
 
 @ccclass("Layout_Setting")
@@ -11,8 +12,6 @@ export class Layout_Setting extends Component {
     btnRestart: Button = null!;
     @property(Button)
     btnContinue: Button = null!;
-    @property(Button)
-    btnLanguage: Button = null!;
 
     @property(Toggle)
     tgMusic: Toggle = null!;
@@ -23,6 +22,10 @@ export class Layout_Setting extends Component {
 
     @property(Label)
     labelVer: Label = null!;
-    @property(Label)
-    labelLanguage: Label = null!;
+
+    @property(Layout_DownSelect)
+    languageSelect: Layout_DownSelect = null!;
+
+    @property(Node)
+    nodeBottom: Node = null!;
 }

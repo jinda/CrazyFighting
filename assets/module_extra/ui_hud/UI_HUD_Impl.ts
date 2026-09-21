@@ -2,7 +2,7 @@ import { Layout_UI_HUD } from "./Layout_HUD";
 import { UI_Award, UI_Help, UI_HUD, UI_Setting } from "../../scripts/UIDef";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { DataMgr } from "../../scripts/DataMgr";
-import { Vec3 } from "cc";
+import { isValid, Vec3 } from "cc";
 
 @egf_class(ModuleDef.EXTRA, UI_HUD)
 export class UI_HUD_Impl extends egf.UIController {
@@ -76,9 +76,14 @@ export class UI_HUD_Impl extends egf.UIController {
         let layout = this.layout as Layout_UI_HUD;
         egf.AudioMgr.playOneShot("getCoin");
         const coin = params.coin;
-        const pos = params.pos ? params.pos : Vec3.ZERO;
-        layout.nodeCoin.position = pos;
-        egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.btnCoin.node.worldPosition, coin);
+        const pos = params?.pos ? params.pos : Vec3.ZERO;
+        egf.Logger.log("showCoinFly:", params, pos, layout.nodeCoin);
+        if (isValid(layout.nodeCoin)) {
+            layout.nodeCoin.position = pos;
+            egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.btnCoin.node.worldPosition, 100, coin, null, () => {
+                this.onCoinChanged();
+            });
+        }
     }
     private showStaminaFly(coin: number) {
         let layout = this.layout as Layout_UI_HUD;
@@ -88,7 +93,7 @@ export class UI_HUD_Impl extends egf.UIController {
 
     private onCoinChanged() {
         let layout = this.layout as Layout_UI_HUD;
-        layout.labelCoin.string = "0";
+        layout.labelCoin.string = "" + DataMgr.coin;
     }
 
     private onStaminaChanged() {

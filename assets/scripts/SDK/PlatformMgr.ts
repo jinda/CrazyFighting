@@ -20,7 +20,7 @@ export const PlatformStr = {
 };
 
 class PlatformManager {
-    private static _inst: PlatformManager;
+    private static _inst: PlatformManager | null = null;
     public static isInitFinished: boolean = false;
     public static get inst(): PlatformManager {
         if (this._inst == null) {

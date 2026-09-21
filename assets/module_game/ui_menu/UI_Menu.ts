@@ -5,6 +5,7 @@ import { UI_Award } from "../../scripts/UIDef";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { GameMgr } from "../game/scripts/GameMgr";
 import { UI_BuyFighter } from "../ui_buyFighter/UI_BuyFighter";
+import { UI_Fighter } from "../ui_fighter/UI_Fighter";
 import { UI_Rank } from "../ui_rank/UI_Rank";
 import { Layout_Menu } from "./Layout_Menu";
 import { EventTouch, Node, Vec2 } from "cc";
@@ -49,19 +50,30 @@ export class UI_Menu extends egf.UIController {
             let fighter = GameCfg.queryByID("fighter", unlock.toString());
             if (fighter) {
                 layout.richTextTips.node.active = true;
-                layout.richTextTips.string = egf.i18nMgr.getText("第#0关解锁#1", [
+                layout.richTextTips.string = `<outline color=#5C3118 size=2>${egf.i18nMgr.getText("第#0关解锁#1", [
                     objNextUnlock.level + "",
                     `<color=#00ff00>${fighter.name}</color>`,
-                ]);
+                ])}</outline>`;
             }
         }
 
-        if (params.bStartGame) {
+        if (params?.bStartGame) {
             this.clickStart();
         }
     }
 
-    protected onDispose(): void {}
+    protected onDispose(): void {
+        egf.EventMgr.off(Constants.EVENT_NAME.UPDATE_FORMATION, this.onUpdateFormation, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.UPDATE_LEVEL, this.onUpdateLevel, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.SHOW_LEVEL_TIPS, this.showFighterLvTips, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.REC_ONLINE_REWARD, this.onUpdateFormation, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.BUY_FIGHTER, this.onFighterPowerTips, this);
+
+        this.node.off(Node.EventType.TOUCH_START, this.onTouchEvent, this);
+        this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchEvent, this);
+        this.node.off(Node.EventType.TOUCH_END, this.onTouchEvent, this);
+        this.node.off(Node.EventType.TOUCH_CANCEL, this.onTouchEvent, this);
+    }
 
     private clickOnline() {
         egf.AudioMgr.playOneShot("tap");
@@ -160,7 +172,7 @@ export class UI_Menu extends egf.UIController {
     private showStart(angleZ: number) {
         let power = 1;
         let tipsStr = "";
-        if (angleZ <= 5 || angleZ >= -5) {
+        if (angleZ >= -5 && angleZ <= 5) {
             //暴走
             power = 1.5; //攻击力提升1.5倍
             const statusStr = egf.i18nMgr.getText("暴走！");
@@ -170,10 +182,9 @@ export class UI_Menu extends egf.UIController {
             ]);
             egf.EventMgr.emit(Constants.EVENT_NAME.SHOW_SPRINT);
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.RAMPAGE);
-        } else if (angleZ <= 35 || angleZ >= -35) {
+        } else if (angleZ >= -35 && angleZ <= 35) {
             //真棒
             power = 1.2; //攻击力提升1.2倍
-            tipsStr = "<color=#ffb12f>真棒！</color>攻击力提升100%";
             const statusStr = egf.i18nMgr.getText("真棒！");
             tipsStr = egf.i18nMgr.getText("#0攻击力提升#1", [
                 `<size=50><color=#ffb12f>${statusStr}</color></size>`,
@@ -184,13 +195,14 @@ export class UI_Menu extends egf.UIController {
             tipsStr = "普通！";
         }
         egf.UI_Toast.show(tipsStr, 2);
+        egf.Logger.log("showStart:", angleZ, power);
 
         const layout = this.layout as Layout_Menu;
         layout.scheduleOnce(() => {
             //开始游戏
             egf.EventMgr.emit(Constants.EVENT_NAME.FIGHT_START, power);
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.FIGHT_START);
-
+            egf.UIMgr.showUI(UI_Fighter);
             this.close();
         }, 2);
     }

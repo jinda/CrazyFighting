@@ -16,7 +16,7 @@ import { EPlatform, PlatformMgr } from "./SDK/PlatformMgr";
  * 通用 Header: X-Game-Code, Content-Type, Authorization: Bearer {token}
  */
 export class ClientApi {
-    private static _inst: ClientApi;
+    private static _inst: ClientApi | null = null;
     public static get inst(): ClientApi {
         if (this._inst == null) {
             this._inst = new ClientApi();

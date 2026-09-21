@@ -1,16 +1,4 @@
-import {
-    _decorator,
-    Component,
-    Node,
-    Prefab,
-    Vec3,
-    Vec2,
-    geometry,
-    PhysicsSystem,
-    BoxColliderComponent,
-    find,
-    view,
-} from "cc";
+import { _decorator, Component, Node, Prefab, Vec3, Vec2, geometry, PhysicsSystem, BoxCollider, find, view } from "cc";
 import { Follow } from "./Follow";
 import { EffectGroup } from "./EeffectGroup";
 import { Constants } from "db://assets/scripts/Constants";
@@ -19,14 +7,14 @@ import { Fighter } from "./Fighter";
 import { FormationCell } from "./FormationCell";
 import { LocalDataMgr } from "db://assets/scripts/LocalDataMgr";
 import { GameMgr } from "./GameMgr";
+import { GameCfg } from "./GameConfig";
+import { UI_Menu } from "../../ui_menu/UI_Menu";
+import { UI_Fighter } from "../../ui_fighter/UI_Fighter";
 
 const { ccclass, property } = _decorator;
 //“管理所有士兵”的脚本
-@ccclass("FighterManager")
-export class FighterManager extends Component {
-    @property(Prefab)
-    public pfFighter: Prefab = null!; //士兵预制体
-
+@ccclass("FighterLogic")
+export class FighterLogic extends Component {
     @property(Prefab)
     public pfFormationCell: Prefab = null!; //单元格预制体
 
@@ -36,16 +24,12 @@ export class FighterManager extends Component {
     @property(Follow)
     public cameraFollow: Follow = null!; //相机绑定的脚本
 
-    @property(BoxColliderComponent)
-    public planeCollider: BoxColliderComponent = null!; //地面碰撞器
+    @property(BoxCollider)
+    public planeCollider: BoxCollider = null!; //地面碰撞器
 
-    public isGameStart: boolean = false; //游戏是否开始
-    public isGameOver: boolean = false; //游戏是否结束
-    public isGamePause: boolean = false; //游戏是否暂停
-    public dictFighter: any = {}; //存放敌我士兵的字典
+    @property(Node)
+    public nodeFighters: Node = null!; //战士节点
 
-    private _identity: number = 1; //士兵唯一标识
-    private _world: any; //物理世界对象
     private _dictCell: any = {}; //存放我方士兵格子节点的字典
     private _aryCell: any[] = []; //存放敌我双方格子节点的数组
     private _currentSelect: number = -1; //当前选中的格子在_dictCell中的key
@@ -90,10 +74,24 @@ export class FighterManager extends Component {
         egf.EventMgr.off(Constants.EVENT_NAME.HIDE_ALL_SIMILAR, this._hideAllSimilar, this);
     }
 
-    start() {
-        this.planeCollider.setGroup(Constants.COLLIDER_GROUP.PLANE);
-
+    protected onLoad(): void {
+        egf.Logger.log("FighterLogic init");
         this._gameInit();
+        GameCfg.loadConfig();
+    }
+
+    protected start(): void {
+        this.planeCollider.setGroup(Constants.COLLIDER_GROUP.PLANE);
+        this._fightReset();
+
+        //首次进来的话检查下是否处于新手引导第一关，直接开始
+        if (DataMgr.level === 1) {
+            egf.UIMgr.showUI(UI_Fighter);
+            //第一关就直接认定为新手引导关卡，直接开始游戏
+            this._fightStart(1.5);
+        } else {
+            egf.UIMgr.showUI(UI_Menu);
+        }
     }
 
     /**
@@ -107,36 +105,15 @@ export class FighterManager extends Component {
 
         this._isInit = true;
 
-        this._initWorld();
-        this._fightReset();
-
-        //首次进来的话检查下是否处于新手引导第一关，直接开始
-        if (DataMgr.level === 1) {
-            //第一关就直接认定为新手引导关卡，直接开始游戏
-            this._fightStart(1.5);
-        }
-    }
-
-    /**
-     * 初始化物理世界
-     */
-    private _initWorld() {
-        //@ts-ignore 设置重力
-        const gravity = box2d.b2Vec2.ZERO;
-
-        //@ts-ignore 物理世界
-        const world = new box2d.b2World(gravity);
-
-        this._world = world;
+        GameMgr.effectGroup = this.effectGroup;
+        GameMgr.initWorld();
     }
 
     /**
      * 重置战斗相关数据
      */
     private _fightReset() {
-        this.isGameStart = false;
-        this.isGamePause = false;
-        this.isGameOver = false;
+        GameMgr.reset();
         this._preTime = 0;
         this._curTime = 0;
         this._timeScale = 1;
@@ -145,17 +122,6 @@ export class FighterManager extends Component {
         //第1关特殊处理
         this.cameraFollow.initCamera(DataMgr.level === 1);
 
-        //重置敌我双方士兵状态
-        for (const team in this.dictFighter) {
-            const dictFighter = this.dictFighter[team];
-
-            for (const pos in dictFighter) {
-                const ndFighter = dictFighter[pos] as Node;
-                const scriptFighter = ndFighter.getComponent(Fighter)!;
-                scriptFighter.resetFighterState();
-            }
-        }
-
         this._aryCell.forEach((node) => {
             node.getComponent(FormationCell).recycle();
         });
@@ -163,9 +129,8 @@ export class FighterManager extends Component {
         this._aryCell = [];
 
         //先直接做释放，后续考虑复用
-        this.node.destroyAllChildren();
+        this.nodeFighters.destroyAllChildren();
 
-        this.dictFighter = {};
         this._dictCell = {};
 
         this.initFighters();
@@ -224,8 +189,8 @@ export class FighterManager extends Component {
                 ],
             };
         }
-
-        this.dictFighter = {};
+        egf.Logger.log("initFighters:", fightData);
+        GameMgr.dictFighter = {};
 
         for (let team in fightData) {
             let arrFormation = fightData[team];
@@ -241,65 +206,19 @@ export class FighterManager extends Component {
     }
 
     /**
-     *  增加士兵：生成士兵节点并初始化数据
-     * @param {number} team 队伍
-     * @param {Vec3} fighterPos
-     * @param {*} fighterInfo 士兵数据
-     * @param {number} pos 在第几个格子
-     * @returns
-     * @memberof FighterManager
-     */
-    public addFighter(team: number, fighterPos: Vec3, fighterInfo: any, pos: number) {
-        let identity = this._identity++;
-        let ndFighter = egf.PoolMgr.getNode(this.pfFighter, this.node as Node);
-
-        let scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
-        scriptFighter.init(identity, team, fighterInfo, fighterPos, this._world, this, pos);
-
-        if (team !== Constants.PLAYER_TEAM) {
-            ndFighter.active = false;
-        }
-
-        if (!this.dictFighter.hasOwnProperty(team)) {
-            this.dictFighter[team] = {};
-        }
-
-        this.dictFighter[team][identity] = ndFighter;
-        ndFighter["fight"] = fighterInfo["fight"];
-
-        return identity;
-    }
-
-    /**
-     * 回收士兵节点和刚体
-     * @param identity 士兵唯一标识
-     */
-    public removeFighter(identity: number) {
-        let ndFighter = this.dictFighter[Constants.PLAYER_TEAM][identity];
-
-        if (ndFighter) {
-            let scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
-            scriptFighter.recycle();
-        }
-
-        delete this.dictFighter[Constants.PLAYER_TEAM][identity];
-    }
-
-    /**
      * 开始游戏
      * @param power 玩家队伍士兵的专属加成
      */
     private _fightStart(power: number) {
-        this.isGameStart = true;
+        GameMgr.isGameStart = true;
         this._preTime = 0;
         this._curTime = 0;
         this._timeScale = 1;
 
-        //展示战斗界面
-        // UIManager.instance.showDialog("fight/fightUI", [this]);
+        egf.Logger.log("fightStart power:", power, GameMgr.dictFighter);
 
         //相机跟随
-        this.cameraFollow.startGame(this);
+        this.cameraFollow.startGame();
 
         //先移动到指定点
         let arrPos = [-3, -1.5, 0, 1.5, 3];
@@ -307,8 +226,8 @@ export class FighterManager extends Component {
         let arrEnemy = [];
         let idxSelect = 0;
 
-        for (let team in this.dictFighter) {
-            let dictFighter = this.dictFighter[team];
+        for (let team in GameMgr.dictFighter) {
+            let dictFighter = GameMgr.dictFighter[team];
             let addition = 1;
             if (team === Constants.PLAYER_TEAM.toString()) {
                 //有加成
@@ -375,7 +294,7 @@ export class FighterManager extends Component {
      * @param deltaTime
      */
     private _checkTimeScale(deltaTime: number) {
-        if (this.isGameStart && !this.isGamePause && !this.isGameOver) {
+        if (GameMgr.isGameStart && !GameMgr.isGamePause && !GameMgr.isGameOver) {
             this._curTime += deltaTime;
 
             let time = Math.floor(this._curTime);
@@ -390,8 +309,8 @@ export class FighterManager extends Component {
 
                     console.log("提速:", this._timeScale, this._preTime);
 
-                    for (let team in this.dictFighter) {
-                        let dictFighter = this.dictFighter[team];
+                    for (let team in GameMgr.dictFighter) {
+                        let dictFighter = GameMgr.dictFighter[team];
 
                         for (let identity in dictFighter) {
                             let scriptFighter = dictFighter[identity].getComponent(Fighter) as Fighter;
@@ -404,40 +323,6 @@ export class FighterManager extends Component {
     }
 
     /**
-     * 获取被击中的对方士兵和它附近的同组士兵
-     * @param team 本方队伍（1为玩家队伍）
-     * @param posWorld 被击中的敌人的世界坐标
-     * @param range 范围
-     * @returns
-     */
-    public getEnemyAroundRange(team: number, posWorld: Vec3, range: number) {
-        let enemyTeam = team === 1 ? 2 : 1;
-        let arrEnemy = [];
-
-        let dictFighters = this.dictFighter[enemyTeam];
-        for (let identity in dictFighters) {
-            let ndFighter = dictFighters[identity] as Node;
-            if (!ndFighter) {
-                continue;
-            }
-            let fighter = ndFighter.getComponent(Fighter) as Fighter;
-            if (!fighter || fighter.isDead) {
-                continue;
-            }
-            let pos = ndFighter.position.clone();
-            let offset = pos.subtract(posWorld);
-            if (offset.x <= range && offset.z <= range) {
-                //判定距离是否在一定范围内
-                if (offset.x * offset.x + offset.z * offset.z <= range * range) {
-                    arrEnemy.push(fighter);
-                }
-            }
-        }
-
-        return arrEnemy;
-    }
-
-    /**
      * 获取距离士兵最近的对方士兵
      * @param who
      * @returns
@@ -447,12 +332,12 @@ export class FighterManager extends Component {
         let enemy: Node = null!;
         let posWho = who.node.position;
 
-        for (let team in this.dictFighter) {
+        for (let team in GameMgr.dictFighter) {
             if (who.team === Number(team)) {
                 continue;
             }
 
-            let objFighters = this.dictFighter[team];
+            let objFighters = GameMgr.dictFighter[team];
             for (let fPos in objFighters) {
                 let fighter = objFighters[fPos];
 
@@ -476,75 +361,6 @@ export class FighterManager extends Component {
     }
 
     /**
-     * 监听双方士兵阵亡, 以显示金币和刷新UI数据
-     * @param who
-     */
-    public onSomeoneDead(who: Fighter) {
-        let team = who.team;
-
-        //先删除，避免进入人数统计
-        delete this.dictFighter[team][who.identity];
-
-        if (team !== 1) {
-            let coin = who.fighterInfo["coin"];
-            if (coin > 0) {
-                //展示金币提示
-                egf.EventMgr.emit(Constants.EVENT_NAME.DROP_COIN, coin, who.node.worldPosition.clone());
-            }
-        } else {
-            //己方士兵死亡要触发刷新UI人数和进度条
-            egf.EventMgr.emit(Constants.EVENT_NAME.DROP_COIN, -1, who.node.worldPosition.clone());
-        }
-    }
-
-    /**
-     * 检查游戏是否胜利
-     * @param team
-     * @returns
-     */
-    public checkWin(team: number) {
-        if (this.isGameOver) {
-            return;
-        }
-
-        let isWin = false;
-        let enemyTeam = team === 1 ? 2 : 1;
-        if (Object.keys(this.dictFighter[enemyTeam]).length <= 0) {
-            this.isGameOver = true;
-
-            let objFighters = this.dictFighter[team];
-            for (let pos in objFighters) {
-                let node = objFighters[pos];
-
-                //胜利方的士兵播放胜利动画
-                node.getComponent(Fighter).showWin();
-            }
-
-            //判断胜利方是否是我方士兵
-            isWin = team === 1;
-            egf.EventMgr.emit(Constants.EVENT_NAME.GAME_OVER, isWin);
-        }
-
-        if (isWin) {
-            let outRay = new geometry.Ray();
-            let size = view.getCanvasSize();
-
-            //如果胜利，则利用射线检测，在屏幕中央的地板位置播放胜利特效
-            GameMgr.mainCamera.screenPointToRay(size.width / 2, size.height / 2, outRay);
-            PhysicsSystem.instance.raycastClosest(outRay, Constants.COLLIDER_GROUP.PLANE, 50, false);
-            const hitPoint = PhysicsSystem.instance.raycastClosestResult.hitPoint;
-
-            this.effectGroup.playWinEffect(hitPoint, () => {});
-
-            //播放胜利音效
-            egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.WIN);
-        } else {
-            //播放失败音效
-            egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.FAIL);
-        }
-    }
-
-    /**
      * 获取指定队伍的人数
      * @param isSelf 是否为我方队伍
      * @returns
@@ -552,35 +368,16 @@ export class FighterManager extends Component {
     public getFighterNum(isSelf: boolean = true) {
         let num = 0;
         if (isSelf) {
-            num = Object.keys(this.dictFighter[Constants.PLAYER_TEAM]).length;
+            num = Object.keys(GameMgr.dictFighter[Constants.PLAYER_TEAM]).length;
         } else {
-            for (let team in this.dictFighter) {
+            for (let team in GameMgr.dictFighter) {
                 if (team !== "1") {
-                    num += Object.keys(this.dictFighter[team]).length;
+                    num += Object.keys(GameMgr.dictFighter[team]).length;
                 }
             }
         }
 
         return num;
-    }
-
-    /**
-     * 获得战力
-     * @param isSelf 是否为我方队伍
-     */
-    public getFighterFight(isSelf: boolean = true) {
-        let fight = 0;
-
-        for (let team in this.dictFighter) {
-            if ((team === "1" && isSelf) || (team !== "1" && !isSelf)) {
-                let tmp = this.dictFighter[team];
-                for (let identity in tmp) {
-                    fight += tmp[identity].fight;
-                }
-            }
-        }
-
-        return fight;
     }
 
     /**
@@ -622,9 +419,9 @@ export class FighterManager extends Component {
      * @param fighterId 士兵ID/角色编号，具体看fighter.csv
      */
     private _addCell(index: number, team: number, fighterId: number) {
-        let ndFormation = egf.PoolMgr.getNode(this.pfFormationCell, this.node as Node);
+        let ndFormation = egf.PoolMgr.getNode(this.pfFormationCell, this.nodeFighters);
         let scriptFormationCell = ndFormation.getComponent(FormationCell) as FormationCell;
-        scriptFormationCell.init(index, Number(team), fighterId, this);
+        scriptFormationCell.init(index, Number(team), fighterId);
 
         if (team === Constants.PLAYER_TEAM) {
             //玩家自身队伍
@@ -744,7 +541,7 @@ export class FighterManager extends Component {
                     let worPos = arrPos[idx];
 
                     //数字1固定表示为自身队伍id
-                    let ndFighter = this.dictFighter[Constants.PLAYER_TEAM][this._arySelectFighterIdentity[idx]];
+                    let ndFighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][this._arySelectFighterIdentity[idx]];
 
                     if (ndFighter) {
                         ndFighter.setPosition(worPos);
@@ -834,7 +631,7 @@ export class FighterManager extends Component {
      */
     private _resetCellFighterPos() {
         this._arySelectFighterIdentity.forEach((identity) => {
-            let ndFighter = this.dictFighter[Constants.PLAYER_TEAM][identity];
+            let ndFighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity];
             let scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
             scriptFighter.rigidBody.enableSync = true;
         });
@@ -846,7 +643,6 @@ export class FighterManager extends Component {
      * @private
      * @param {FormationCell} cellSelect 玩家拖拽/选中的格子的脚本
      * @param {FormationCell} cellTarget 目标格子的脚本
-     * @memberof FighterManager
      */
     private _swapCell(cellSelect: FormationCell, cellTarget: FormationCell) {
         //互换格子上的士兵编号和士兵唯一标识数组
@@ -866,7 +662,7 @@ export class FighterManager extends Component {
             let arrPos = GameMgr.getFighterPosByNum(this._tempPos, cellTarget.aryIdentity.length);
 
             cellTarget.aryIdentity.forEach((identity: any, index: number) => {
-                let fighter = this.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
+                let fighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
                 fighter.cellPos = cellTarget.pos;
                 fighter.rigidBody.setWorldPosition(arrPos[index]);
                 fighter.rigidBody.enableSync = true;
@@ -879,7 +675,7 @@ export class FighterManager extends Component {
             let arrPos = GameMgr.getFighterPosByNum(this._tempPos, cellSelect.aryIdentity.length);
 
             cellSelect.aryIdentity.forEach((identity: any, index: number) => {
-                let fighter = this.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
+                let fighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
                 fighter.cellPos = cellSelect.pos;
                 fighter.rigidBody.setWorldPosition(arrPos[index]);
                 fighter.rigidBody.enableSync = true;
@@ -987,7 +783,6 @@ export class FighterManager extends Component {
      * 是否是近战士兵
      * @param {number} type
      * @returns
-     * @memberof FighterManager
      */
     private _isCloseFighter(type: number) {
         return (
@@ -1008,12 +803,12 @@ export class FighterManager extends Component {
         let longPosX = 0,
             longPosY = 0; //远程士兵x、y的值
 
-        for (let team in this.dictFighter) {
+        for (let team in GameMgr.dictFighter) {
             if (team === Constants.PLAYER_TEAM.toString()) {
                 continue;
             }
 
-            let objFighters = this.dictFighter[team];
+            let objFighters = GameMgr.dictFighter[team];
             //遍历敌方的士兵
             for (let identity in objFighters) {
                 let ndFighter = objFighters[identity];
@@ -1056,12 +851,12 @@ export class FighterManager extends Component {
                 percent = 1;
             }
 
-            for (let team in this.dictFighter) {
+            for (let team in GameMgr.dictFighter) {
                 if (team === Constants.PLAYER_TEAM.toString()) {
                     continue;
                 }
 
-                let objFighters = this.dictFighter[team];
+                let objFighters = GameMgr.dictFighter[team];
                 //遍历敌人节点
                 for (let identity in objFighters) {
                     let ndFighter = objFighters[identity] as Node;
@@ -1082,7 +877,6 @@ export class FighterManager extends Component {
      * 获取引导合成的起点终点、范围等信息
      *
      * @returns
-     * @memberof FighterManager
      */
     public getCombineContentForGuide() {
         //获得位置2的屏幕坐标，然后在做对应换算
@@ -1148,20 +942,6 @@ export class FighterManager extends Component {
     }
 
     /**
-     * 暂停游戏
-     */
-    public pauseGame() {
-        this.isGamePause = true;
-    }
-
-    /**
-     * 恢复游戏
-     */
-    public resumeGame() {
-        this.isGamePause = false;
-    }
-
-    /**
      * 隐藏所有的格子上“可合成的”特效提示
      */
     private _hideAllSimilar() {
@@ -1214,21 +994,21 @@ export class FighterManager extends Component {
     update(deltaTime: number) {
         // Your update function goes here.
         //暂停/结束时物理世界不步进，并清空累加器，避免恢复后一次性补步进
-        if (!this.isGameStart || this.isGamePause || this.isGameOver) {
+        if (!GameMgr.isGameStart || GameMgr.isGamePause || GameMgr.isGameOver) {
             this._physicsAccumulator = 0;
             return;
         }
 
         this._checkTimeScale(deltaTime);
 
-        if (this._world) {
+        if (GameMgr.world) {
             //固定步长 + 累加器：物理推进只与真实时间有关，不受设备帧率影响
             this._physicsAccumulator += deltaTime;
 
             let steps = 0;
             //参数：1、逻辑帧的时间长度（1秒30帧），2、速度计算迭代次数（迭代的次数越多，碰撞传导的速度越快），3、位移计算迭代次数（迭代的次数越多，解决刚体重叠的速度越快）
             while (this._physicsAccumulator >= Constants.PHYSICS_STEP && steps < Constants.PHYSICS_MAX_STEPS) {
-                this._world.Step(Constants.PHYSICS_STEP, 6, 2);
+                GameMgr.world.Step(Constants.PHYSICS_STEP, 6, 2);
                 this._physicsAccumulator -= Constants.PHYSICS_STEP;
                 steps++;
             }

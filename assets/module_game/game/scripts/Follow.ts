@@ -1,6 +1,5 @@
 import { _decorator, Component, Vec3, CameraComponent, Tween, lerp, CCInteger, Node } from "cc";
 import { Fighter } from "./Fighter";
-import { FighterManager } from "./FighterManager";
 import { GameMgr } from "./GameMgr";
 
 //相机脚本
@@ -19,7 +18,6 @@ export class Follow extends Component {
     @property({ type: CCInteger })
     public originFov: number = 40; //相机视角大小
 
-    private _manager: FighterManager = null!; //“管理所有士兵”的脚本
     private _posTween: Vec3 = new Vec3(); //缓动的目标位置
     private _rotateTween: Vec3 = new Vec3(); //缓动的目标角度
     private _tweenMove: any = null!; //移动缓动对象
@@ -92,8 +90,7 @@ export class Follow extends Component {
      * 游戏开始后设置相机的位置和角度
      * @param manager
      */
-    public startGame(manager: FighterManager) {
-        this._manager = manager;
+    public startGame() {
         this.node.getWorldPosition(this._posTween);
         this._rotateTween.set(this.node.eulerAngles);
         this._orthoHeight.value = this.camera.orthoHeight;
@@ -127,7 +124,7 @@ export class Follow extends Component {
 
             this.camera.orthoHeight = this._orthoHeight.value;
         } else if (this._isStartFollow) {
-            if (!this._manager.isGameOver) {
+            if (!GameMgr.isGameOver) {
                 this._adjustCoolTime -= deltaTime;
 
                 if (this._adjustCoolTime < 0) {
@@ -140,8 +137,8 @@ export class Follow extends Component {
                         maxX = -999999,
                         minZ = 999999,
                         maxZ = -999999;
-                    for (let team in this._manager.dictFighter) {
-                        let dict = this._manager.dictFighter[team];
+                    for (let team in GameMgr.dictFighter) {
+                        let dict = GameMgr.dictFighter[team];
                         for (let identity in dict) {
                             cnt++;
 
@@ -195,8 +192,8 @@ export class Follow extends Component {
                     //士兵存活数量
                     let surviveNum = 0;
 
-                    for (const key in this._manager.dictFighter) {
-                        const team = this._manager.dictFighter[key];
+                    for (const key in GameMgr.dictFighter) {
+                        const team = GameMgr.dictFighter[key];
 
                         for (const identity in team) {
                             const ndFighter = team[identity] as Node;

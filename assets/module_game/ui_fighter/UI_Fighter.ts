@@ -1,15 +1,12 @@
-import { Vec3 } from "cc";
+import { isValid, Vec3 } from "cc";
 import { Constants } from "../../scripts/Constants";
 import { Layout_Fighter } from "./Layout_Fighter";
-import { FighterManager } from "../game/scripts/FighterManager";
-import { UI_Setting } from "../../scripts/UIDef";
-import { DataMgr } from "../../scripts/DataMgr";
 import { GameMgr } from "../game/scripts/GameMgr";
+import { UI_Settlement } from "../ui_settlement/UI_Settlement";
 
 export class UI_Fighter extends egf.UIController {
     private _gold: number = 0; //金币数量
     private _factor: number = 1; //系数：每个士兵掉落金币乘以本关加成系数
-    private _manager: FighterManager = null!; //“管理所有士兵”的脚本
 
     constructor() {
         super("ui_fighter/UI_Fighter", egf.UILayers.GAME, Layout_Fighter);
@@ -23,8 +20,8 @@ export class UI_Fighter extends egf.UIController {
         egf.EventMgr.on(Constants.EVENT_NAME.GAME_OVER, this.onGameOver, this);
 
         layout.showInfo();
-        let myCount = this._manager.getFighterFight(true);
-        let enemyCount = this._manager.getFighterFight(false);
+        let myCount = GameMgr.getFighterFight(true);
+        let enemyCount = GameMgr.getFighterFight(false);
         layout.updateFighterNum(myCount, enemyCount);
     }
 
@@ -52,8 +49,11 @@ export class UI_Fighter extends egf.UIController {
             //1. 展示获得金币提示
             let uiPos = new Vec3();
             GameMgr.mainCamera.convertToUINode(posWorld, this.node, uiPos);
-            layout.nodeCoin.position = uiPos;
-            egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.labelCoin.node.worldPosition, coin);
+            egf.Logger.log("onDropCoin:", layout.nodeCoin, uiPos, layout.nodeCoin);
+            if (isValid(layout.nodeCoin)) {
+                layout.nodeCoin.position = uiPos;
+                egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.labelCoin.node.worldPosition, coin);
+            }
 
             //2. 更新获得金币数
             this._gold += coin;
@@ -61,8 +61,8 @@ export class UI_Fighter extends egf.UIController {
         }
 
         //3.更新UI上的敌我双方人数和进度条
-        let myCount = this._manager.getFighterFight(true);
-        let enemyCount = this._manager.getFighterFight(false);
+        let myCount = GameMgr.getFighterFight(true);
+        let enemyCount = GameMgr.getFighterFight(false);
         layout.updateFighterNum(myCount, enemyCount);
     }
 
@@ -71,8 +71,10 @@ export class UI_Fighter extends egf.UIController {
      * @param isWin
      */
     private onGameOver(isWin: boolean) {
+        egf.Logger.log("onGameOver isWin:", isWin, this._gold);
         setTimeout(() => {
-            egf.UIMgr.showUI(UI_Setting, null, this, { coin: this._gold, isWin: isWin });
+            this.close();
+            egf.UIMgr.showUI(UI_Settlement, null, this, { coin: this._gold, bWin: isWin });
         }, 2000);
     }
 }

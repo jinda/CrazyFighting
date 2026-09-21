@@ -22,7 +22,7 @@ export class EffectGroup extends Component {
      * @param endCb
      */
     public playChairEffect(posWorld: Vec3, endCb?: Function) {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/hit01", (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/hit01", (pf: Prefab) => {
             const ndEffect = egf.PoolMgr.getNode(pf, this.node);
 
             posWorld.y = 0.1;
@@ -46,7 +46,7 @@ export class EffectGroup extends Component {
      * @param scale
      */
     public playBombEffect(posWorld: Vec3, scale: number = 1) {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/hitBoom01", (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/hitBoom01", (pf: Prefab) => {
             const ndEffect = egf.PoolMgr.getNode(pf, this.node);
             ndEffect.setScale(scale, scale, scale);
 
@@ -68,7 +68,7 @@ export class EffectGroup extends Component {
      * @param callback
      */
     public playFireBallEffect(posWorld: Vec3, callback: Function) {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/fireBall01", (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/fireBall01", (pf: Prefab) => {
             const ndEffect = instantiate(pf);
             ndEffect.parent = this.node;
             ndEffect.setWorldPosition(posWorld);
@@ -91,7 +91,7 @@ export class EffectGroup extends Component {
      * @param callback
      */
     public playWinEffect(posWorld: Vec3, callback: Function) {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/win01", (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/win01", (pf: Prefab) => {
             const ndEffect = instantiate(pf);
             ndEffect.parent = this.node;
             ndEffect.setWorldPosition(posWorld);

@@ -80,7 +80,7 @@ export class Constants {
     };
 
     //1奥特曼/2牛角/3短剑/4标枪/5投石车/6小丑
-    public static FIGHTER_MODEL = {
+    public static FIGHTER_MODEL: Record<number, string> = {
         1: "axe",
         2: "altman",
         3: "soldier",

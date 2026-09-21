@@ -1,14 +1,16 @@
 import { _decorator, Component, Node, Vec3, AnimationComponent, ParticleSystemComponent, Prefab } from "cc";
-import { FighterManager } from "./FighterManager";
 import { Constants } from "db://assets/scripts/Constants";
 import { GameCfg } from "./GameConfig";
-import { DataMgr } from "db://assets/scripts/DataMgr";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
 import { Effect } from "./Effect";
+import { GameMgr } from "./GameMgr";
 const { ccclass, property } = _decorator;
 //格子/土地节点脚本
 @ccclass("FormationCell")
 export class FormationCell extends Component {
+    @property(Prefab)
+    public pfFighter: Prefab = null!; //士兵预制体
+
     @property(Node)
     public ndCell: Node = null!; //格子节点
 
@@ -32,7 +34,6 @@ export class FormationCell extends Component {
 
     private _ndSimilar: Node = null!; //“提示可以与其他士兵合成”的特效
     private _team: number = 0; //队伍
-    private _manager: FighterManager = null!; //“管理所有士兵”的脚本
     private _isShowSimilar: boolean = false; //是否有与格子上士兵相同的士兵/格子上的士兵是否可以合成
     private _select: boolean = false; //是否被选中
     private _similarPos: Vec3 = new Vec3(0, 0.1, 0); //“合并提示特效”位置
@@ -53,11 +54,10 @@ export class FormationCell extends Component {
      * @param manager
      * @returns
      */
-    public init(pos: number, team: number, fighterId: number, manager: FighterManager) {
+    public init(pos: number, team: number, fighterId: number) {
         this.pos = pos;
         this._team = team;
         this.fighterId = Number(fighterId);
-        this._manager = manager;
 
         this.showSimilar(false);
 
@@ -97,7 +97,7 @@ export class FormationCell extends Component {
         //移除原来格子关联的士兵ID
         if (this.aryIdentity.length > 0) {
             this.aryIdentity.forEach((identity: any) => {
-                this._manager.removeFighter(identity);
+                GameMgr.removeFighter(identity);
             });
 
             this.aryIdentity = [];
@@ -115,9 +115,10 @@ export class FormationCell extends Component {
 
         this._cellPos1.set(this.node.worldPosition);
 
-        let arrPos = DataMgr.getFighterPosByNum(this._cellPos1, num);
+        let arrPos = GameMgr.getFighterPosByNum(this._cellPos1, num);
         arrPos.forEach((fighterPos) => {
-            let identity = this._manager.addFighter(this._team, fighterPos, fighterInfo, this.pos);
+            let ndFighter = egf.PoolMgr.getNode(this.pfFighter, this.node.parent!);
+            let identity = GameMgr.addFighter(ndFighter, this._team, fighterPos, fighterInfo, this.pos);
             this.aryIdentity.push(identity);
         });
     }
@@ -152,7 +153,7 @@ export class FormationCell extends Component {
 
         if (this._isShowSimilar) {
             if (!this._ndSimilar) {
-                egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/upLoop01", (pf: Prefab) => {
+                egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/upLoop01", (pf: Prefab) => {
                     if (!this.node.activeInHierarchy) {
                         return;
                     }
@@ -179,7 +180,7 @@ export class FormationCell extends Component {
      * 展示合并成功特效
      */
     public showCombineSucceed() {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/upClick", (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/upClick", (pf: Prefab) => {
             if (!this.node.activeInHierarchy) {
                 return;
             }
@@ -199,7 +200,7 @@ export class FormationCell extends Component {
      * 格子上展示冲刺暴走特效
      */
     public showSprint() {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "prefabs/effect/goBallistic01", (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/goBallistic01", (pf: Prefab) => {
             if (!this.node.activeInHierarchy) {
                 return;
             }

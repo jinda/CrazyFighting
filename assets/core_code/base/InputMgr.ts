@@ -2,7 +2,7 @@ export class InputManager {
     private STATE_NORMAL = 1;
     private STATE_KEEP = 2;
 
-    private static _inst: InputManager;
+    private static _inst: InputManager | null = null;
     private _flags: { [key: string]: any } = {};
     private _flagsMeta: { [key: string]: any } = {};
     public static get inst(): InputManager {

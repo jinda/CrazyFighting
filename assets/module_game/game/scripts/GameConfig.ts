@@ -16,11 +16,11 @@ class GameConfig {
     }
 
     public loadConfig() {
-        const fighterContent = egf.ResMgr.getAsset(ModuleDef.GAME, "data/fighter");
-        this._csvManager.addTable("fighter", fighterContent);
+        const fighterContent = egf.ResMgr.getAsset(ModuleDef.GAME, "datas/fighter");
+        this._csvManager.addTable("fighter", fighterContent.text);
 
-        const levelContent = egf.ResMgr.getAsset(ModuleDef.GAME, "data/level");
-        this._csvManager.addTable("level", levelContent);
+        const levelContent = egf.ResMgr.getAsset(ModuleDef.GAME, "datas/level");
+        this._csvManager.addTable("level", levelContent.text);
     }
 
     /**

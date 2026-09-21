@@ -7,7 +7,7 @@ import { WebSock } from "./WebSock";
  *
  */
 class NetManager {
-    private static _inst: NetManager;
+    private static _inst: NetManager | null = null;
     protected _channels: { [key: number]: NetNode } = {};
     private _defaultChannelId: number = 0; // 默认当前的网络节点
 
