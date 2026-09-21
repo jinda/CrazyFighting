@@ -879,8 +879,8 @@
         "__expectedType__": "cc.Material"
       }
     ],
-    "ndRightHand": {
-      "__id__": 11
+    "nodeWeapon": {
+      "__id__": 24
     },
     "ndHead": {
       "__id__": 5

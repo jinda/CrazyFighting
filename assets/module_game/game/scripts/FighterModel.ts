@@ -26,7 +26,7 @@ export class FighterModel extends Component {
     public aryMaterial: Material[] = []; //材质皮肤数组
 
     @property(Node)
-    public ndRightHand: Node = null!; //右手节点
+    public nodeWeapon: Node = null!; //右手节点
 
     @property(Node)
     public ndHead: Node = null!; //头部节点
@@ -93,11 +93,11 @@ export class FighterModel extends Component {
 
         //生成武器在右手
         if (this.pfWeapon) {
-            this._ndWeapon = egf.PoolMgr.getNode(this.pfWeapon, this.ndRightHand);
+            this._ndWeapon = egf.PoolMgr.getNode(this.pfWeapon, this.nodeWeapon);
 
             // egf.Logger.log("pfWeapon:", this.pfWeapon.data);
-            this._ndWeapon.position = this.ndRightHand.position.clone();
-            this._ndWeapon.eulerAngles = this.ndRightHand.eulerAngles.clone();
+            this._ndWeapon.position = this.nodeWeapon.position;
+            this._ndWeapon.eulerAngles = this.nodeWeapon.eulerAngles;
             this._ndWeapon.active = true;
 
             let missile = this._ndWeapon.getComponent(Missile);

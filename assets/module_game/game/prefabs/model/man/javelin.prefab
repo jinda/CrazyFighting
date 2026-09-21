@@ -34,11 +34,11 @@
         "__id__": 29
       },
       {
-        "__id__": 33
+        "__id__": 32
       }
     ],
     "_prefab": {
-      "__id__": 35
+      "__id__": 34
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -884,9 +884,6 @@
     "_sockets": [
       {
         "__id__": 31
-      },
-      {
-        "__id__": 32
       }
     ],
     "_id": ""
@@ -894,13 +891,6 @@
   {
     "__type__": "cc.CompPrefabInfo",
     "fileId": "e0EJupzGxPeKTT+EK/wtcU"
-  },
-  {
-    "__type__": "cc.SkeletalAnimation.Socket",
-    "path": "RootNode/Dummy01",
-    "target": {
-      "__id__": 23
-    }
   },
   {
     "__type__": "cc.SkeletalAnimation.Socket",
@@ -919,7 +909,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 34
+      "__id__": 33
     },
     "model": {
       "__id__": 18
@@ -934,8 +924,8 @@
         "__expectedType__": "cc.Material"
       }
     ],
-    "ndRightHand": {
-      "__id__": 12
+    "nodeWeapon": {
+      "__id__": 26
     },
     "ndHead": {
       "__id__": 5
