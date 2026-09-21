@@ -22,10 +22,10 @@ export function hasChanged(value: any, oldValue: any): boolean {
 
 export class RenderReactiveHandler {
     constructor(reactiveTarget?: object) {
-        this.reactiveTarget = reactiveTarget;
+        this.reactiveTarget = reactiveTarget ?? null;
     }
     /**需要作出反应的对象 */
-    private reactiveTarget: object = null;
+    private reactiveTarget: object | null = null;
 
     /**
      *
@@ -40,7 +40,7 @@ export class RenderReactiveHandler {
         let hadKey = hasOwn(target, prop);
         let result = Reflect.set(target, prop, value);
         if (!hadKey || hasChanged(value, oldValue)) {
-            if (prop == "angle" || prop == "scale" || prop == "position" || prop == "_renderFlag") return;
+            if (prop == "angle" || prop == "scale" || prop == "position" || prop == "_renderFlag") return true;
             if (prop == "activeInHierarchy") {
                 egf.Logger.warn(target);
             }
@@ -67,10 +67,9 @@ export class RenderReactiveHandler {
 
     deleteProperty(target: object, prop: string | symbol): boolean {
         let hadKey = hasOwn(target, prop);
-        let oldValue = target[prop];
         let result = Reflect.deleteProperty(target, prop);
         if (result && hadKey) {
-            //trigger(target, prop, void 0, oldValue);
+            //trigger(target, prop, void 0);
         }
 
         return result;

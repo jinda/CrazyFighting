@@ -3,7 +3,6 @@ import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
 
 let wx = (<any>window).wx;
 
-const wxId = "wx1ff8000e1f8395b1";
 const adunitVideo = "adunit-57415739ee47a411";
 const adunitInterstitial = "adunit-54cdc3174f761e60";
 const adunitBanner = "adunit-b9179edb023af2a9";
@@ -155,6 +154,10 @@ export class IWeChat extends SDKBase {
     showRewardedVideo(startCb: Function, endCb?: Function): void {
         if (!this._videoAd) {
             console.error("videoAd not found");
+            //必须回调结束，否则调用方（已暂停的游戏）无法恢复
+            if (endCb) {
+                endCb(false);
+            }
             return;
         }
         this._startCb = startCb;
@@ -166,6 +169,11 @@ export class IWeChat extends SDKBase {
                 .then(() => this._videoAd.show())
                 .catch((err: Error) => {
                     egf.Logger.log("激励视频 广告显示失败:", err);
+                    //重试仍失败：按未完成处理，保证调用方恢复游戏，并清空避免迟到回调重复通知
+                    if (this._endCb) {
+                        this._endCb(false);
+                        this._endCb = null;
+                    }
                 });
         });
     }

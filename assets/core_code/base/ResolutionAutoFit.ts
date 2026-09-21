@@ -1,5 +1,5 @@
 import { _decorator, Component, view, screen, Size, size, ResolutionPolicy, Node, v3, isValid, sys } from "cc";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 const CHECK_INTERVAL = 0.1;
 

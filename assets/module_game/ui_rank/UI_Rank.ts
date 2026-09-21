@@ -1,5 +1,5 @@
 import { Layout_Rank } from "./Layout_Rank";
-import { sys, Color, size } from "cc";
+import { Color, size } from "cc";
 import { IRankData } from "./Layout_RankItem";
 import { ClientApi } from "../../scripts/ClientApi";
 import { DataMgr } from "../../scripts/DataMgr";

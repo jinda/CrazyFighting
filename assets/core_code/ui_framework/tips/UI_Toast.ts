@@ -1,4 +1,4 @@
-import { RichText, UIOpacity, instantiate, tween, v3 } from "cc";
+import { UIOpacity, instantiate, tween, v3 } from "cc";
 import { Layout_Toast } from "./Layout_Toast";
 import { UIController } from "../UIController";
 

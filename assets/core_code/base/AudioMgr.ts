@@ -1,5 +1,5 @@
 //AudioMgr.ts
-import { Node, AudioSource, AudioClip, resources, director, assetManager } from "cc";
+import { Node, AudioSource, AudioClip, director, assetManager } from "cc";
 /**
  * @en
  * this is a sington class for audio play, can be easily called from anywhere in you project.
@@ -22,7 +22,6 @@ class AudioManager {
     private _musicVolume = 1.0;
     private _musicVolumeScale = 1.0;
     private _soundVolume = 1.0;
-    private _bgmType = 0;
     private _bundleName = "resources";
     private _currentEffect = 0;
     constructor() {
@@ -70,8 +69,8 @@ class AudioManager {
         }
     }
 
-    public set bgmType(t: number) {
-        this._bgmType = t;
+    public set bgmType(_t: number) {
+        //保留 API：当前版本未使用背景音乐类型区分，参数仅占位
     }
 
     public set bundleName(name: string) {

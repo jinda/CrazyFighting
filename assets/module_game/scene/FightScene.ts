@@ -1,7 +1,7 @@
 import { _decorator, Component } from "cc";
 import { UI_HUD } from "../../scripts/UIDef";
 import { GameMgr } from "../game/scripts/GameMgr";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 @ccclass("FightScene")
 export class FightScene extends Component {

@@ -5,7 +5,7 @@
 // // Learn life-cycle callbacks:
 // //  - https://docs.cocos.com/creator/2.4/manual/en/scripting/life-cycle-callbacks.html
 
-import { _decorator, Component, ScrollView, Event, Node, UITransform, size, EventTouch, Vec2, EventMouse } from "cc";
+import { _decorator, Component, ScrollView, Node, UITransform, size, EventTouch, Vec2, EventMouse } from "cc";
 const { ccclass, property } = _decorator;
 
 enum ScrollDirection {
@@ -34,29 +34,29 @@ const _tempVec2_1 = new Vec2();
 @ccclass("ScrollViewExt")
 export class ScrollViewExt extends Component {
     @property(Node)
-    Parent: Node = null;
+    Parent: Node = null!;
 
-    ScrollParent: ScrollViewExt = null;
+    ScrollParent: ScrollViewExt = null!;
 
     // LIFE-CYCLE CALLBACKS:
-    private _scrollView: ScrollView = null;
-    private _onScrollViewTouchStart: Function = null;
-    private _onScrollViewTouchMove: Function = null;
-    private _onScrollViewTouchEnd: Function = null;
-    private _onScrollViewTouchCancelled: Function = null;
-    private _onScrollViewMouseWheel: Function = null;
+    private _scrollView: ScrollView = null!;
+    private _onScrollViewTouchStart: Function = null!;
+    private _onScrollViewTouchMove: Function = null!;
+    private _onScrollViewTouchEnd: Function = null!;
+    private _onScrollViewTouchCancelled: Function = null!;
+    private _onScrollViewMouseWheel: Function = null!;
 
     private _isTouchStart: boolean = false;
     private _scrollDirection: ScrollDirection = ScrollDirection.None;
     //------------
 
     protected onLoad() {
-        this._scrollView = this.node.getComponent(ScrollView);
+        this._scrollView = this.node.getComponent(ScrollView)!;
         if (this._scrollView && this.Parent) {
             this._scrollView.elastic = false;
         }
         if (this.Parent) {
-            this.ScrollParent = this.Parent.getComponent(ScrollViewExt);
+            this.ScrollParent = this.Parent.getComponent(ScrollViewExt)!;
         }
         this._onScrollViewTouchStart = this._scrollView["_onTouchBegan"].bind(this._scrollView);
         this._onScrollViewTouchMove = this._scrollView["_onTouchMoved"].bind(this._scrollView);
@@ -85,7 +85,7 @@ export class ScrollViewExt extends Component {
         this.node.off(Node.EventType.MOUSE_WHEEL, this._onMouseWheel, this);
     }
 
-    private _getContentSize(node: Node) {
+    private _getContentSize(node: Node | null) {
         if (!node) {
             return size(0, 0);
         }
@@ -98,10 +98,10 @@ export class ScrollViewExt extends Component {
 
     private _isBoundary(scrollView: ScrollView, boundary: ScrollBoundary): boolean {
         if (scrollView.content) {
-            let view = scrollView.content.parent;
+            let view = scrollView.content.parent!;
             let viewSize = this._getContentSize(view);
 
-            let vut = view.getComponent(UITransform);
+            let vut = view.getComponent(UITransform)!;
 
             let anchorX = viewSize.width * vut.anchorX;
             let anchorY = viewSize.height * vut.anchorY;
@@ -146,28 +146,31 @@ export class ScrollViewExt extends Component {
 
     private _getContentLeftBoundary(scrollView: ScrollView) {
         let contentPos = scrollView.getContentPosition();
-        let scut = scrollView.content.getComponent(UITransform);
+        let scut = scrollView.content!.getComponent(UITransform)!;
         return contentPos.x - scut.anchorX * scut.width;
     }
 
     private _getContentRightBoundary(scrollView: ScrollView) {
-        let scut = scrollView.content.getComponent(UITransform);
+        let scut = scrollView.content!.getComponent(UITransform)!;
         return this._getContentLeftBoundary(scrollView) + scut.width;
     }
 
     private _getContentTopBoundary(scrollView: ScrollView) {
-        let scut = scrollView.content.getComponent(UITransform);
+        let scut = scrollView.content!.getComponent(UITransform)!;
         return this._getContentBottomBoundary(scrollView) + scut.height;
     }
 
     private _getContentBottomBoundary(scrollView: ScrollView) {
         let contentPos = scrollView.getContentPosition();
-        let scut = scrollView.content.getComponent(UITransform);
+        let scut = scrollView.content!.getComponent(UITransform)!;
         return contentPos.y - scut.anchorY * scut.height;
     }
 
     private _checkScrollDirection(event: EventTouch): ScrollDirection {
         let touch = event.touch;
+        if (!touch) {
+            return ScrollDirection.None;
+        }
         const deltaMove = touch.getUILocation(_tempVec2);
         deltaMove.subtract(touch.getUIStartLocation(_tempVec2_1));
         if (deltaMove.length() > 7) {

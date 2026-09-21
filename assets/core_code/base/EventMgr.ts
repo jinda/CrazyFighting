@@ -47,7 +47,6 @@ class EventManager {
             let h = v.data;
             if (h.cb == cb && h.thisArg == thisArg && h.once == once) {
                 v.dispose();
-                return true;
             }
         });
     }

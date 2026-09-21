@@ -6,7 +6,6 @@ import {
     SkeletalAnimation,
     Prefab,
     AnimationComponent,
-    Vec3,
     isValid,
     SkinnedMeshRenderer,
 } from "cc";

@@ -1,4 +1,5 @@
 import { Layout_Award } from "./Layout_Award";
+import { Constants } from "../../scripts/Constants";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { DataMgr } from "../../scripts/DataMgr";
@@ -23,11 +24,12 @@ export class UI_Award_Impl extends egf.UIController {
         this.onButtonEvent(layout.btnDoubleGet, this.clickDoubleGet, this);
 
         layout.showInfo(this._params.bOnline, this._params.coin, this._params.bDailyGift);
-        egf.EventMgr.emit("game_pause");
+        //本界面打开时暂停战斗，关闭时恢复（与 onDispose 成对派发，GameMgr 内部按计数处理叠加暂停）
+        egf.EventMgr.emit(Constants.EVENT_NAME.GAME_PAUSE);
     }
 
     protected onDispose(): void {
-        egf.EventMgr.emit("game_resume");
+        egf.EventMgr.emit(Constants.EVENT_NAME.GAME_RESUME);
     }
 
     clickBack() {

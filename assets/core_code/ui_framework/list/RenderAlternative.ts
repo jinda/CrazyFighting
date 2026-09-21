@@ -23,7 +23,7 @@ const { ccclass, property } = _decorator;
 export default class RenderAlternative extends Component {
     private static _isDirty: WeakMap<Node, boolean> = new WeakMap();
     public static isDirty(renderLayer: Node): boolean {
-        return this._isDirty.has(renderLayer) ? this._isDirty.get(renderLayer) : false;
+        return this._isDirty.get(renderLayer) ?? false;
     }
     public static setDirty(renderLayer: Node) {
         if (renderLayer && !this.isDirty(renderLayer)) {
@@ -52,7 +52,7 @@ export default class RenderAlternative extends Component {
     }
     /**渲染层节点 */
     @property(Node)
-    public renderLayer: Node = null;
+    public renderLayer: Node = null!;
     /**渲染的zIndex */
     @property
     public renderZIndex: number = 0;
@@ -64,23 +64,23 @@ export default class RenderAlternative extends Component {
     /**渲染的sIndex */
     public sIndex: number = 0;
     /**非渲染组件 */
-    public proxyRender: UIRenderer = null;
+    public proxyRender: UIRenderer = null!;
     /**渲染组件 */
-    private renderCompnent: UIRenderer = null;
+    private renderCompnent: UIRenderer = null!;
     /**渲染节点的ui控件 */
-    private renderUiTrans: UITransform = null;
+    private renderUiTrans: UITransform = null!;
     /**ui控件 */
-    private uiTrans: UITransform = null;
+    private uiTrans: UITransform = null!;
     /**上次更新的数据 */
-    public lastWMat4: Mat4 = null;
+    public lastWMat4: Mat4 = null!;
     /**上次更新的数据 */
-    public lastLMat4: Mat4 = null;
+    public lastLMat4: Mat4 = null!;
     /**上次更新的数据 */
-    public lastPos: Vec3 = null;
+    public lastPos: Vec3 = null!;
     /**距离下次刷新累计了多少间隔 */
     public accuTime: number = 0;
     /**最后一次刷新时间 */
-    public lastFrameTime: number = null;
+    public lastFrameTime: number = null!;
     /**是否进行刷新 */
     public isAttachFrame: boolean = false;
 
@@ -88,7 +88,7 @@ export default class RenderAlternative extends Component {
     get zIndex() {
         let zIndex = this.renderZIndex + this.sIndex * 0.01;
         let parentNode = this.node.parent;
-        while (parentNode != this.renderLayer?.parent && parentNode != director.getScene()) {
+        while (parentNode && parentNode != this.renderLayer?.parent && parentNode != director.getScene()) {
             let render = parentNode.getComponent(RenderAlternative);
             if (render) {
                 zIndex += render.zIndex + 1;
@@ -109,7 +109,7 @@ export default class RenderAlternative extends Component {
         }
         if (!this.renderLayer) {
             egf.Logger.warn(`节点${this.node.name}没有设置渲染层`);
-            return null;
+            return null!;
         }
         return this.initRender<T>();
     }
@@ -118,7 +118,7 @@ export default class RenderAlternative extends Component {
      */
     private initRender<T extends UIRenderer>(): T {
         let node = this.getRender();
-        node.setParent(this.renderLayer ? this.renderLayer : director.getScene().getChildByName("Canvas"));
+        node.setParent(this.renderLayer ? this.renderLayer : director.getScene()!.getChildByName("Canvas"));
         this.isAttachFrame = true;
         requestAnimationFrame(this.frameUpdate.bind(this));
         return this.doProxy<T>();
@@ -201,8 +201,8 @@ export default class RenderAlternative extends Component {
 
     protected onDestroy(): void {
         this.renderCompnent?.node.destroy();
-        this.renderCompnent = null;
-        this.proxyRender = null;
+        this.renderCompnent = null!;
+        this.proxyRender = null!;
     }
 
     /**
@@ -212,7 +212,7 @@ export default class RenderAlternative extends Component {
     private getOpacity(node: Node) {
         let opacity = (node.getComponent(UIOpacity)?.opacity || 255) / 255;
         let parentNode = node.parent;
-        while (parentNode != this.renderLayer.parent && parentNode != director.getScene()) {
+        while (parentNode && parentNode != this.renderLayer.parent && parentNode != director.getScene()) {
             opacity *= (parentNode.getComponent(UIOpacity)?.opacity || 255) / 255;
             parentNode = parentNode.parent;
         }
@@ -237,10 +237,10 @@ export default class RenderAlternative extends Component {
     private getRender() {
         let node = instantiate(this.node);
         node.removeAllChildren();
-        this.uiTrans = this.node.getComponent(UITransform);
-        this.renderUiTrans = node.getComponent(UITransform);
-        this.renderCompnent = node.getComponent(UIRenderer);
-        this.node.getComponent(UIRenderer).destroy();
+        this.uiTrans = this.node.getComponent(UITransform)!;
+        this.renderUiTrans = node.getComponent(UITransform)!;
+        this.renderCompnent = node.getComponent(UIRenderer)!;
+        this.node.getComponent(UIRenderer)!.destroy();
         for (let i = 0, len = node.components.length; i < len; ++i) {
             let comp = node.components[i];
             if (!(comp instanceof UIRenderer || comp instanceof UITransform)) {

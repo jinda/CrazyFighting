@@ -62,6 +62,10 @@ export class UI_Settlement extends egf.UIController {
     checkUnlock() {
         //先判定当前是否有解锁的士兵
         let levelInfo = GameCfg.queryByID("level", DataMgr.level.toString());
+        //通关最后一关后（配置表没有对应行）不再有可解锁士兵，直接返回
+        if (!levelInfo) {
+            return;
+        }
         let unlock = levelInfo["unlock"];
         if (unlock) {
             //有待解锁的士兵

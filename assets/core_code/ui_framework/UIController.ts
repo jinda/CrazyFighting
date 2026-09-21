@@ -14,7 +14,18 @@ import {
 } from "cc";
 import { DoubleList, DoubleListItem } from "../base/DoubleList";
 import { NetMgr } from "../network/NetMgr";
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
+
+/** EventHandler 上附加的自定义透传字段：注册时写入（onButtonEvent/onToggleEvent/onSlideEvent），事件转发时读取 */
+interface IHandlerExtras {
+    $cb$?: Function;
+    $target$?: any;
+    $args$?: any;
+    $interval$?: number;
+    $lastClickTime$?: number;
+}
+/** 以 IHandlerExtras 视角访问 EventHandler（这些字段运行时动态挂载，不在 cc 类型声明里） */
+const handlerExtras = (h: EventHandler): IHandlerExtras => h as unknown as IHandlerExtras;
 /***
  * @en internal class, used for handling node event.
  * @zh 内部类，用于节点事件监听
@@ -32,19 +43,19 @@ export class __NodeEventAgent__ extends Component {
         for (let i = 0; i < clickEvents.length; ++i) {
             const h = clickEvents[i];
             if (h.customEventData == customEventData) {
-                const cb = h["$cb$"];
-                const target = h["$target$"];
-                const interval = h["$interval$"];
-                const lastClickTime = h["$lastClickTime$"];
+                const ex = handlerExtras(h);
+                const cb = ex.$cb$!;
+                const target = ex.$target$;
+                const interval = ex.$interval$!;
+                const lastClickTime = ex.$lastClickTime$;
                 if (interval > 0) {
                     const currentTime = Date.now();
                     if (lastClickTime && currentTime - lastClickTime < interval) {
                         return;
                     }
-                    h["$lastClickTime$"] = currentTime;
+                    ex.$lastClickTime$ = currentTime;
                 }
-                const args = h["$args$"];
-                cb.apply(target, [btn, args]);
+                cb.apply(target, [btn, ex.$args$]);
             }
         }
     }
@@ -61,10 +72,8 @@ export class __NodeEventAgent__ extends Component {
         for (let i = 0; i < checkEvents.length; ++i) {
             let h = checkEvents[i];
             if (h.customEventData == customEventData) {
-                let cb = h["$cb$"];
-                let target = h["$target$"];
-                let args = h["$args$"];
-                cb.apply(target, [toggle, args]);
+                const ex = handlerExtras(h);
+                ex.$cb$!.apply(ex.$target$, [toggle, ex.$args$]);
             }
         }
     }
@@ -78,10 +87,8 @@ export class __NodeEventAgent__ extends Component {
         for (let i = 0; i < slideEvents.length; ++i) {
             let h = slideEvents[i];
             if (h.customEventData == customEventData) {
-                let cb = h["$cb$"];
-                let target = h["$target$"];
-                let args = h["$args$"];
-                cb.apply(target, [slider, args]);
+                const ex = handlerExtras(h);
+                ex.$cb$!.apply(ex.$target$, [slider, ex.$args$]);
             }
         }
     }
@@ -246,7 +253,7 @@ export class UIController {
         }
 
         if (!buttonNode) {
-            return null;
+            return;
         }
 
         //添加转发器
@@ -267,10 +274,11 @@ export class UIController {
         handler.customEventData = "" + UIController._idBase++;
 
         //附加额外信息 供事件转发使用
-        handler["$cb$"] = cb;
-        handler["$target$"] = target;
-        handler["$args$"] = args;
-        handler["$interval$"] = interval;
+        const ex = handlerExtras(handler);
+        ex.$cb$ = cb;
+        ex.$target$ = target;
+        ex.$args$ = args;
+        ex.$interval$ = interval;
 
         clickEvents.push(handler);
         btn.clickEvents = clickEvents;
@@ -313,7 +321,8 @@ export class UIController {
         if (cb && target) {
             for (let i = 0; i < clickEvents.length; ++i) {
                 let h = clickEvents[i];
-                if (h["$cb$"] == cb && h["$target$"] == target) {
+                const ex = handlerExtras(h);
+                if (ex.$cb$ == cb && ex.$target$ == target) {
                     clickEvents.splice(i, 1);
                     btn.clickEvents = clickEvents;
                     break;
@@ -345,7 +354,7 @@ export class UIController {
         }
 
         if (!buttonNode) {
-            return null;
+            return;
         }
 
         //添加转发器
@@ -366,9 +375,10 @@ export class UIController {
         handler.customEventData = "" + UIController._idBase++;
 
         //附加额外信息 供事件转发使用
-        handler["$cb$"] = cb;
-        handler["$target$"] = target;
-        handler["$args$"] = args;
+        const ex = handlerExtras(handler);
+        ex.$cb$ = cb;
+        ex.$target$ = target;
+        ex.$args$ = args;
 
         checkEvents.push(handler);
         btn.checkEvents = checkEvents;
@@ -394,7 +404,7 @@ export class UIController {
         }
 
         if (!buttonNode) {
-            return null;
+            return;
         }
 
         //添加转发器
@@ -409,7 +419,8 @@ export class UIController {
         let checkEvents = btn.checkEvents;
         for (let i = 0; i < checkEvents.length; ++i) {
             let h = checkEvents[i];
-            if (h["$cb$"] == cb && h["$target$"] == target) {
+            const ex = handlerExtras(h);
+            if (ex.$cb$ == cb && ex.$target$ == target) {
                 checkEvents.splice(i, 1);
                 btn.checkEvents = checkEvents;
                 break;
@@ -428,7 +439,7 @@ export class UIController {
         }
 
         if (!sliderNode) {
-            return null;
+            return;
         }
 
         //添加转发器
@@ -446,9 +457,10 @@ export class UIController {
         handler.customEventData = "" + UIController._idBase++;
 
         //附加额外信息 供事件转发使用
-        handler["$cb$"] = cb;
-        handler["$target$"] = target;
-        handler["$args$"] = args;
+        const ex = handlerExtras(handler);
+        ex.$cb$ = cb;
+        ex.$target$ = target;
+        ex.$args$ = args;
 
         slideEvents.push(handler);
         slider.slideEvents = slideEvents;
@@ -465,7 +477,7 @@ export class UIController {
         }
 
         if (!sliderNode) {
-            return null;
+            return;
         }
 
         //添加转发器
@@ -477,7 +489,8 @@ export class UIController {
         let slideEvents = slider.slideEvents;
         for (let i = 0; i < slideEvents.length; ++i) {
             let h = slideEvents[i];
-            if (h["$cb$"] == cb && h["$target$"] == target) {
+            const ex = handlerExtras(h);
+            if (ex.$cb$ == cb && ex.$target$ == target) {
                 slideEvents.splice(i, 1);
                 slider.slideEvents = slideEvents;
                 break;

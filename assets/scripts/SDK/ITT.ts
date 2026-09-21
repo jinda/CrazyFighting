@@ -2,7 +2,6 @@ import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
 
 const tt = (<any>window).tt;
 
-const ttId = "tt12b3640e8d84b0f602";
 const adUnitIdVideo = "2h7689m9d1e77pu0je";
 const adUnitIdInterstitial = "ea3hf01o6ao3h4xw9t";
 const adUnitIdBanner = "adunit-xxxxxxxxxxxxxxxx";
@@ -152,7 +151,7 @@ export class ITT extends SDKBase {
         if (!this._bannerAd) {
             // 创建 banner 广告实例（懒加载），优先使用服务器配置
             this._bannerAd = tt.createBannerAd({
-                adUnitId: this._banner_ad_id || adunitBanner,
+                adUnitId: this._banner_ad_id || adUnitIdBanner,
                 style: {
                     left: 0,
                     top: position === EBannerPosition.Top ? 0 : undefined,

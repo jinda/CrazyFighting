@@ -247,6 +247,8 @@ export class Constants {
 
         GAME_INIT: "gameInit", //游戏初始化
         GAME_OVER: "gameOver", //游戏结束
+        GAME_PAUSE: "gamePause", //暂停游戏（设置界面、奖励界面、激励视频等外部模块广播，由游戏模块统一冻结战斗逻辑）
+        GAME_RESUME: "gameResume", //恢复游戏（与 GAME_PAUSE 成对派发，支持叠加暂停）
 
         HOME_UI_TOUCH: "homeUITouch", //接收主界面的触摸位置
         HIDE_ALL_SIMILAR: "hideAllSimilar", //隐藏所有的格子上“可合成的”特效提示

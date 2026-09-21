@@ -1,8 +1,9 @@
 import { Node, v3, instantiate, tween, Vec3, Tween, Vec2, NodePool, Game, game } from "cc";
 
 var timeScale = 1;
-//@ts-ignore
-game._calculateDT = function (now: number) {
+//覆写引擎的帧间隔计算实现全局时间缩放：_deltaTime/_startTime 为引擎内部字段，未在类型声明公开，故借 any 视图访问
+const gameInternal = game as any;
+gameInternal._calculateDT = function (this: any, now: number) {
     if (!now) now = performance.now();
     this._deltaTime = now > this._startTime ? (now - this._startTime) / 1000 : 0;
     if (this._deltaTime > Game.DEBUG_DT_THRESHOLD) {

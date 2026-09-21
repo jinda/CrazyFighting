@@ -21,11 +21,20 @@ class GameManager {
     public mainCamera: Camera = null!; //相机组件
     public isGameStart: boolean = false; //游戏是否开始
     public isGameOver: boolean = false; //游戏是否结束
-    public isGamePause: boolean = false; //游戏是否暂停
     public dictFighter: any = {}; //存放敌我士兵的字典
     public effectGroup: EffectGroup = null!; //特效管理的脚本
     public world: any = null; //物理世界对象
+    //暂停请求计数：设置界面、奖励界面、激励视频等多个来源可能同时请求暂停，计数归零才真正恢复
+    private _pauseCount: number = 0;
     private _identity: number = 1; //士兵唯一标识
+
+    /**
+     * 游戏是否暂停（只读）
+     * 采用计数方式支持多个来源叠加暂停，避免其中一个来源恢复就解除了其他来源的暂停
+     */
+    public get isGamePause(): boolean {
+        return this._pauseCount > 0;
+    }
 
     /**
      * 初始化物理世界
@@ -52,7 +61,8 @@ class GameManager {
             case 1: //1个人
                 return [posCell];
             case 2: {
-                //另外：case 内直接声明变量会触发 ESLint no-case-declarations，这里用块作用域包裹 //物理射线结果的共享对象 hitPoint，原地修改会污染后续的格子判定，因此一律操作克隆对象。 //注意：不能用 posCell 原对象做加减。调用方（fighterManager._checkNewCell）传入的可能是 //2个人
+                //case 内直接声明变量会触发 ESLint no-case-declarations，这里用块作用域包裹
+                //注意：不能用 posCell 原对象做加减（调用方传入的可能是共享对象），一律操作克隆对象
                 const posClone = posCell.clone();
                 const left = posCell.clone();
                 left.z -= Constants.CELL_FIGHTER_SPACING;
@@ -216,7 +226,8 @@ class GameManager {
     reset() {
         egf.Logger.log("GameMgr reset");
         this.isGameStart = false;
-        this.isGamePause = false;
+        //暂停计数清零，避免上一局的暂停状态残留到下一局
+        this._pauseCount = 0;
         this.isGameOver = false;
         this._identity = 1;
 
@@ -332,16 +343,20 @@ class GameManager {
 
     /**
      * 暂停游戏
+     * 多个来源（设置界面、奖励界面、激励视频等）可叠加暂停
      */
     public pauseGame() {
-        this.isGamePause = true;
+        this._pauseCount++;
+        egf.Logger.log("GameMgr pauseGame, pauseCount:", this._pauseCount);
     }
 
     /**
      * 恢复游戏
+     * 暂停计数减到0才算真正恢复，避免多来源暂停被提前解除
      */
     public resumeGame() {
-        this.isGamePause = false;
+        this._pauseCount = Math.max(0, this._pauseCount - 1);
+        egf.Logger.log("GameMgr resumeGame, pauseCount:", this._pauseCount);
     }
 
     /**

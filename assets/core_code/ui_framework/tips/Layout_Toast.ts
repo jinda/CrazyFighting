@@ -1,4 +1,4 @@
-import { _decorator, Component, Label, Node, RichText } from "cc";
+import { _decorator, Component, Node, RichText } from "cc";
 const { ccclass, property } = _decorator;
 
 @ccclass("Layout_Toast")

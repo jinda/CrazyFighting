@@ -18,7 +18,8 @@ export class Utils {
                     if (typeof arg === "number") {
                         result = str.match(/(%d)|(%s)/);
                         if (result) {
-                            str = str.replace(/(%d)|(%s)/, arg);
+                            //number 不能直接作为 replace 的替换串，转成字符串（与引擎 ToString 行为一致）
+                            str = str.replace(/(%d)|(%s)/, String(arg));
                             break;
                         }
                     }

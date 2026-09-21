@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, isValid, Label, Node, RichText, Sprite, SpriteFrame } from "cc";
+import { _decorator, Button, Color, Component, isValid, Label, RichText, Sprite, SpriteFrame } from "cc";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { DataMgr } from "../../scripts/DataMgr";

@@ -60,6 +60,9 @@ export class FighterLogic extends Component {
         egf.EventMgr.on(Constants.EVENT_NAME.USE_FIRE_BALL, this._useFireBall, this);
         egf.EventMgr.on(Constants.EVENT_NAME.SHOW_SPRINT, this._showSprint, this);
         egf.EventMgr.on(Constants.EVENT_NAME.HIDE_ALL_SIMILAR, this._hideAllSimilar, this);
+        //设置界面、奖励界面、激励视频等外部模块广播的暂停/恢复，由游戏模块统一冻结战斗逻辑
+        egf.EventMgr.on(Constants.EVENT_NAME.GAME_PAUSE, this._gamePause, this);
+        egf.EventMgr.on(Constants.EVENT_NAME.GAME_RESUME, this._gameResume, this);
     }
 
     onDisable() {
@@ -72,6 +75,8 @@ export class FighterLogic extends Component {
         egf.EventMgr.off(Constants.EVENT_NAME.USE_FIRE_BALL, this._useFireBall, this);
         egf.EventMgr.off(Constants.EVENT_NAME.SHOW_SPRINT, this._showSprint, this);
         egf.EventMgr.off(Constants.EVENT_NAME.HIDE_ALL_SIMILAR, this._hideAllSimilar, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.GAME_PAUSE, this._gamePause, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.GAME_RESUME, this._gameResume, this);
     }
 
     protected onLoad(): void {
@@ -107,6 +112,21 @@ export class FighterLogic extends Component {
 
         GameMgr.effectGroup = this.effectGroup;
         GameMgr.initWorld();
+    }
+
+    /**
+     * 暂停游戏（设置界面、奖励界面、激励视频等外部模块广播）
+     * 采用计数式暂停，避免多个弹窗嵌套时提前恢复
+     */
+    private _gamePause() {
+        GameMgr.pauseGame();
+    }
+
+    /**
+     * 恢复游戏（与 _gamePause 配对，全部恢复请求到齐后才真正恢复）
+     */
+    private _gameResume() {
+        GameMgr.resumeGame();
     }
 
     /**

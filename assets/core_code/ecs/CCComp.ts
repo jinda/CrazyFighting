@@ -1,7 +1,7 @@
 import { _decorator, Component } from "cc";
 import { ECS } from "./ECS";
 
-const { ccclass, property } = _decorator;
+const { ccclass } = _decorator;
 
 /** 
  * 游戏显示对象组件

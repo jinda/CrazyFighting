@@ -1,4 +1,5 @@
 import { sys } from "cc";
+import { Constants } from "../Constants";
 import { SDKBase, SDKInterface } from "./SDKInterface";
 import { IWeChat } from "./IWeChat";
 import { ITT } from "./ITT";
@@ -93,16 +94,37 @@ class PlatformManager {
      */
     public showRewardedVideo(startCb?: Function, endCb?: Function) {
         //暂停游戏
-        egf.EventMgr.emit("GamePause");
+        egf.EventMgr.emit(Constants.EVENT_NAME.GAME_PAUSE);
         egf.AudioMgr.pause();
-        this._sdkInterface?.showRewardedVideo(
+
+        //本来源的暂停只解除一次：
+        //1. SDK 可能漏回调（如广告实例未创建），游戏会一直停留在暂停状态；
+        //2. SDK 可能重复回调（onClose、onError 都触发），多减一次会误解除其它来源的暂停。
+        let bResumed = false;
+        const fnResumeGame = (bSuccess: boolean) => {
+            if (bResumed) {
+                return;
+            }
+            bResumed = true;
+
+            //恢复游戏
+            egf.AudioMgr.resume();
+            egf.EventMgr.emit(Constants.EVENT_NAME.GAME_RESUME);
+            endCb && endCb(bSuccess);
+        };
+
+        if (!this._sdkInterface) {
+            //没有可用的SDK实现，直接按未完成处理，避免游戏一直暂停
+            fnResumeGame(false);
+            return;
+        }
+
+        this._sdkInterface.showRewardedVideo(
             () => {
                 startCb && startCb();
             },
             (bSuccess: boolean) => {
-                //恢复游戏
-                egf.AudioMgr.resume();
-                endCb && endCb(bSuccess);
+                fnResumeGame(bSuccess);
             },
         );
     }

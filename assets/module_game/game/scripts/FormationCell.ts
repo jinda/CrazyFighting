@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Vec3, AnimationComponent, ParticleSystemComponent, Prefab } from "cc";
+import { _decorator, Component, Node, Vec3, ParticleSystemComponent, Prefab } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
 import { GameCfg } from "./GameConfig";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";

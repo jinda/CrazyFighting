@@ -7,6 +7,9 @@
     /* 脱离编辑器直接跑 `npm run typecheck` 时，需要显式声明 lib 才能解析引擎声明 */
     "lib": ["ES2016", "DOM"],
     "skipLibCheck": true,
+    /* crypto-ts 为 CommonJS 包（无 default 导出声明），Cocos 运行时按 CJS 互操作把模块挂到 default 上，
+       需允许合成默认导入才能用 `import CryptoTS from "crypto-ts"` 通过类型检查 */
+    "allowSyntheticDefaultImports": true,
 
     /* 代码质量门禁（详见《代码规范审核报告》）：防止未使用符号与漏 return 回流 */
     "noUnusedLocals": true,

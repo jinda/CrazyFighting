@@ -71,7 +71,7 @@ export class ShowNode<T extends TDate> extends Component {
             let propMap: WeakMap<RenderAlternative, boolean> = new WeakMap();
             let keys = Object.keys(this);
             for (let i = 0, len = keys.length; i < len; ++i) {
-                let value = this[keys[i]];
+                let value = (this as any)[keys[i]];
                 let alternative: RenderAlternative | null = null;
                 if (value instanceof Node) {
                     alternative = value.getComponent(RenderAlternative);
@@ -81,7 +81,7 @@ export class ShowNode<T extends TDate> extends Component {
                 } else if (value instanceof UIRenderer) {
                     alternative = value.getComponent(RenderAlternative);
                     if (alternative) {
-                        this[keys[i]] = alternative.init<typeof value>(this.renderLayer);
+                        (this as any)[keys[i]] = alternative.init<typeof value>(this.renderLayer);
                     }
                 }
                 alternative && propMap.set(alternative, true);
@@ -121,9 +121,9 @@ export class ItemCell<T extends TDate> {
     /**持有cell的list */
     public looplist: LoopList<T> | null = null;
     /**大小处理 */
-    public uiTrans: UITransform | null = null;
+    public uiTrans: UITransform = null!;
     /**位置节点 */
-    public node: Node | null = null;
+    public node: Node = null!;
     /**显示节点 */
     public showNode: ShowNode<T> | null = null;
     /**数据下标 */
@@ -131,7 +131,7 @@ export class ItemCell<T extends TDate> {
     /**cell下标 */
     public cellIndex: number = 0;
     /**尺寸 */
-    public size: Size | null = null;
+    public size: Size = null!;
     /**数据 */
     public data: T | null = null;
     /**
@@ -156,7 +156,7 @@ export class ItemCell<T extends TDate> {
         Tween.stopAllByTarget(this.node!);
         this.cellIndex = cellIndex;
         this.dataIndex = dataIndex;
-        !this.uiTrans && (this.uiTrans = this.node!.getComponent(UITransform));
+        !this.uiTrans && (this.uiTrans = this.node!.getComponent(UITransform)!);
         this.uiTrans!.width = size.width;
         this.uiTrans!.height = size.height;
         this.data = data;
@@ -217,7 +217,7 @@ export class ItemCell<T extends TDate> {
         return !this.showNode;
     }
     /**回收显示节点 */
-    recircle() {
+    recircle(): ShowNode<T> | null {
         if (this.showNode) {
             let node = this.showNode;
             this.showNode.cell = null;
@@ -226,18 +226,19 @@ export class ItemCell<T extends TDate> {
             this.showNode = null;
             return node;
         }
+        return null;
     }
     destroy() {
         this.node?.destroy();
-        this.node = null;
-        this.uiTrans = null;
+        this.node = null!;
+        this.uiTrans = null!;
         this.looplist = null;
     }
     /**
      * 失去显示节点
      * @returns
      */
-    lostShowNode() {
+    lostShowNode(): ShowNode<T> | null {
         if (this.showNode) {
             let node = this.showNode;
             this.showNode.cell = null;
@@ -245,6 +246,7 @@ export class ItemCell<T extends TDate> {
             this.showNode = null;
             return node;
         }
+        return null;
     }
     /**
      * 获取显示节点
@@ -263,7 +265,7 @@ export class ItemCell<T extends TDate> {
  */
 export default class LoopList<T extends TDate> {
     public static insMap: Map<string, LoopList<any>> = new Map();
-    public static ins<T>(listName: string): LoopList<T> {
+    public static ins<T extends TDate>(listName: string): LoopList<T> {
         if (!this.insMap.has(listName)) {
             this.insMap.set(listName, new LoopList<T>());
         }
@@ -300,11 +302,9 @@ export default class LoopList<T extends TDate> {
     /**通用锚点 */
     public anchor: Vec2 | null = null;
     /**通用锚点 */
-    private loadDataCB: () => void = null;
+    private loadDataCB: () => void = null!;
     /**是否开启分页 */
     private _pageView: boolean = false;
-    /**分布页面最小缩放 */
-    private _pageMinScale: number = 1;
     /**当前页面索引 */
     private _curPageIdx: number = 0;
     /**每一个页面居中时需要的偏移量 */
@@ -312,7 +312,7 @@ export default class LoopList<T extends TDate> {
     /**每一个页面居中时需要的偏移量 */
     private _scrollCenterOffsetY: number[] = [];
     /**每一个页面的回调 */
-    private _pageCallback: (pageIdx: number) => void = null;
+    private _pageCallback: (pageIdx: number) => void = null!;
 
     /**
      * 更新边界
@@ -320,8 +320,8 @@ export default class LoopList<T extends TDate> {
     public updateBorder() {
         this.contentUiTrans = this.scrollView?.content!.getComponent(UITransform)!;
         let view = this.scrollView?.view!;
-        view.anchorX = this.contentUiTrans.anchorX;
-        view.anchorY = this.contentUiTrans.anchorY;
+        view.anchorX = this.contentUiTrans!.anchorX;
+        view.anchorY = this.contentUiTrans!.anchorY;
         //修改锚点之后下一帧世界坐标才会更新，没办法只能等一帧了
         return new Promise<void>((resolve, reject) => {
             requestAnimationFrame(() => {
@@ -361,7 +361,7 @@ export default class LoopList<T extends TDate> {
         this.scrollView = scrollView;
         await this.updateBorder();
         if (isValid(this.scrollView)) {
-            this.scrollView.node.on(ScrollView.EventType.SCROLLING, this.scrollingListener, this);
+            this.scrollView!.node.on(ScrollView.EventType.SCROLLING, this.scrollingListener, this);
         }
     }
 
@@ -457,7 +457,7 @@ export default class LoopList<T extends TDate> {
         for (let i = data.length, len = this.itemCells.length; i < len; ++i) {
             this.recircleShowNode(this.itemCells[i].recircle()!);
             this.itemCells[i].destroy();
-            this.itemCells[i] = null;
+            this.itemCells[i] = null!;
         }
         requestAnimationFrame(() => {
             this.updateNodes();
@@ -510,7 +510,7 @@ export default class LoopList<T extends TDate> {
                         for (let i = cellIndex; i < this.cellMaxNum; i++) {
                             let curDataIndex = this.curStartIndex + i;
                             let curData = this.datas[curDataIndex];
-                            let curCellSize = curData.size ? curData.size : this.size;
+                            let curCellSize = curData.size ? curData.size : this.size!;
                             this.itemCells[i].init(curData, curCellSize!, curDataIndex, i);
                             this.itemCells[i].updateShowNode(this.renderLayer!);
                         }
@@ -564,7 +564,7 @@ export default class LoopList<T extends TDate> {
             const showCells = this.updateNodes();
             showCells.forEach((cell) => {
                 if (cell.dataIndex == index) {
-                    cell.updateShowNode(this.renderLayer);
+                    cell.updateShowNode(this.renderLayer!);
                 }
             });
         }
@@ -575,7 +575,7 @@ export default class LoopList<T extends TDate> {
      */
     private async addNodeFromIndex(dataIndex: number) {
         let data = this.datas[dataIndex];
-        let cellSize: Size = data.size ? data.size : this.size;
+        let cellSize: Size = data.size ? data.size : this.size!;
         //是否开启cell循环
         if (this.cellMaxNum) {
             let cellIndex = dataIndex - this.curStartIndex;
@@ -585,12 +585,12 @@ export default class LoopList<T extends TDate> {
                 for (let i = cellIndex; i < this.cellMaxNum; i++) {
                     let curDataIndex = this.curStartIndex + i;
                     let curData = this.datas[curDataIndex];
-                    let curCellSize: Size = curData.size ? curData.size : this.size;
+                    let curCellSize: Size = curData.size ? curData.size : this.size!;
                     this.itemCells[i].init(curData, curCellSize, curDataIndex, i);
-                    this.itemCells[i].updateShowNode(this.renderLayer);
+                    this.itemCells[i].updateShowNode(this.renderLayer!);
                 }
                 //获取当前的位置
-                let nodeSides: IBorder = null;
+                let nodeSides: IBorder = null!;
                 let itemCell: ItemCell<T> = this.itemCells[cellIndex];
                 if (itemCell) {
                     nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
@@ -604,17 +604,17 @@ export default class LoopList<T extends TDate> {
             }
         } else {
             //获取当前的位置
-            let nodeSides: IBorder = null;
+            let nodeSides: IBorder = null!;
             if (this.itemCells[dataIndex]) {
                 nodeSides = getNodeBorder(this.itemCells[dataIndex], [true, true, true, true]);
             }
             let node = new Node("LoopListCell");
             let uiTrans = node.addComponent(UITransform);
-            uiTrans.setAnchorPoint(this.anchor);
-            node.setParent(this.scrollView.content);
+            uiTrans.setAnchorPoint(this.anchor!);
+            node.setParent(this.scrollView!.content!);
             node.setSiblingIndex(dataIndex);
             if (this._pageView) {
-                this.scrollView.content.getComponent(Layout)?.updateLayout();
+                this.scrollView!.content!.getComponent(Layout)?.updateLayout();
                 this.addPage(node, dataIndex);
             }
             let itemCell: ItemCell<T> = new ItemCell<T>(node, this);
@@ -648,15 +648,15 @@ export default class LoopList<T extends TDate> {
     private dealLoopList(offset: Vec3, showCells: ItemCell<T>[]) {
         let startCell = showCells[0];
         let endCell = showCells[showCells.length - 1];
-        if (this.scrollView.vertical) {
+        if (this.scrollView!.vertical) {
             /**内容上移 */
 
             if (offset.y > 0) {
                 //已经到达最后倒数第二个节点并且还有数据
-                const bottomY = -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size.height;
-                // egf.Logger.log("dealLoopList1:", this.scrollView.content.position.y, bottomY);
+                const bottomY = -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size!.height;
+                // egf.Logger.log("dealLoopList1:", this.scrollView!.content!.position.y, bottomY);
                 // egf.Logger.log("dealLoopList2:", endCell.dataIndex, this.datas.length - 2);
-                if (this.scrollView.content.position.y >= bottomY && endCell.dataIndex < this.datas.length - 2) {
+                if (this.scrollView!.content!.position.y >= bottomY && endCell.dataIndex < this.datas.length - 2) {
                     //显示开始数据下标(这里-1是想要顶部留一个itemcell做缓冲)
                     let showStart = startCell.dataIndex - 1;
                     //剩余可展示的数据量
@@ -666,7 +666,7 @@ export default class LoopList<T extends TDate> {
                     //计算第一个cell的数据下标
                     this.curStartIndex = showStart - cellStartIndex;
 
-                    let cellTop = getNodeBorder(this.itemCells[startCell.cellIndex], [true]).topSide;
+                    let cellTop = getNodeBorder(this.itemCells[startCell.cellIndex], [true]).topSide!;
 
                     let contentHeight = 0;
                     let targetY = 0;
@@ -681,25 +681,25 @@ export default class LoopList<T extends TDate> {
                                 }
                                 let showNode = showCells[showIndex].lostShowNode();
                                 showIndex++;
-                                this.itemCells[i].getShowNode(showNode);
+                                this.itemCells[i].getShowNode(showNode!);
                             }
                             jumpFirst = false;
                         }
                         let dataIndex = this.curStartIndex + i;
                         let data = this.datas[dataIndex];
-                        let cellSize = data.size ? data.size : this.size;
+                        let cellSize = data.size ? data.size : this.size!;
                         contentHeight += cellSize.height;
                         this.itemCells[i].init(data, cellSize, dataIndex, i);
                     }
 
                     //将content的位置移动到最上方并对齐移动前的状态
-                    let posY = targetY + (cellTop - this.viewSides.topSide);
-                    this.scrollView.content.setPosition(v3(this.scrollView.content.position.x, posY));
-                    this.scrollView.scrollToOffset(v2(0, posY + endCell.size.height), 1);
+                    let posY = targetY + (cellTop - this.viewSides.topSide!);
+                    this.scrollView!.content!.setPosition(v3(this.scrollView!.content!.position.x, posY));
+                    this.scrollView!.scrollToOffset(v2(0, posY + endCell.size.height), 1);
                     this.lastPos = null;
                 } else if (
-                    this.scrollView.content.position.y >=
-                        -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size.height &&
+                    this.scrollView!.content!.position.y >=
+                        -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size!.height &&
                     endCell.dataIndex >= this.datas.length - 2
                 ) {
                     //已经到达最后倒数第二个节点并且没有数据
@@ -709,7 +709,7 @@ export default class LoopList<T extends TDate> {
             else if (offset.y < 0) {
                 //已经到达第二个节点并且还有数据
                 if (
-                    this.scrollView.content.position.y < -this.itemCells[2].node.position.y &&
+                    this.scrollView!.content!.position.y < -this.itemCells[2].node.position.y &&
                     startCell.dataIndex > 2
                 ) {
                     //展示的最后一个数据下表，+1是为了在底部预留一部分空间
@@ -720,7 +720,7 @@ export default class LoopList<T extends TDate> {
                     this.curStartIndex = Math.max(showEndIndex - (this.itemCells.length - 1), 0);
 
                     //将content的位置移动到最下方并对齐移动前的状态
-                    let cellTop = getNodeBorder(this.itemCells[Math.max(startCell.cellIndex - 1, 0)], [true]).topSide;
+                    let cellTop = getNodeBorder(this.itemCells[Math.max(startCell.cellIndex - 1, 0)], [true]).topSide!;
 
                     let contentHeight = 0;
                     let showIndex = showCells.length - 1;
@@ -730,14 +730,14 @@ export default class LoopList<T extends TDate> {
                             if (showIndex >= 0) {
                                 let showNode = showCells[showIndex].lostShowNode();
                                 showIndex--;
-                                this.itemCells[i].getShowNode(showNode);
+                                this.itemCells[i].getShowNode(showNode!);
                             } else {
                                 showIndex--;
                             }
                         }
                         let dataIndex = this.curStartIndex + i;
                         let data = this.datas[dataIndex];
-                        let cellSize = data.size ? data.size : this.size;
+                        let cellSize = data.size ? data.size : this.size!;
                         if (showIndex < -1) {
                             contentHeight += cellSize.height;
                         }
@@ -745,18 +745,18 @@ export default class LoopList<T extends TDate> {
                     }
 
                     //将content的位置移动到最下方并对齐移动前的状态
-                    let posY = contentHeight + (cellTop - this.viewSides.topSide);
-                    this.scrollView.content.setPosition(v3(this.scrollView.content.position.x, posY));
-                    this.scrollView.scrollToOffset(v2(0, posY - startCell.size.height), 1);
+                    let posY = contentHeight + (cellTop - this.viewSides.topSide!);
+                    this.scrollView!.content!.setPosition(v3(this.scrollView!.content!.position.x, posY));
+                    this.scrollView!.scrollToOffset(v2(0, posY - startCell.size.height), 1);
                     this.lastPos = null;
                 }
             }
-        } else if (this.scrollView.horizontal) {
+        } else if (this.scrollView!.horizontal) {
             if (offset.x < 0) {
                 //已经到达最后倒数第二个节点并且还有数据
                 if (
-                    this.scrollView.content.position.x <=
-                        -(this.itemCells[this.itemCells.length - 2].node.position.x - this.viewSides.size.width) &&
+                    this.scrollView!.content!.position.x <=
+                        -(this.itemCells[this.itemCells.length - 2].node.position.x - this.viewSides.size!.width) &&
                     endCell.dataIndex < this.datas.length - 2
                 ) {
                     //显示开始数据下标(这里-1是想要左侧留一个itemcell做缓冲)
@@ -768,7 +768,7 @@ export default class LoopList<T extends TDate> {
                     //计算第一个cell的数据下标
                     this.curStartIndex = showStart - cellStartIndex;
 
-                    let cellLeft = getNodeBorder(this.itemCells[startCell.cellIndex], [false, false, true]).leftSide;
+                    let cellLeft = getNodeBorder(this.itemCells[startCell.cellIndex], [false, false, true]).leftSide!;
 
                     let contentWidth = 0;
                     let targetX = 0;
@@ -783,26 +783,26 @@ export default class LoopList<T extends TDate> {
                                 }
                                 let showNode = showCells[showIndex].lostShowNode();
                                 showIndex++;
-                                this.itemCells[i].getShowNode(showNode);
+                                this.itemCells[i].getShowNode(showNode!);
                             }
                             jumpFirst = false;
                         }
 
                         let dataIndex = this.curStartIndex + i;
                         let data = this.datas[dataIndex];
-                        let cellSize = data.size ? data.size : this.size;
+                        let cellSize = data.size ? data.size : this.size!;
                         contentWidth += cellSize.width;
                         this.itemCells[i].init(data, cellSize, dataIndex, i);
                     }
 
                     //将content的位置移动到最左侧并对齐移动前的状态
-                    let posX = cellLeft - this.viewSides.leftSide - targetX;
-                    this.scrollView.content.setPosition(v3(posX, this.scrollView.content.position.y));
-                    this.scrollView.scrollToOffset(v2(-(posX - endCell.size.width), 0), 1);
+                    let posX = cellLeft - this.viewSides.leftSide! - targetX;
+                    this.scrollView!.content!.setPosition(v3(posX, this.scrollView!.content!.position.y));
+                    this.scrollView!.scrollToOffset(v2(-(posX - endCell.size.width), 0), 1);
                     this.lastPos = null;
                 } else if (
-                    this.scrollView.content.position.x <=
-                        -(this.itemCells[this.itemCells.length - 2].node.position.x - this.viewSides.size.width) &&
+                    this.scrollView!.content!.position.x <=
+                        -(this.itemCells[this.itemCells.length - 2].node.position.x - this.viewSides.size!.width) &&
                     endCell.dataIndex >= this.datas.length - 2
                 ) {
                     //已经到达最后倒数第二个节点并且没有数据
@@ -811,7 +811,7 @@ export default class LoopList<T extends TDate> {
             } else if (offset.x > 0) {
                 //已经到达第二个节点并且还有数据
                 if (
-                    this.scrollView.content.position.x > -this.itemCells[2].node.position.x &&
+                    this.scrollView!.content!.position.x > -this.itemCells[2].node.position.x &&
                     startCell.dataIndex > 2
                 ) {
                     //展示的最后一个数据下表，+1是为了在右侧预留一部分空间
@@ -826,7 +826,7 @@ export default class LoopList<T extends TDate> {
                         false,
                         false,
                         true,
-                    ]).leftSide;
+                    ]).leftSide!;
 
                     let contentWidth = 0;
                     let showIndex = showCells.length - 1;
@@ -836,7 +836,7 @@ export default class LoopList<T extends TDate> {
                             if (showIndex >= 0) {
                                 let showNode = showCells[showIndex].lostShowNode();
                                 showIndex--;
-                                this.itemCells[i].getShowNode(showNode);
+                                this.itemCells[i].getShowNode(showNode!);
                             } else {
                                 showIndex--;
                             }
@@ -844,7 +844,7 @@ export default class LoopList<T extends TDate> {
 
                         let dataIndex = this.curStartIndex + i;
                         let data = this.datas[dataIndex];
-                        let cellSize = data.size ? data.size : this.size;
+                        let cellSize = data.size ? data.size : this.size!;
                         if (showIndex < -1) {
                             contentWidth += cellSize.width;
                         }
@@ -852,9 +852,9 @@ export default class LoopList<T extends TDate> {
                     }
 
                     //将content的位置移动到最右侧并对齐移动前的状态
-                    let posX = cellLeft - this.viewSides.leftSide - contentWidth;
-                    this.scrollView.content.setPosition(v3(posX, this.scrollView.content.position.y));
-                    this.scrollView.scrollToOffset(v2(-(posX + startCell.size.width), 0), 1);
+                    let posX = cellLeft - this.viewSides.leftSide! - contentWidth;
+                    this.scrollView!.content!.setPosition(v3(posX, this.scrollView!.content!.position.y));
+                    this.scrollView!.scrollToOffset(v2(-(posX + startCell.size.width), 0), 1);
                     this.lastPos = null;
                 }
             }
@@ -878,22 +878,23 @@ export default class LoopList<T extends TDate> {
      * 处理cell的显示隐藏
      * @param itemCell
      */
-    private dealItemShow(itemCell: ItemCell<T>) {
+    private dealItemShow(itemCell: ItemCell<T>): boolean {
         if (itemCell) {
             let isShow = this.checkInView(itemCell);
             if (isShow) {
                 itemCell.hasNoNode &&
                     itemCell.updateShow(
                         isShow,
-                        this.prefab,
-                        this.showNodePool.length > 0 ? this.showNodePool.pop() : null,
-                        this.renderLayer,
+                        this.prefab!,
+                        this.showNodePool.length > 0 ? this.showNodePool.pop()! : null!,
+                        this.renderLayer!,
                     );
             } else {
-                !itemCell.hasNoNode && this.recircleShowNode(itemCell.recircle());
+                !itemCell.hasNoNode && this.recircleShowNode(itemCell.recircle()!);
             }
             return isShow;
         }
+        return false;
     }
 
     /**
@@ -905,13 +906,13 @@ export default class LoopList<T extends TDate> {
         let nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
         //节点右侧边缘在屏幕左侧外面或者节点左边缘在屏幕右侧外面 则不在显示区域
         let horizontalOutside =
-            nodeSides.rightSide < this.viewSides.leftSide || nodeSides.leftSide > this.viewSides.rightSide;
+            nodeSides.rightSide! < this.viewSides.leftSide! || nodeSides.leftSide! > this.viewSides.rightSide!;
 
         let verticalOutside = false;
         if (!horizontalOutside) {
             //节点上边缘在屏幕下方外面或者节点下边缘在屏幕上方外面 则不在显示区域
             verticalOutside =
-                nodeSides.topSide < this.viewSides.bottomSide || nodeSides.bottomSide > this.viewSides.topSide;
+                nodeSides.topSide! < this.viewSides.bottomSide! || nodeSides.bottomSide! > this.viewSides.topSide!;
         }
         return !horizontalOutside && !verticalOutside;
     }
@@ -922,22 +923,22 @@ export default class LoopList<T extends TDate> {
      * @param changeSize
      */
     public async dealChangeSize(cell: ItemCell<T>, nodeSides: IBorder, changeSize: Size, time: number = 0.3) {
-        let topToBottomFulfill = this.contentUiTrans.anchorY == 1 && nodeSides.bottomSide >= this.viewSides.topSide;
-        let bottomToTopFulfill = this.contentUiTrans.anchorY == 0 && nodeSides.topSide <= this.viewSides.bottomSide;
+        let topToBottomFulfill = this.contentUiTrans!.anchorY == 1 && nodeSides.bottomSide! >= this.viewSides.topSide!;
+        let bottomToTopFulfill = this.contentUiTrans!.anchorY == 0 && nodeSides.topSide! <= this.viewSides.bottomSide!;
         if (topToBottomFulfill || bottomToTopFulfill) {
             if (topToBottomFulfill) {
-                this.scrollView.content.position.add(v3(0, changeSize.height));
+                this.scrollView!.content!.position.add(v3(0, changeSize.height));
             } else {
-                this.scrollView.content.position.subtract(v3(0, changeSize.height));
+                this.scrollView!.content!.position.subtract(v3(0, changeSize.height));
             }
         }
-        let leftToRightFulfill = this.contentUiTrans.anchorX == 0 && nodeSides.rightSide <= this.viewSides.leftSide;
-        let RightToLeftFulfill = this.contentUiTrans.anchorX == 1 && nodeSides.leftSide >= this.viewSides.rightSide;
+        let leftToRightFulfill = this.contentUiTrans!.anchorX == 0 && nodeSides.rightSide! <= this.viewSides.leftSide!;
+        let RightToLeftFulfill = this.contentUiTrans!.anchorX == 1 && nodeSides.leftSide! >= this.viewSides.rightSide!;
         if (leftToRightFulfill || RightToLeftFulfill) {
             if (RightToLeftFulfill) {
-                this.scrollView.content.position.add(v3(changeSize.width, 0));
+                this.scrollView!.content!.position.add(v3(changeSize.width, 0));
             } else {
-                this.scrollView.content.position.subtract(v3(changeSize.width, 0));
+                this.scrollView!.content!.position.subtract(v3(changeSize.width, 0));
             }
         }
         if (!(topToBottomFulfill || bottomToTopFulfill || leftToRightFulfill || RightToLeftFulfill)) {
@@ -988,11 +989,11 @@ export default class LoopList<T extends TDate> {
     private addPage(node: Node, idx: number) {
         if (!isValid(node)) return;
 
-        const scrollWidth = this.scrollView.getComponent(UITransform).width;
-        const scrollHeight = this.scrollView.getComponent(UITransform).height;
-        const contentLayout = this.scrollView.content.getComponent(Layout);
+        const scrollWidth = this.scrollView!.getComponent(UITransform)!.width;
+        const scrollHeight = this.scrollView!.getComponent(UITransform)!.height;
+        const contentLayout = this.scrollView!.content!.getComponent(Layout)!;
 
-        if (this.scrollView.horizontal) {
+        if (this.scrollView!.horizontal) {
             this._scrollCenterOffsetX[idx] =
                 Math.abs(node.position.x) - (Math.abs(scrollWidth) >> 1) - contentLayout.paddingLeft;
             // egf.Logger.log('add page x:', node.position.x, Math.abs(scrollWidth) >> 1);
@@ -1001,7 +1002,7 @@ export default class LoopList<T extends TDate> {
                 const itemCell = this.itemCells[i];
                 this._scrollCenterOffsetX[idx + 1] =
                     Math.abs(itemCell.node.position.x) +
-                    (Math.abs(scrollWidth - this.size.width) >> 1) -
+                    (Math.abs(scrollWidth - this.size!.width) >> 1) -
                     contentLayout.paddingLeft;
             }
         } else {
@@ -1017,17 +1018,16 @@ export default class LoopList<T extends TDate> {
 
     /**
      * 设置分页模式
-     * @param scale 缩放比例
+     * @param _scale 缩放比例（原用于“分布页面最小缩放”，当前版本未启用，保留参数位以兼容调用方）
      */
-    public setPage(scale: number = 1.0, autoScrollAlign: boolean = true, pageCallback: (idx: number) => void = null) {
+    public setPage(_scale: number = 1.0, autoScrollAlign: boolean = true, pageCallback: (idx: number) => void = null!) {
         this._pageView = true;
-        this._pageMinScale = scale;
         this._curPageIdx = 0;
         this._pageCallback = pageCallback;
 
         // 拖动后自动对齐的监听
         if (autoScrollAlign) {
-            this.scrollView.node.on(ScrollView.EventType.SCROLL_ENDED, this.scrollendListener, this);
+            this.scrollView!.node.on(ScrollView.EventType.SCROLL_ENDED, this.scrollendListener, this);
         }
     }
     public scrollToPage(idx: number, time: number = 0, attenuated: boolean = true) {
@@ -1036,9 +1036,9 @@ export default class LoopList<T extends TDate> {
         }
         this._curPageIdx = idx;
         this._pageCallback && this._pageCallback(idx);
-        if (this.scrollView.horizontal) {
+        if (this.scrollView!.horizontal) {
             const offsetX = this._scrollCenterOffsetX[idx] || 0;
-            this.scrollView.scrollToOffset(v2(offsetX, 0), time, attenuated);
+            this.scrollView!.scrollToOffset(v2(offsetX, 0), time, attenuated);
             // egf.Logger.log(
             //   'scroll to page x:',
             //   offsetX,
@@ -1047,7 +1047,7 @@ export default class LoopList<T extends TDate> {
             // );
         } else {
             const offsetY = this._scrollCenterOffsetY[idx] || 0;
-            this.scrollView.scrollToOffset(v2(0, offsetY), time, attenuated);
+            this.scrollView!.scrollToOffset(v2(0, offsetY), time, attenuated);
         }
     }
 
@@ -1057,7 +1057,7 @@ export default class LoopList<T extends TDate> {
         this.curStartIndex = 0;
         this.itemCells = [];
         this.showNodePool = [];
-        this.scrollView.content.removeAllChildren();
+        this.scrollView!.content!.removeAllChildren();
         this._scrollCenterOffsetX = [];
         this._scrollCenterOffsetY = [];
     }

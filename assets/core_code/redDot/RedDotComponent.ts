@@ -19,10 +19,10 @@ export default class RedDotComponent extends Component {
     dotName: string = "";
 
     @property({ type: Label, tooltip: "数字文本" })
-    numLabel: Label;
+    numLabel: Label = null!;
 
     @property({ type: Sprite, tooltip: "底图" })
-    sprite: Sprite;
+    sprite: Sprite = null!;
 
     setDotName(name: string) {
         this.dotName = name;
@@ -56,10 +56,9 @@ export default class RedDotComponent extends Component {
 
     doAction() {
         let redDot = RedDotMgr.inst.getNodeByName(this.dotName);
-        let show = false,
-            num = 0;
+        let num = 0;
         if (redDot) {
-            [show, num] = redDot.getResult();
+            [, num] = redDot.getResult();
         }
         let str = num.toString();
 

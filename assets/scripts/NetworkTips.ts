@@ -1,7 +1,6 @@
-import { JsonAsset } from "cc";
+import { assetManager } from "cc";
 import { GetEnvConfig } from "./config/EnvConfig";
 import { LocalDataMgr } from "./LocalDataMgr";
-import { ModuleDef } from "./ModuleDef";
 import { UI_CommonTips } from "./UIDef";
 
 export class NetworkTips implements egf.INetworkTips {
@@ -51,7 +50,8 @@ export class NetworkTips implements egf.INetworkTips {
     }
 
     showServerErrorTips(errorMsg: unknown): void {
-        const error = errorMsg as Proto.pb.ErrorMsg;
+        //TODO: 原工程使用 Proto.pb.ErrorMsg（protobuf 定义未随本项目迁移），先按结构类型处理，接入协议后替换
+        const error = errorMsg as { code?: number; bizCode?: string } | null;
         egf.UIWaiting.hide();
 
         if (!error) {
@@ -62,10 +62,9 @@ export class NetworkTips implements egf.INetworkTips {
         }
     }
 
-    filterErrorBizCode(error: Proto.pb.ErrorMsg) {
-        // Check if it is log in errors
-        const { code, bizCode } = error;
-        if (code !== Proto.pb.RetCode.ERR_BUSINESS) {
+    filterErrorBizCode(error: { code?: number; bizCode?: string }) {
+        //TODO: 原工程判定 Proto.pb.RetCode.ERR_BUSINESS；协议未迁移前以“业务错误必带 bizCode 文案 key”等价处理
+        if (!error.bizCode) {
             return;
         }
         egf.UIMgr.showUI(UI_CommonTips, undefined, this, {
@@ -78,41 +77,34 @@ export class NetworkTips implements egf.INetworkTips {
     async checkMaintenance(): Promise<boolean> {
         const { remoteResUrl } = GetEnvConfig();
         const resUrl = remoteResUrl + `/maintenance/maintenance.json` + `?v=${Date.now()}`;
-        return new Promise<boolean>((resolve, reject) => {
-            egf.ResMgr.inst.getAsset(
-                ModuleDef.BASIC,
-                resUrl,
-                (jsonAsset: JsonAsset) => {
-                    if (!jsonAsset) {
-                        egf.Logger.error(`${resUrl} not found!`);
-                        resolve(false); // 假设资源未找到时，返回 false 表示不在维护状态
-                    } else {
-                        // 根据 jsonAsset 的内容判断是否在维护状态，并返回相应的布尔值
-                        const maintenanceConfig = jsonAsset.json;
-                        if (maintenanceConfig && maintenanceConfig.isUpdating) {
-                            const content = maintenanceConfig.content[LocalDataMgr.Setting.language] || {
-                                title: "Maintenance",
-                                text: "Token War is currently under maintenance. Please check back later!",
-                            };
-                            egf.UIMgr.showUI(UI_CommonTips, undefined, this, {
-                                title: content.title,
-                                content: content.text,
-                                okTxt: "TXT_Exit",
-                                callback: (ok: boolean) => {
-                                    ok && window.location.reload();
-                                },
-                            });
-                            resolve(true);
-                        } else {
-                            resolve(false); // 假设资源未找到时，返回 false 表示不在维护状态
-                        }
-                    }
-                },
-                (error: Error) => {
-                    egf.Logger.error(`Error fetching ${resUrl}:`, error);
-                    resolve(false); // 出现错误时，也返回 false 表示不在维护状态
-                },
-            );
+        return new Promise<boolean>((resolve) => {
+            //维护配置是远程 json（不在任何 bundle 内），原工程的 ResMgr/ModuleDef.BASIC 用法无法加载，改用 loadRemote 直连
+            assetManager.loadRemote(resUrl, (err: Error | null, data: unknown) => {
+                if (err || !data) {
+                    egf.Logger.error(`${resUrl} not found!`, err);
+                    resolve(false); // 假设资源未找到时，返回 false 表示不在维护状态
+                    return;
+                }
+                // 根据 json 内容判断是否在维护状态，并返回相应的布尔值
+                const maintenanceConfig = typeof data === "string" ? JSON.parse(data) : (data as any);
+                if (maintenanceConfig && maintenanceConfig.isUpdating) {
+                    const content = maintenanceConfig.content[LocalDataMgr.Setting.language] || {
+                        title: "Maintenance",
+                        text: "Token War is currently under maintenance. Please check back later!",
+                    };
+                    egf.UIMgr.showUI(UI_CommonTips, undefined, this, {
+                        title: content.title,
+                        content: content.text,
+                        okTxt: "TXT_Exit",
+                        callback: (ok: boolean) => {
+                            ok && window.location.reload();
+                        },
+                    });
+                    resolve(true);
+                } else {
+                    resolve(false); // 未开启维护时，返回 false 表示不在维护状态
+                }
+            });
         });
     }
 

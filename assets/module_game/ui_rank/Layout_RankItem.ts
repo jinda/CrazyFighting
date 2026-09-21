@@ -1,4 +1,4 @@
-import { _decorator, Color, isValid, Label, Node, Sprite, SpriteFrame, Texture2D } from "cc";
+import { _decorator, Color, isValid, Label, Sprite, SpriteFrame } from "cc";
 const { ccclass, property } = _decorator;
 
 export interface IRankData {

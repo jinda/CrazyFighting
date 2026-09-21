@@ -1,4 +1,5 @@
 import { randomRangeInt, Toggle } from "cc";
+import { Constants } from "../../scripts/Constants";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { UI_Language, UI_Setting } from "../../scripts/UIDef";
 import { Layout_Setting } from "./Layout_Setting";
@@ -58,10 +59,10 @@ export class UI_Setting_Impl extends UI_Setting {
             PlatformMgr.showInterstitialAd();
         }
 
-        egf.EventMgr.emit("GamePause");
+        egf.EventMgr.emit(Constants.EVENT_NAME.GAME_PAUSE);
     }
     protected onDispose(): void {
-        egf.EventMgr.emit("GameResume");
+        egf.EventMgr.emit(Constants.EVENT_NAME.GAME_RESUME);
     }
 
     protected onMusic(toggle: Toggle): void {
