@@ -1,4 +1,4 @@
-import { _decorator, Button, Color, Component, Label, Node, RichText, Sprite, SpriteFrame } from "cc";
+import { _decorator, Button, Color, Component, isValid, Label, Node, RichText, Sprite, SpriteFrame } from "cc";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { DataMgr } from "../../scripts/DataMgr";
@@ -30,7 +30,7 @@ export class Layout_BuyFighter extends Component {
         }
         //展示对应卡片
         egf.ResMgr.getAsset(ModuleDef.GAME, `texture/card/${fighter["type"]}/spriteFrame`, (sp: SpriteFrame) => {
-            if (this.spriteItem.node.isValid) {
+            if (isValid(this.spriteItem)) {
                 this.spriteItem.spriteFrame = sp;
             }
         });

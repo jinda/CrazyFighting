@@ -2,13 +2,13 @@ import {
     _decorator,
     Component,
     Node,
-    SkinningModelComponent,
     Material,
-    SkeletalAnimationComponent,
+    SkeletalAnimation,
     Prefab,
     AnimationComponent,
     Vec3,
     isValid,
+    SkinnedMeshRenderer,
 } from "cc";
 import { Fighter } from "./Fighter";
 import { Constants } from "db://assets/scripts/Constants";
@@ -19,8 +19,8 @@ const { ccclass, property } = _decorator;
 
 @ccclass("FighterModel")
 export class FighterModel extends Component {
-    @property(SkinningModelComponent)
-    public model: SkinningModelComponent = null!; //蒙皮网格渲染器组件
+    @property(SkinnedMeshRenderer)
+    public model: SkinnedMeshRenderer = null!; //蒙皮网格渲染器组件
 
     @property([Material])
     public aryMaterial: Material[] = []; //材质皮肤数组
@@ -31,8 +31,8 @@ export class FighterModel extends Component {
     @property(Node)
     public ndHead: Node = null!; //头部节点
 
-    @property(SkeletalAnimationComponent)
-    public ani: SkeletalAnimationComponent = null!; //骨骼动画组件
+    @property(SkeletalAnimation)
+    public ani: SkeletalAnimation = null!; //骨骼动画组件
 
     @property(Prefab)
     public pfWeapon: Prefab = null!; //武器预制体
@@ -43,8 +43,6 @@ export class FighterModel extends Component {
     private _ndCrown: Node = null!; //皇冠节点
     private _currentAni: string = ""; //当前动画名称
     private _fighter: Fighter = null!; //该士兵绑定的fighter脚本
-    private _weaponPos: Vec3 = new Vec3(); //武器位置
-    private _weaponEuler: Vec3 = new Vec3(); //武器角度
     private _crownGeneration: number = 0; //皇冠异步加载代次：每次 show()/reset() 递增，防止模型复用后旧皇冠挂到新角色
 
     start() {
@@ -97,11 +95,9 @@ export class FighterModel extends Component {
         if (this.pfWeapon) {
             this._ndWeapon = egf.PoolMgr.getNode(this.pfWeapon, this.ndRightHand);
 
-            this._weaponPos.set(this.pfWeapon.data.position);
-            this._weaponEuler.set(this.pfWeapon.data.eulerAngles);
-
-            this._ndWeapon.position = this._weaponPos;
-            this._ndWeapon.eulerAngles = this._weaponEuler;
+            // egf.Logger.log("pfWeapon:", this.pfWeapon.data);
+            this._ndWeapon.position = this.ndRightHand.position.clone();
+            this._ndWeapon.eulerAngles = this.ndRightHand.eulerAngles.clone();
             this._ndWeapon.active = true;
 
             let missile = this._ndWeapon.getComponent(Missile);
@@ -120,7 +116,7 @@ export class FighterModel extends Component {
 
             //代次保护：模型被复用/重置后，迟到的加载结果直接丢弃，避免旧皇冠挂到新角色
             const crownGeneration = ++this._crownGeneration;
-            egf.ResMgr.getAsset(ModuleDef.GAME, `prefabs/model/${path}`, (pf: Prefab) => {
+            egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/model/${path}`, (pf: Prefab) => {
                 if (
                     crownGeneration !== this._crownGeneration ||
                     !isValid(this.node) ||
@@ -210,7 +206,7 @@ export class FighterModel extends Component {
      * @param callback
      */
     public throwWeapon(callback: Function) {
-        let ndThrow = egf.PoolMgr.getNode(this.pfWeapon, this._fighter.node.parent as Node);
+        let ndThrow = egf.PoolMgr.getNode(this.pfWeapon, this._fighter.node.parent!);
         ndThrow.setWorldPosition(this._ndWeapon.worldPosition);
         ndThrow.setWorldRotation(this._ndWeapon.worldRotation);
         let posTarget = this._fighter.target.node.worldPosition;

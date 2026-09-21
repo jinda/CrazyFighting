@@ -372,7 +372,7 @@ class GameManager {
      */
     public addFighter(ndFighter: Node, team: number, fighterPos: Vec3, fighterInfo: any, pos: number) {
         let identity = this._identity++;
-        egf.Logger.log("addFighter:", this._identity, team, fighterInfo, pos);
+        // egf.Logger.log("addFighter:", this._identity, team, fighterInfo, pos);
 
         const scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
         scriptFighter.init(identity, team, fighterInfo, fighterPos, pos);

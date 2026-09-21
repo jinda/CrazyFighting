@@ -49,7 +49,7 @@ export class UI_Fighter extends egf.UIController {
             //1. 展示获得金币提示
             let uiPos = new Vec3();
             GameMgr.mainCamera.convertToUINode(posWorld, this.node, uiPos);
-            egf.Logger.log("onDropCoin:", layout.nodeCoin, uiPos, layout.nodeCoin);
+            // egf.Logger.log("onDropCoin:", layout.nodeCoin, uiPos, layout.nodeCoin);
             if (isValid(layout.nodeCoin)) {
                 layout.nodeCoin.position = uiPos;
                 egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.labelCoin.node.worldPosition, coin);

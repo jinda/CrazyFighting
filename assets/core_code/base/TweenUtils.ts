@@ -16,8 +16,8 @@ export class TweenUtils {
     public static goldFlyAction(
         orgNode: Node,
         targetPos: Vec3,
-        r: number = 100,
         count: number = 5,
+        r: number = 100,
         nodePool?: NodePool | null,
         callback?: Function,
     ) {
@@ -36,18 +36,20 @@ export class TweenUtils {
         }
         // egf.Logger.log('points:', points);
 
-        // 生成分点上的金币
-        let coinNodeList = points.map((pos, index) => {
-            let coin = orgNode;
-            if (index > 0) {
-                if (nodePool) {
-                    coin = nodePool.get() || instantiate(orgNode);
-                } else {
-                    coin = instantiate(orgNode);
-                }
-                coin.parent = orgNode.parent;
-                coin.scale = orgNode.scale.clone();
+        // 生成分点上的金币。
+        // 注意：orgNode 只能作为“模板”使用，这里必须始终实例化克隆体来飞。
+        // 若让 orgNode 自己参与动画，动画结束时的回收分支会 destroy/put 掉 orgNode，
+        // 导致调用方（如 UI_HUD_Impl.showCoinFly / UI_Fighter.onDropCoin）持有的模板节点
+        // 在第一次播完动画后失效，第二次调用 isValid() 就为 false（且 scale 已被改成 0）。
+        let coinNodeList = points.map((pos: Vec3) => {
+            let coin: Node;
+            if (nodePool) {
+                coin = nodePool.get() || instantiate(orgNode);
+            } else {
+                coin = instantiate(orgNode);
             }
+            coin.parent = orgNode.parent;
+            coin.scale = orgNode.scale.clone();
             coin.setWorldPosition(orgPos);
             coin.active = true;
 

@@ -3,6 +3,7 @@
  */
 
 import { IUserInfo } from "./apiInterface";
+import { Constants } from "./Constants";
 import { LocalDataMgr } from "./LocalDataMgr";
 
 window.onerror = function (message, source, lineno, colno, error) {
@@ -46,6 +47,7 @@ class DataManager {
         this.userData.money += coin;
         LocalDataMgr.GameInfo.coin = DataMgr.coin;
         LocalDataMgr.saveGameInfoData();
+        egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
     }
 
     public subCoin(coin: number) {
@@ -56,6 +58,7 @@ class DataManager {
         }
         LocalDataMgr.GameInfo.coin = DataMgr.coin;
         LocalDataMgr.saveGameInfoData();
+        egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
     }
 
     public get level() {
@@ -70,6 +73,9 @@ class DataManager {
         this.userData.level++;
         // LocalDataMgr.GameInfo.level = this.userData.level;
         // LocalDataMgr.saveGameInfoData();
+        if (this.userData.level > Constants.MAX_LEVEL) {
+            this.userData.level = Constants.MAX_LEVEL;
+        }
     }
 }
 

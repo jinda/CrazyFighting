@@ -101,6 +101,8 @@ export class UI_Menu extends egf.UIController {
         if (DataMgr.coin > coin) {
             DataMgr.subCoin(coin);
             LocalDataMgr.upgradeCoin();
+            const layout = this.layout as Layout_Menu;
+            layout.updateCoinCost();
         } else {
             egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
         }
@@ -118,6 +120,8 @@ export class UI_Menu extends egf.UIController {
             DataMgr.subCoin(land);
             LocalDataMgr.upgradeLand();
             this.addCell();
+            const layout = this.layout as Layout_Menu;
+            layout.updateCoinCost();
         } else {
             egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
         }
@@ -153,9 +157,9 @@ export class UI_Menu extends egf.UIController {
         }
     }
     private onFighterPowerTips(pos: number, fighterId: number) {
-        let fighterPower = GameCfg.queryByID("fighter", fighterId.toString());
+        let fighterInfo = GameCfg.queryByID("fighter", fighterId.toString());
         const layout = this.layout as Layout_Menu;
-        layout.showPowerTips(fighterPower);
+        layout.showPowerTips(fighterInfo.fight);
     }
 
     /**

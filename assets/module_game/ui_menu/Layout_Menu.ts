@@ -131,6 +131,7 @@ export class Layout_Menu extends Component {
     public showPowerTips(fighterPower: string) {
         this.nodePowerTips.active = true;
         this.labelPowerAdd.string = "+" + fighterPower;
+        this.nodePowerTips.scale = v3(1, 1, 1);
         tween(this.nodePowerTips)
             .by(0.5, { position: v3(0, 50, 0) })
             .delay(0.3)

@@ -40,14 +40,17 @@
         "__id__": 90
       },
       {
-        "__id__": 112
+        "__id__": 110
       },
       {
-        "__id__": 118
+        "__id__": 116
       }
     ],
     "_active": true,
     "_components": [
+      {
+        "__id__": 124
+      },
       {
         "__id__": 126
       },
@@ -56,13 +59,10 @@
       },
       {
         "__id__": 130
-      },
-      {
-        "__id__": 132
       }
     ],
     "_prefab": {
-      "__id__": 134
+      "__id__": 132
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -1941,7 +1941,7 @@
     "__prefab": {
       "__id__": 79
     },
-    "playOnLoad": false,
+    "playOnLoad": true,
     "_clips": [
       {
         "__uuid__": "0bc1b36a-8bcf-4552-9c89-fcf82decf238",
@@ -1973,7 +1973,7 @@
   },
   {
     "__type__": "cc.Node",
-    "_name": "SpriteCoin",
+    "_name": "SpriteItem",
     "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
@@ -2174,13 +2174,10 @@
       },
       {
         "__id__": 107
-      },
-      {
-        "__id__": 109
       }
     ],
     "_prefab": {
-      "__id__": 111
+      "__id__": 109
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -2583,42 +2580,6 @@
     "fileId": "abobpI1ZhMOY5NueETlp7/"
   },
   {
-    "__type__": "cc.Widget",
-    "_name": "",
-    "_objFlags": 0,
-    "__editorExtras__": {},
-    "node": {
-      "__id__": 90
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 108
-    },
-    "_alignFlags": 4,
-    "_target": null,
-    "_left": 0,
-    "_right": 0,
-    "_top": 702.5070000000001,
-    "_bottom": 382.06399999999996,
-    "_horizontalCenter": 0,
-    "_verticalCenter": 0,
-    "_isAbsLeft": true,
-    "_isAbsRight": true,
-    "_isAbsTop": true,
-    "_isAbsBottom": true,
-    "_isAbsHorizontalCenter": true,
-    "_isAbsVerticalCenter": true,
-    "_originalWidth": 0,
-    "_originalHeight": 0,
-    "_alignMode": 2,
-    "_lockFlags": 0,
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "eae/yHoBdGrLVHb0TOwr+L"
-  },
-  {
     "__type__": "cc.Layout",
     "_name": "",
     "_objFlags": 0,
@@ -2628,7 +2589,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 110
+      "__id__": 108
     },
     "_resizeMode": 1,
     "_layoutType": 1,
@@ -2681,14 +2642,14 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 113
+        "__id__": 111
       },
       {
-        "__id__": 115
+        "__id__": 113
       }
     ],
     "_prefab": {
-      "__id__": 117
+      "__id__": 115
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -2725,11 +2686,11 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 112
+      "__id__": 110
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 114
+      "__id__": 112
     },
     "_contentSize": {
       "__type__": "cc.Size",
@@ -2753,11 +2714,11 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 112
+      "__id__": 110
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 116
+      "__id__": 114
     },
     "_lineHeight": 40,
     "_string": "战力提升<color=#2EFF11>100%</color>",
@@ -2816,17 +2777,17 @@
     "_active": true,
     "_components": [
       {
+        "__id__": 117
+      },
+      {
         "__id__": 119
       },
       {
         "__id__": 121
-      },
-      {
-        "__id__": 123
       }
     ],
     "_prefab": {
-      "__id__": 125
+      "__id__": 123
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -2863,11 +2824,11 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 118
+      "__id__": 116
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 120
+      "__id__": 118
     },
     "_contentSize": {
       "__type__": "cc.Size",
@@ -2891,11 +2852,11 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 118
+      "__id__": 116
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 122
+      "__id__": 120
     },
     "_customMaterial": null,
     "_srcBlendFactor": 2,
@@ -2962,11 +2923,11 @@
     "_objFlags": 0,
     "__editorExtras__": {},
     "node": {
-      "__id__": 118
+      "__id__": 116
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 124
+      "__id__": 122
     },
     "i18n_string": "购买",
     "i18n_params": [],
@@ -2999,7 +2960,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 127
+      "__id__": 125
     },
     "_contentSize": {
       "__type__": "cc.Size",
@@ -3027,7 +2988,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 129
+      "__id__": 127
     },
     "_alignFlags": 45,
     "_target": null,
@@ -3063,7 +3024,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 131
+      "__id__": 129
     },
     "_id": ""
   },
@@ -3081,7 +3042,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 133
+      "__id__": 131
     },
     "btnBack": {
       "__id__": 25
@@ -3093,12 +3054,14 @@
       "__id__": 69
     },
     "labelTips": {
-      "__id__": 115
+      "__id__": 113
     },
     "labelCoin": {
       "__id__": 100
     },
-    "spriteItem": null,
+    "spriteItem": {
+      "__id__": 84
+    },
     "_id": ""
   },
   {

@@ -3,6 +3,7 @@ import { UI_Award, UI_Help, UI_HUD, UI_Setting } from "../../scripts/UIDef";
 import { ModuleDef } from "../../scripts/ModuleDef";
 import { DataMgr } from "../../scripts/DataMgr";
 import { isValid, Vec3 } from "cc";
+import { Constants } from "../../scripts/Constants";
 
 @egf_class(ModuleDef.EXTRA, UI_HUD)
 export class UI_HUD_Impl extends egf.UIController {
@@ -65,7 +66,7 @@ export class UI_HUD_Impl extends egf.UIController {
 
     clickCoin() {
         egf.AudioMgr.playOneShot("tap");
-        egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: 10 });
+        egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
     }
 
     clickStamina() {
@@ -77,10 +78,10 @@ export class UI_HUD_Impl extends egf.UIController {
         egf.AudioMgr.playOneShot("getCoin");
         const coin = params.coin;
         const pos = params?.pos ? params.pos : Vec3.ZERO;
-        egf.Logger.log("showCoinFly:", params, pos, layout.nodeCoin);
+        // egf.Logger.log("showCoinFly:", params, pos, layout.nodeCoin);
         if (isValid(layout.nodeCoin)) {
             layout.nodeCoin.position = pos;
-            egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.btnCoin.node.worldPosition, 100, coin, null, () => {
+            egf.TweenUtils.goldFlyAction(layout.nodeCoin, layout.btnCoin.node.worldPosition, coin, 100, null, () => {
                 this.onCoinChanged();
             });
         }
@@ -88,7 +89,9 @@ export class UI_HUD_Impl extends egf.UIController {
     private showStaminaFly(coin: number) {
         let layout = this.layout as Layout_UI_HUD;
         egf.AudioMgr.playOneShot("getCoin");
-        egf.TweenUtils.goldFlyAction(layout.nodeStamina, layout.btnStamina.node.worldPosition, coin);
+        if (isValid(layout.nodeStamina)) {
+            egf.TweenUtils.goldFlyAction(layout.nodeStamina, layout.btnStamina.node.worldPosition, coin);
+        }
     }
 
     private onCoinChanged() {
