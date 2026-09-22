@@ -333,15 +333,7 @@ export class FighterLogic extends Component {
                     this._timeScale = timeScale;
 
                     console.log("提速:", this._timeScale, this._preTime);
-
-                    for (let team in GameMgr.dictFighter) {
-                        let dictFighter = GameMgr.dictFighter[team];
-
-                        for (let identity in dictFighter) {
-                            let scriptFighter = dictFighter[identity].getComponent(Fighter) as Fighter;
-                            scriptFighter.timeScale = this._timeScale;
-                        }
-                    }
+                    GameMgr.timeScale = this._timeScale;
                 }
             }
         }

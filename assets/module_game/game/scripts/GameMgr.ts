@@ -24,6 +24,8 @@ class GameManager {
     public dictFighter: any = {}; //存放敌我士兵的字典
     public effectGroup: EffectGroup = null!; //特效管理的脚本
     public world: any = null; //物理世界对象
+    public timeScale: number = 1; //时间缩放，用于加快攻击及移动速度, 也可以理解成游戏速度
+
     //暂停请求计数：设置界面、奖励界面、激励视频等多个来源可能同时请求暂停，计数归零才真正恢复
     private _pauseCount: number = 0;
     private _identity: number = 1; //士兵唯一标识
@@ -226,9 +228,10 @@ class GameManager {
     reset() {
         egf.Logger.log("GameMgr reset");
         this.isGameStart = false;
+        this.isGameOver = false;
+        this.timeScale = 1;
         //暂停计数清零，避免上一局的暂停状态残留到下一局
         this._pauseCount = 0;
-        this.isGameOver = false;
         this._identity = 1;
 
         //重置敌我双方士兵状态

@@ -27,19 +27,6 @@ export class Fighter extends Component {
     public cellPos: number = 0; //所属格子坐标
     public target: Fighter = null!; //目标敌人的脚本
 
-    //设置时间缩放
-    public set timeScale(value: number) {
-        this._timeScale = value;
-
-        //更新时间缩放的同时更新士兵的动画播放速度
-        this._fighterModel && this._fighterModel.updateAniSpeed();
-    }
-
-    //获取时间缩放
-    public get timeScale() {
-        return this._timeScale;
-    }
-
     //刚体半径
     public get radius() {
         return 0.3 * this.fighterInfo.scale;
@@ -62,7 +49,6 @@ export class Fighter extends Component {
     private _nodeModel: Node = null!; //士兵模型
     private _fighterModel: FighterModel = null!; //士兵模型的脚本
     private _isPlayingChairEffect = false; //是否正在播放被击中的特效
-    private _timeScale: number = 1; //时间缩放，用于加快攻击及移动速度, 也可以理解成游戏速度
     private _curPos: Vec3 = new Vec3(); //当前位置
     private _outPos: Vec3 = new Vec3(); //士兵阵亡后退的位置
     private _oriEuler: Vec3 = new Vec3(); //士兵初始欧拉角
@@ -102,7 +88,6 @@ export class Fighter extends Component {
         //开启刚体数据同步
         this.rigidBody.enableSync = true;
 
-        this.timeScale = 1;
         this.isDead = false;
         this.target = null!;
         this.cellPos = cellPos;
@@ -164,7 +149,7 @@ export class Fighter extends Component {
 
             this._nodeModel = egf.PoolMgr.getNode(pf, this.ndModelParent);
             this._fighterModel = this._nodeModel.getComponent(FighterModel) as FighterModel;
-            this._fighterModel.show(this);
+            this._fighterModel.show(this.team, this.fighterInfo.color, this.fighterInfo.crown);
             this._fighterModel.setEffectListener(this._triggerEffect, this);
         });
 
@@ -223,16 +208,16 @@ export class Fighter extends Component {
 
         switch (status) {
             case Constants.FIGHTER_STATUS.IDLE:
-                this._fighterModel && this._fighterModel.playAni(Constants.ANI_TYPE.IDLE);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.IDLE);
                 break;
             case Constants.FIGHTER_STATUS.FIND:
                 this._findEnemy();
                 break;
             case Constants.FIGHTER_STATUS.DEAD:
-                this._fighterModel && this._fighterModel.playAni(Constants.ANI_TYPE.DIED, true);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.DIED, true);
                 break;
             case Constants.FIGHTER_STATUS.CHARGE:
-                this._fighterModel && this._fighterModel.playAni(Constants.ANI_TYPE.RUN, true);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.RUN, true);
                 break;
         }
     }
@@ -442,7 +427,7 @@ export class Fighter extends Component {
                 let posTarget = this.target.node.worldPosition;
 
                 //扔武器
-                this._fighterModel.throwWeapon((target: Fighter) => {
+                this._fighterModel.throwWeapon(this.node.parent!, this.target, (target: Fighter) => {
                     //触发特效
                     if (this.fightType === Constants.FIGHTER_TYPE.ARCHER) {
                         //弓箭手
@@ -499,7 +484,7 @@ export class Fighter extends Component {
             return;
         }
 
-        this._fighterModel && this._fighterModel.playAni(Constants.ANI_TYPE.WIN);
+        this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.WIN);
     }
 
     /**
@@ -538,7 +523,7 @@ export class Fighter extends Component {
         }
 
         //deltaTime 加入时间缩放，用于加快攻击及移动速度
-        deltaTime *= this.timeScale;
+        deltaTime *= GameMgr.timeScale;
 
         if (this.target) {
             if (this.target.isDead) {
@@ -579,7 +564,7 @@ export class Fighter extends Component {
                 }
             } else {
                 //接着移动
-                this._fighterModel && this._fighterModel.playAni(Constants.ANI_TYPE.RUN, true);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.RUN, true);
 
                 this._direction.set(offset);
                 //随机扰动 ±0.1：原实现 Math.floor(Math.random() * 0.2) - 0.1 因为 floor 恒为 0，
@@ -627,7 +612,7 @@ export class Fighter extends Component {
                 this._enterStatus(Constants.FIGHTER_STATUS.FIND);
             } else {
                 //接着移动
-                this._fighterModel && this._fighterModel.playAni(Constants.ANI_TYPE.RUN, true);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.RUN, true);
 
                 this._direction.set(offset);
 

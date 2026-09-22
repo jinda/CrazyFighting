@@ -267,11 +267,14 @@ export class Constants {
 
     //动画类型
     public static ANI_TYPE = {
-        IDLE: "idle",
-        RUN: "run",
-        ATTACK: "attack",
-        WIN: "win",
-        DIED: "died",
+        IDLE: 0,
+        WALK: 1,
+        RUN: 2,
+        ATTACK: 3,
+        BEHIT: 4,
+        DIED: 5,
+        WIN: 6,
+        SKILL: 7,
     };
 
     //玩家状态
