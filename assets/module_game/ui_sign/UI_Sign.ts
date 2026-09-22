@@ -1,0 +1,106 @@
+import { Layout_Sign } from "./Layout_Sign";
+import { ModuleDef } from "../../scripts/ModuleDef";
+import { game, Sprite, sys } from "cc";
+import { DataMgr } from "../../scripts/DataMgr";
+import { UI_CommonTips } from "../../scripts/UIDef";
+import { LocalDataMgr } from "../../scripts/LocalDataMgr";
+import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
+
+const AWARD_LIST = [100, 200, 300, 400, 500, 600, 700, 1000];
+
+@egf_class(ModuleDef.GAME)
+export class UI_Sign extends egf.UIController {
+    private _currentDay: number = 0;
+    constructor() {
+        super("ui_sign/UI_Sign", egf.UILayers.POPUP2, Layout_Sign);
+    }
+
+    //子类的所有操作，需要在这个函数之后。
+    protected onCreated(params?: any) {
+        let layout = this.layout as Layout_Sign;
+        params = params || { toolType: 0 };
+
+        this.onButtonEvent(layout.btnBack, this.clickBack, this);
+        this.onButtonEvent(layout.btnGet, this.clickGet, this);
+        this.onButtonEvent(layout.btnDoubleGet, this.clickDoubleGet, this);
+
+        layout.showInfo(AWARD_LIST);
+        this.updateSignState();
+    }
+
+    private updateSignState() {
+        let layout = this.layout as Layout_Sign;
+        this._currentDay = LocalDataMgr.getSignProgress() - 1;
+        for (let i = 0; i < 7; i++) {
+            let status = 0;
+            if (i < this._currentDay) {
+                status = 1;
+            } else if (i == this._currentDay && !LocalDataMgr.isSignToday()) {
+                status = 2;
+            }
+            egf.Logger.log("updateItemState:", i + 1, status, this._currentDay);
+            layout.updateItemState(i + 1, status);
+        }
+        layout.btnGet.getComponent(Sprite)!.grayscale = LocalDataMgr.isSignToday();
+        layout.btnDoubleGet.getComponent(Sprite)!.grayscale = LocalDataMgr.isSignToday();
+    }
+
+    clickBack() {
+        egf.AudioMgr.playOneShot("tap");
+        this.close();
+    }
+
+    clickGet() {
+        egf.AudioMgr.playOneShot("tap");
+        if (sys.getNetworkType() == sys.NetworkType.NONE) {
+            const commonParam = {
+                content: egf.i18nMgr.getText("网络连接不可用，请连接网络后再尝试领取"),
+                bCancel: true,
+            };
+            egf.UIMgr.showUI(UI_CommonTips, null, this, commonParam);
+            return;
+        }
+        if (LocalDataMgr.isSignToday()) {
+            egf.UIAlert.show(egf.i18nMgr.getText("今天已经签到过了！"));
+            return;
+        }
+        const day = LocalDataMgr.doSign();
+        if (day <= 0) {
+            return;
+        }
+        let coin = AWARD_LIST[day - 1];
+        if (day == 6) {
+            coin = egf.Utils.getRandomInt(AWARD_LIST[day - 1], AWARD_LIST[day]);
+        }
+        DataMgr.addCoin(coin);
+        egf.EventMgr.emit("add_coin_fly", { coin });
+        this.updateSignState();
+        this.close();
+    }
+
+    clickDoubleGet() {
+        egf.AudioMgr.playOneShot("tap");
+        if (LocalDataMgr.isSignToday()) {
+            egf.UIAlert.show(egf.i18nMgr.getText("今天已经签到过了！"));
+            return;
+        }
+        const callback = (ret: boolean) => {
+            if (ret) {
+                const day = LocalDataMgr.doSign();
+                if (day > 0) {
+                    let coin = AWARD_LIST[day - 1];
+                    if (day == 6) {
+                        coin = egf.Utils.getRandomInt(AWARD_LIST[day - 1], AWARD_LIST[day]);
+                    }
+                    DataMgr.addCoin(coin * 2);
+                    egf.EventMgr.emit("add_coin_fly", { coin: coin * 2 });
+                    this.updateSignState();
+                    this.close();
+                }
+            } else {
+                egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));
+            }
+        };
+        PlatformMgr.showRewardedVideo(undefined, callback);
+    }
+}

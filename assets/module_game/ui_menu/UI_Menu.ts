@@ -7,6 +7,7 @@ import { GameMgr } from "../game/scripts/GameMgr";
 import { UI_BuyFighter } from "../ui_buyFighter/UI_BuyFighter";
 import { UI_Fighter } from "../ui_fighter/UI_Fighter";
 import { UI_Rank } from "../ui_rank/UI_Rank";
+import { UI_Sign } from "../ui_sign/UI_Sign";
 import { Layout_Menu } from "./Layout_Menu";
 import { EventTouch, Node, Vec2 } from "cc";
 
@@ -82,6 +83,7 @@ export class UI_Menu extends egf.UIController {
     }
     private clickSign() {
         egf.AudioMgr.playOneShot("tap");
+        egf.UIMgr.showUI(UI_Sign);
     }
     private clickStart() {
         egf.AudioMgr.playOneShot("tap");

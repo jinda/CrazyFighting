@@ -2,6 +2,7 @@
  * 网络数据管理器
  */
 
+import { clamp } from "cc";
 import { IUserInfo } from "./apiInterface";
 import { Constants } from "./Constants";
 import { LocalDataMgr } from "./LocalDataMgr";
@@ -43,6 +44,11 @@ class DataManager {
         this.userData.money = value;
     }
 
+    public getGoldRateByLv(lv: number) {
+        lv = clamp(lv, 1, Constants.goldRate.maxLv);
+        return (lv - 1) * Constants.goldRate.step + Constants.goldRate.default;
+    }
+
     public addCoin(coin: number) {
         this.userData.money += coin;
         LocalDataMgr.GameInfo.coin = DataMgr.coin;
@@ -59,6 +65,7 @@ class DataManager {
         LocalDataMgr.GameInfo.coin = DataMgr.coin;
         LocalDataMgr.saveGameInfoData();
         egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
+        egf.EventMgr.emit("coin_changed");
     }
 
     public get level() {
@@ -71,11 +78,11 @@ class DataManager {
 
     public nextLevel() {
         this.userData.level++;
-        // LocalDataMgr.GameInfo.level = this.userData.level;
-        // LocalDataMgr.saveGameInfoData();
         if (this.userData.level > Constants.MAX_LEVEL) {
             this.userData.level = Constants.MAX_LEVEL;
         }
+        LocalDataMgr.GameInfo.level = this.userData.level;
+        LocalDataMgr.saveGameInfoData();
     }
 }
 

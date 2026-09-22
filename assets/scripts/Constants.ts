@@ -300,4 +300,6 @@ export class Constants {
     static SkillCD = 10;
     // 观看视频可领取金币数量
     static awardCoin = 100;
+    // 金币加成配置
+    static goldRate: { default: 1; step: 0.1; maxLv: 50 };
 }

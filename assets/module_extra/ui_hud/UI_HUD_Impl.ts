@@ -12,10 +12,6 @@ export class UI_HUD_Impl extends egf.UIController {
         super("ui_hud/UI_HUD", egf.UILayers.POPUP1, Layout_UI_HUD);
     }
 
-    public getRes(): [] {
-        return [];
-    }
-
     //子类的所有操作，需要在这个函数之后。
     protected onCreated(params?: any) {
         this._bGameing = params?.bGameing ?? false;

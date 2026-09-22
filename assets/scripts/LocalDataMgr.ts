@@ -17,6 +17,9 @@ interface IGameInfo {
     onlineReward: number; //在线奖励的数值
     finishGuides: Array<number>; //完成的引导步骤
     formation: { [key: number]: number }; //阵型
+    signDay: number;
+    lastSignTime: number;
+    signTotalDay: number;
 }
 
 interface ISetting {
@@ -57,6 +60,9 @@ class LocalDataManager {
         onlineReward: 0, //在线奖励的数值
         finishGuides: [], //完成的引导步骤
         formation: { 1: 101, 2: 101, 3: 101 },
+        signDay: 0,
+        lastSignTime: 0,
+        signTotalDay: 0,
     };
 
     public get Setting(): ISetting {
@@ -302,6 +308,61 @@ class LocalDataManager {
     public upgradeLand() {
         this._gameInfo.landLv++;
         this.saveGameInfoData();
+    }
+
+    // ---------- Sign 签到便捷访问 ----------
+    /**
+     * 将时间戳归一化到当日 0 点（用于跨天判断）
+     */
+    private getTodayZero(): number {
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+        return now.getTime();
+    }
+
+    /**
+     * 今天是否已签到
+     */
+    public isSignToday(): boolean {
+        return this._gameInfo.lastSignTime >= this.getTodayZero();
+    }
+
+    /**
+     * 获取当前应领取的奖励天数（1~N，跨天不重置，用于展示第几天）
+     */
+    public getSignProgress(): number {
+        return (this._gameInfo.signDay % 7) + 1;
+    }
+
+    /**
+     * 执行签到
+     * @returns 返回本次签到领取的奖励档位（第几天）
+     */
+    public doSign(): number {
+        if (this.isSignToday()) {
+            egf.Logger.warn("今天已签到，不能重复签到！");
+            return 0;
+        }
+
+        const today = this.getTodayZero();
+        const lastSignTime = this._gameInfo.lastSignTime;
+
+        // 判断是否连续签到（昨天签到过）
+        const yesterday = today - 24 * 60 * 60 * 1000;
+        if (lastSignTime >= yesterday) {
+            this._gameInfo.signTotalDay += 1;
+        } else {
+            // 跨天/断签，连续签到重置
+            this._gameInfo.signTotalDay = 1;
+        }
+
+        this._gameInfo.signDay += 1;
+        this._gameInfo.lastSignTime = Date.now();
+        this.saveGameInfoData();
+
+        const day = this.getSignProgress();
+        egf.Logger.log("doSign success:", day, this._gameInfo);
+        return day;
     }
 }
 

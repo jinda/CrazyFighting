@@ -90,7 +90,7 @@ export class UIAlert extends UIController {
         const layout = this.getLayout();
         const handleClick = (isOK: boolean): void => {
             this.close();
-            egf.AudioMgr.playOneShot("ui_sfx_button_pressed");
+            egf.AudioMgr.playOneShot("tap");
             const { _cbClick, _cbClickThisArg } = this._options as any;
             _cbClick?.call(_cbClickThisArg, isOK);
         };
