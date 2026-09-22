@@ -1,4 +1,4 @@
-import { sys } from "cc";
+import { clamp, sys } from "cc";
 import CryptoTS from "crypto-ts";
 import { ClientApi } from "./ClientApi";
 import { Constants } from "./Constants";
@@ -363,6 +363,11 @@ class LocalDataManager {
         const day = this.getSignProgress();
         egf.Logger.log("doSign success:", day, this._gameInfo);
         return day;
+    }
+
+    public getCoinRate() {
+        const lv = clamp(this._gameInfo.coinLv, 1, Constants.goldRate.maxLv);
+        return (lv - 1) * Constants.goldRate.step;
     }
 }
 

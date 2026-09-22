@@ -5,6 +5,7 @@ import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { DataMgr } from "../../scripts/DataMgr";
 import { UI_Award, UI_CommonTips } from "../../scripts/UIDef";
 import { sys } from "cc";
+import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 
 @egf_class(ModuleDef.EXTRA, UI_Award)
 export class UI_Award_Impl extends egf.UIController {
@@ -23,7 +24,9 @@ export class UI_Award_Impl extends egf.UIController {
         this.onButtonEvent(layout.btnGet, this.clickGet, this);
         this.onButtonEvent(layout.btnDoubleGet, this.clickDoubleGet, this);
 
-        layout.showInfo(this._params.bOnline, this._params.coin, this._params.bDailyGift);
+        const addCoin = Math.floor(this._params.coin * LocalDataMgr.getCoinRate());
+        layout.showInfo(this._params.bOnline, this._params.coin, addCoin, this._params.bDailyGift);
+        this._params.coin += addCoin;
         //本界面打开时暂停战斗，关闭时恢复（与 onDispose 成对派发，GameMgr 内部按计数处理叠加暂停）
         egf.EventMgr.emit(Constants.EVENT_NAME.GAME_PAUSE);
     }

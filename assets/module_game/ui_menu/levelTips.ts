@@ -1,6 +1,7 @@
-import { _decorator, Component, Node, SpriteComponent, SpriteFrame, Vec2, view } from "cc";
+import { _decorator, Component, Node, SpriteComponent, SpriteFrame, v3, Vec2, view } from "cc";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { Constants } from "../../scripts/Constants";
+import { GameMgr } from "../game/scripts/GameMgr";
 
 const { ccclass, property } = _decorator;
 //士兵等级提示脚本：在界面移动士兵时，士兵头上会展示
@@ -23,7 +24,6 @@ export class LevelTips extends Component {
 
     private _fighterId: number = null!; //士兵编号
     private _type: number = null!; //提示类型
-    private _newPos: Vec2 = new Vec2(); //该节点的位置
 
     start() {
         // Your initialization goes here.
@@ -42,12 +42,11 @@ export class LevelTips extends Component {
      * @returns
      */
     public show(pos: Vec2, fighterId: number, type: number) {
-        this._newPos.set(pos.x / view.getScaleX(), pos.y / view.getScaleY() + 120);
+        const newPos = v3(pos.x / view.getScaleX(), pos.y / view.getScaleY() + 60);
 
         //type 为 0 表示不需要出现任何标志  1为升级  2为交换位置
-        this.node.setWorldPosition(this._newPos.x, this._newPos.y, 0);
-        // console.log('2: ', pos.x - Math.floor(this.node.parent.width/2), pos.y - Math.floor(this.node.parent.height/2), 0);
-        // console.log('3: ', this.node.position);
+        this.node.worldPosition = newPos;
+
         if (typeof fighterId === "undefined" || typeof type === "undefined") {
             return;
         }
@@ -64,7 +63,7 @@ export class LevelTips extends Component {
 
         //如果能升级的话会多一颗新星图标，否则展示交换图标
         if (type === Constants.LEVEL_TIPS_TYPE.UPGRADE) {
-            let nextId = this.getFighterNextId(fighterId);
+            let nextId = GameMgr.getFighterNextId(fighterId);
             if (nextId > 0) {
                 level += 1;
             } else {
@@ -95,22 +94,5 @@ export class LevelTips extends Component {
         for (let idx = star; idx < this.aryStar.length; idx++) {
             this.aryStar[idx].active = false;
         }
-    }
-    /**
-     * 获得下一等级的士兵id
-     * @param fighterId
-     */
-    public getFighterNextId(fighterId: number): number {
-        let fighterInfo = GameCfg.queryByID("fighter", fighterId.toString());
-
-        let next = GameCfg.queryOneByCondition("fighter", {
-            level: fighterInfo.level + 1,
-            type: fighterInfo.type,
-        });
-        if (next) {
-            return Number(next.ID);
-        }
-
-        return -1;
     }
 }

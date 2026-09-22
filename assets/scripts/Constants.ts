@@ -294,12 +294,12 @@ export class Constants {
     /**
      * 排行榜玩法标识（对应服务器后台配置的 mode）
      */
-    static LeaderboardMode = "crazyfight_level";
+    public static LeaderboardMode = "crazyfight_level";
 
     // 技能CD时间
-    static SkillCD = 10;
+    public static SkillCD = 10;
     // 观看视频可领取金币数量
-    static awardCoin = 100;
+    public static awardCoin = 100;
     // 金币加成配置
-    static goldRate: { default: 1; step: 0.1; maxLv: 50 };
+    public static goldRate = { default: 1, step: 0.1, maxLv: 50 };
 }

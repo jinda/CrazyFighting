@@ -13,6 +13,8 @@ export class Layout_Settlement extends Component {
     labelLevel: Label = null!;
     @property(Label)
     labelCoin: Label = null!;
+    @property(Label)
+    labelCoinAdd: Label = null!;
     @property(Node)
     nodeWin: Node = null!;
     @property(Node)
@@ -22,9 +24,10 @@ export class Layout_Settlement extends Component {
     @property(Node)
     nodeWinEffect2: Node = null!;
 
-    showInfo(bWin: boolean, level: number, coin: number) {
+    showInfo(bWin: boolean, level: number, coin: number, addCoin: number) {
         this.labelLevel.string = egf.i18nMgr.getText("第#0关", [level + ""]);
         this.labelCoin.string = "x" + coin;
+        this.labelCoinAdd.string = "+" + addCoin;
 
         this.nodeWin.active = bWin;
         this.nodeLose.active = !bWin;

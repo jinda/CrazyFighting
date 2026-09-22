@@ -13,7 +13,12 @@ var resPkg = {
         },
         {
             assetType: Prefab,
-            urls: [],
+            urls: [
+                "ui_menu/UI_Menu",
+                "game/prefabs/model/altman",
+                "game/prefabs/fight/fighter",
+                "game/prefabs/fight/formationCell",
+            ],
         },
         {
             assetType: TextAsset,

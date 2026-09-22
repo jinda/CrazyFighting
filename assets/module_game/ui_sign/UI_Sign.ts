@@ -10,7 +10,7 @@ const AWARD_LIST = [100, 200, 300, 400, 500, 600, 700, 1000];
 
 @egf_class(ModuleDef.GAME)
 export class UI_Sign extends egf.UIController {
-    private _currentDay: number = 0;
+    private _currentAward: number[] = [];
     constructor() {
         super("ui_sign/UI_Sign", egf.UILayers.POPUP2, Layout_Sign);
     }
@@ -23,22 +23,25 @@ export class UI_Sign extends egf.UIController {
         this.onButtonEvent(layout.btnBack, this.clickBack, this);
         this.onButtonEvent(layout.btnGet, this.clickGet, this);
         this.onButtonEvent(layout.btnDoubleGet, this.clickDoubleGet, this);
-
-        layout.showInfo(AWARD_LIST);
+        AWARD_LIST.forEach((value) => {
+            const addCoin = Math.floor(value * LocalDataMgr.getCoinRate());
+            this._currentAward.push(value + addCoin);
+        });
+        layout.showInfo(this._currentAward);
         this.updateSignState();
     }
 
     private updateSignState() {
         let layout = this.layout as Layout_Sign;
-        this._currentDay = LocalDataMgr.getSignProgress() - 1;
+        const currentDay = LocalDataMgr.getSignProgress() - 1;
         for (let i = 0; i < 7; i++) {
             let status = 0;
-            if (i < this._currentDay) {
+            if (i < currentDay) {
                 status = 1;
-            } else if (i == this._currentDay && !LocalDataMgr.isSignToday()) {
+            } else if (i == currentDay && !LocalDataMgr.isSignToday()) {
                 status = 2;
             }
-            egf.Logger.log("updateItemState:", i + 1, status, this._currentDay);
+            egf.Logger.log("updateItemState:", i + 1, status, currentDay);
             layout.updateItemState(i + 1, status);
         }
         layout.btnGet.getComponent(Sprite)!.grayscale = LocalDataMgr.isSignToday();
@@ -61,16 +64,16 @@ export class UI_Sign extends egf.UIController {
             return;
         }
         if (LocalDataMgr.isSignToday()) {
-            egf.UIAlert.show(egf.i18nMgr.getText("今天已经签到过了！"));
+            egf.UI_Toast.show(egf.i18nMgr.getText("今天已经签到过了！"));
             return;
         }
         const day = LocalDataMgr.doSign();
         if (day <= 0) {
             return;
         }
-        let coin = AWARD_LIST[day - 1];
+        let coin = this._currentAward[day - 1];
         if (day == 6) {
-            coin = egf.Utils.getRandomInt(AWARD_LIST[day - 1], AWARD_LIST[day]);
+            coin = egf.Utils.getRandomInt(this._currentAward[day - 1], this._currentAward[day]);
         }
         DataMgr.addCoin(coin);
         egf.EventMgr.emit("add_coin_fly", { coin });
@@ -81,16 +84,16 @@ export class UI_Sign extends egf.UIController {
     clickDoubleGet() {
         egf.AudioMgr.playOneShot("tap");
         if (LocalDataMgr.isSignToday()) {
-            egf.UIAlert.show(egf.i18nMgr.getText("今天已经签到过了！"));
+            egf.UI_Toast.show(egf.i18nMgr.getText("今天已经签到过了！"));
             return;
         }
         const callback = (ret: boolean) => {
             if (ret) {
                 const day = LocalDataMgr.doSign();
                 if (day > 0) {
-                    let coin = AWARD_LIST[day - 1];
+                    let coin = this._currentAward[day - 1];
                     if (day == 6) {
-                        coin = egf.Utils.getRandomInt(AWARD_LIST[day - 1], AWARD_LIST[day]);
+                        coin = egf.Utils.getRandomInt(this._currentAward[day - 1], this._currentAward[day]);
                     }
                     DataMgr.addCoin(coin * 2);
                     egf.EventMgr.emit("add_coin_fly", { coin: coin * 2 });

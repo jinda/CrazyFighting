@@ -26,13 +26,15 @@ export class UI_Settlement extends egf.UIController {
                 winCoin += levelInfo.gold;
             }
             coin += winCoin;
-            layout.showInfo(bWin, DataMgr.level, coin);
+            const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
+            layout.showInfo(bWin, DataMgr.level, coin, addCoin);
             this.checkUnlock();
             DataMgr.nextLevel();
             //播放胜利音效
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.WIN);
         } else {
-            layout.showInfo(bWin, DataMgr.level, coin);
+            const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
+            layout.showInfo(bWin, DataMgr.level, coin, addCoin);
             //播放失败音效
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.FAIL);
         }

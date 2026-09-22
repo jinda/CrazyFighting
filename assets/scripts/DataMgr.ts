@@ -44,11 +44,6 @@ class DataManager {
         this.userData.money = value;
     }
 
-    public getGoldRateByLv(lv: number) {
-        lv = clamp(lv, 1, Constants.goldRate.maxLv);
-        return (lv - 1) * Constants.goldRate.step + Constants.goldRate.default;
-    }
-
     public addCoin(coin: number) {
         this.userData.money += coin;
         LocalDataMgr.GameInfo.coin = DataMgr.coin;

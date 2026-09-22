@@ -10,6 +10,7 @@ import { GameMgr } from "./GameMgr";
 import { GameCfg } from "./GameConfig";
 import { UI_Menu } from "../../ui_menu/UI_Menu";
 import { UI_Fighter } from "../../ui_fighter/UI_Fighter";
+import BackResPkg from "db://assets/scripts/BackResPkg";
 
 const { ccclass, property } = _decorator;
 //“管理所有士兵”的脚本
@@ -95,7 +96,11 @@ export class FighterLogic extends Component {
             //第一关就直接认定为新手引导关卡，直接开始游戏
             this._fightStart(1.5);
         } else {
-            egf.UIMgr.showUI(UI_Menu);
+            egf.UIMgr.showUI(UI_Menu, () => {
+                egf.ResMgr.preloadResPackage("backRetPkg", BackResPkg, (now: number, total: number) => {
+                    egf.Logger.log("backRetPkg loaded:" + now + "/" + total);
+                });
+            });
         }
     }
 

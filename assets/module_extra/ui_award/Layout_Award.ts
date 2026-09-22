@@ -13,10 +13,12 @@ export class Layout_Award extends Component {
     labelContent: Label = null!;
     @property(Label)
     labelCoin: Label = null!;
+    @property(Label)
+    labelCoinAdd: Label = null!;
     @property(Node)
     nodeAd: Node = null!;
 
-    public showInfo(bOnline: boolean, coin: number, bDailyGift: boolean) {
+    public showInfo(bOnline: boolean, coin: number, addCoin: number, bDailyGift: boolean) {
         if (bOnline) {
             this.labelContent.string = egf.i18nMgr.getText("获得在线时长金币奖励");
             this.btnDoubleGet.node.active = true;
@@ -28,6 +30,7 @@ export class Layout_Award extends Component {
             this.btnDoubleGet.node.active = false;
         }
         this.labelCoin.string = "x" + coin;
+        this.labelCoinAdd.string = "+" + addCoin;
         this.nodeAd.active = !bOnline;
     }
 }

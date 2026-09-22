@@ -49,6 +49,7 @@ export class UI_Fighter extends egf.UIController {
     private clickSkill() {
         const layout = this.layout as Layout_Fighter;
         layout.showSkillStatus(true);
+        egf.EventMgr.emit(Constants.EVENT_NAME.USE_FIRE_BALL);
     }
 
     /**
