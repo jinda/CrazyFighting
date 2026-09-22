@@ -40,7 +40,7 @@ export class UI_BuyFighter extends egf.UIController {
             egf.UI_Toast.show(egf.i18nMgr.getText("没有空位，不可购买"));
             return;
         }
-        if (DataMgr.userData?.money! < this._price) {
+        if (DataMgr.coin < this._price) {
             egf.UI_Toast.show(egf.i18nMgr.getText("金币不足，不可购买"));
             return;
         }

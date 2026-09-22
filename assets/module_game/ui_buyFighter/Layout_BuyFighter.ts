@@ -24,7 +24,7 @@ export class Layout_BuyFighter extends Component {
 
         this.labelTips.string = egf.i18nMgr.getText("战力提升") + `<color=#2EFF11>${fighter["fight"]}%</color>`;
         this.labelCoin.string = price.toString();
-        if (DataMgr.userData?.money! < price) {
+        if (DataMgr.coin < price) {
             this.btnGet.getComponent(Sprite)!.grayscale = true;
             this.labelCoin.color = new Color().fromHEX("#f23160");
         }

@@ -2,7 +2,6 @@
  * 网络数据管理器
  */
 
-import { clamp } from "cc";
 import { IUserInfo } from "./apiInterface";
 import { Constants } from "./Constants";
 import { LocalDataMgr } from "./LocalDataMgr";
@@ -31,32 +30,44 @@ class DataManager {
 
     public maintenance: IMaintenance = {}; // 维护信息
 
-    public userData: IUserInfo = { money: 0, level: 0 }; // 用户数据
+    // 内存加密存储，防止内存扫描篡改金币/关卡
+    private _coin: egf.SecureValue = new egf.SecureValue(0);
+    private _level: egf.SecureValue = new egf.SecureValue(0);
+
+    private _userData: IUserInfo = { money: 0, level: 0 }; // 用户数据
+    public get userData(): IUserInfo {
+        return this._userData;
+    }
+    public set userData(v: IUserInfo) {
+        this._userData = v;
+        // 登录拿到服务器账号信息后，同步进加密字段
+        if (v) {
+            this._coin.set(v.money ?? 0);
+            this._level.set(v.level ?? 0);
+        }
+    }
     public onlineGetTime: number = Date.now(); // 在线奖励获取时间
     public bBannerAd: boolean = false; // 是否显示banner
     public isDebugMode: boolean = false; // 调试模式
     public waitingBuy: number = -1; //优先安排购买
 
     public get coin() {
-        return this.userData.money || 0;
+        return this._coin.get();
     }
     public set coin(value: number) {
-        this.userData.money = value;
+        this._coin.set(value);
     }
 
     public addCoin(coin: number) {
-        this.userData.money += coin;
+        this._coin.set(this._coin.get() + coin);
         LocalDataMgr.GameInfo.coin = DataMgr.coin;
         LocalDataMgr.saveGameInfoData();
         egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
     }
 
     public subCoin(coin: number) {
-        if (coin > DataMgr.coin) {
-            DataMgr.coin = 0;
-        } else {
-            DataMgr.coin -= coin;
-        }
+        const cur = this._coin.get();
+        this._coin.set(cur > coin ? cur - coin : 0);
         LocalDataMgr.GameInfo.coin = DataMgr.coin;
         LocalDataMgr.saveGameInfoData();
         egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
@@ -64,19 +75,16 @@ class DataManager {
     }
 
     public get level() {
-        return this.userData.level + 1;
+        return this._level.get() + 1;
     }
 
     public set level(value: number) {
-        this.userData.level = value;
+        this._level.set(value);
     }
 
     public nextLevel() {
-        this.userData.level++;
-        if (this.userData.level > Constants.MAX_LEVEL) {
-            this.userData.level = Constants.MAX_LEVEL;
-        }
-        LocalDataMgr.GameInfo.level = this.userData.level;
+        this._level.set(Math.min(this._level.get() + 1, Constants.MAX_LEVEL));
+        LocalDataMgr.GameInfo.level = this._level.get();
         LocalDataMgr.saveGameInfoData();
     }
 }
