@@ -25,7 +25,7 @@ export class Weapon extends Component {
     public aryMaterial: Material[] = []; //材质皮肤数组
 
     @property(CCBoolean)
-    public isAutoRotate: boolean = false; //武器是否朝向下一个目标位置
+    public isAutoRotate: boolean = true; //武器是否朝向下一个目标位置
 
     @property(CCBoolean)
     public isLine: boolean = false; //是否是直线

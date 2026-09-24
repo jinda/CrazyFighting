@@ -128,7 +128,7 @@ export class Fighter extends Component {
         //回调必须校验加载代次、identity 与节点有效性，避免旧模型挂到新角色
         const loadGeneration = ++this._loadGeneration;
         const curIdentity = identity;
-        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/model/role/${this.fighterInfo.model}`, (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/role/${this.fighterInfo.model}`, (pf: Prefab) => {
             //代次校验：本次初始化已被回收/重新初始化，或节点已失效时，迟到的加载结果直接丢弃
             if (
                 loadGeneration !== this._loadGeneration ||
