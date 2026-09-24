@@ -1,18 +1,34 @@
-import { _decorator, Component, Node, Vec3, Prefab, ParticleSystemComponent, ModelComponent, CCBoolean } from "cc";
+import {
+    _decorator,
+    Component,
+    Node,
+    Vec3,
+    Prefab,
+    ParticleSystemComponent,
+    MeshRenderer,
+    CCBoolean,
+    Material,
+} from "cc";
 import { Fighter } from "./Fighter";
+import { Constants } from "db://assets/scripts/Constants";
 
 const { ccclass, property } = _decorator;
-//飞行武器脚本
-@ccclass("Missile")
-export class Missile extends Component {
+//武器脚本
+@ccclass("Weapon")
+export class Weapon extends Component {
     @property(Prefab)
     public pfTrail: Prefab = null!; //拖尾
 
-    @property(ModelComponent)
-    public model: ModelComponent = null!; //武器模型（暂无用到）
+    @property([MeshRenderer])
+    public msrs: MeshRenderer[] = []; //武器模型
+    @property([Material])
+    public aryMaterial: Material[] = []; //材质皮肤数组
 
     @property(CCBoolean)
     public isAutoRotate: boolean = false; //武器是否朝向下一个目标位置
+
+    @property(CCBoolean)
+    public isLine: boolean = false; //是否是直线
 
     private totalTime: number = -1; //飞行时间
     private currentTime: number = 0; //当前飞行时间
@@ -26,10 +42,23 @@ export class Missile extends Component {
     private _targetPos: Vec3 = new Vec3(); //当前目标位置
     private _nextTargetPos: Vec3 = new Vec3(); //下次目标位置
 
-    onLoad() {}
-
-    start() {
+    show(team: number, color: number) {
         // Your initialization goes here.
+        let idxMaterial = 0;
+        if (team === Constants.PLAYER_TEAM) {
+            idxMaterial = color;
+        } else {
+            idxMaterial = 0;
+        }
+        this.msrs.forEach((msr) => {
+            msr.material = this.aryMaterial[idxMaterial];
+        });
+
+        if (this.ndTrail) {
+            egf.PoolMgr.putNode(this.ndTrail);
+            this.ndTrail = null!;
+        }
+        this.reset();
     }
 
     /**
@@ -43,11 +72,6 @@ export class Missile extends Component {
         this.posOffset = null!;
         this.maxHeight = 0;
         this.node.setScale(1, 1, 1);
-
-        if (this.ndTrail) {
-            egf.PoolMgr.putNode(this.ndTrail);
-            this.ndTrail = null!;
-        }
     }
 
     /**

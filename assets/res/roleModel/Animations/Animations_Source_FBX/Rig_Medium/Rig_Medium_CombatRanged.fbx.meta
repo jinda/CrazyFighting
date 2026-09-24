@@ -40,7 +40,19 @@
           "from": 0,
           "to": 0.6666666865348816
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.06666666666666667,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1,
+        "auxiliaryCurves": {}
       },
       "ver": "1.0.18",
       "imported": true,
@@ -274,7 +286,13 @@
           "from": 0,
           "to": 1.0666667222976685
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.3333333333333333,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -297,7 +315,39 @@
           "from": 0,
           "to": 1.600000023841858
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.3333333333333333,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 0.6666666666666666,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 1,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 1.3333333333333333,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 1.6,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1,
+        "auxiliaryCurves": {}
       },
       "ver": "1.0.18",
       "imported": true,
@@ -366,7 +416,13 @@
           "from": 0,
           "to": 1.0666667222976685
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.3333333333333333,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -389,7 +445,38 @@
           "from": 0,
           "to": 1.0666667222976685
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.16666666666666666,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 0.3333333333333333,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 0.5333333333333333,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 0.6666666666666666,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 0.8333333333333334,
+            "func": "triggerEffect",
+            "params": []
+          },
+          {
+            "frame": 1,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -435,7 +522,13 @@
           "from": 0,
           "to": 1.3333333730697632
         },
-        "events": []
+        "events": [
+          {
+            "frame": 1,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -458,7 +551,13 @@
           "from": 0,
           "to": 1.3333333730697632
         },
-        "events": []
+        "events": [
+          {
+            "frame": 1,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -481,7 +580,13 @@
           "from": 0,
           "to": 1.5666667222976685
         },
-        "events": []
+        "events": [],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1,
+        "auxiliaryCurves": {}
       },
       "ver": "1.0.18",
       "imported": true,
@@ -504,7 +609,19 @@
           "from": 0,
           "to": 1.3333333730697632
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.1,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1,
+        "auxiliaryCurves": {}
       },
       "ver": "1.0.18",
       "imported": true,
@@ -527,7 +644,13 @@
           "from": 0,
           "to": 1.3666666746139526
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.16666666666666666,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -550,7 +673,13 @@
           "from": 0,
           "to": 2.0999999046325684
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.6666666666666666,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -573,7 +702,19 @@
           "from": 0,
           "to": 0.9333333373069763
         },
-        "events": []
+        "events": [
+          {
+            "frame": 0.16666666666666666,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ],
+        "embeddedPlayers": [],
+        "editorExtras": {
+          "embeddedPlayerGroups": []
+        },
+        "speed": 1,
+        "auxiliaryCurves": {}
       },
       "ver": "1.0.18",
       "imported": true,
@@ -596,7 +737,13 @@
           "from": 0,
           "to": 2.5333333015441895
         },
-        "events": []
+        "events": [
+          {
+            "frame": 1.5,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,
@@ -619,7 +766,13 @@
           "from": 0,
           "to": 4.300000190734863
         },
-        "events": []
+        "events": [
+          {
+            "frame": 2,
+            "func": "triggerEffect",
+            "params": []
+          }
+        ]
       },
       "ver": "1.0.18",
       "imported": true,

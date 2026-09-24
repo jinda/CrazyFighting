@@ -3,18 +3,19 @@
     "__type__": "cc.Prefab",
     "_name": "fireBall01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_native": "",
     "data": {
       "__id__": 1
     },
     "optimizationPolicy": 0,
-    "asyncLoadAssets": false,
     "persistent": false
   },
   {
     "__type__": "cc.Node",
     "_name": "fireBall01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [
       {
@@ -24,14 +25,11 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 60
-      },
-      {
-        "__id__": 62
+        "__id__": 61
       }
     ],
     "_prefab": {
-      "__id__": 64
+      "__id__": 63
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -52,6 +50,7 @@
       "y": 1,
       "z": 1
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -65,6 +64,7 @@
     "__type__": "cc.Node",
     "_name": "meteorite01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": {
       "__id__": 1
     },
@@ -76,11 +76,11 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 56
+        "__id__": 57
       }
     ],
     "_prefab": {
-      "__id__": 59
+      "__id__": 60
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -97,10 +97,11 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 3,
-      "y": 3,
-      "z": 3
+      "x": 1,
+      "y": 1,
+      "z": 1
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -114,6 +115,7 @@
     "__type__": "cc.Node",
     "_name": "fire01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": {
       "__id__": 2
     },
@@ -125,7 +127,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 55
+      "__id__": 56
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -146,6 +148,7 @@
       "y": 1,
       "z": 1
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -159,6 +162,7 @@
     "__type__": "cc.ParticleSystem",
     "_name": "",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 3
     },
@@ -212,7 +216,7 @@
     "startLifetime": {
       "__id__": 15
     },
-    "duration": 1,
+    "duration": 0.1,
     "loop": true,
     "simulationSpeed": 1,
     "playOnAwake": true,
@@ -226,6 +230,13 @@
       "__id__": 18
     },
     "bursts": [],
+    "_renderCulling": false,
+    "_cullingMode": 0,
+    "_aabbHalfX": 0,
+    "_aabbHalfY": 0,
+    "_aabbHalfZ": 0,
+    "_dataCulling": false,
+    "enableCulling": false,
     "_colorOverLifetimeModule": {
       "__id__": 19
     },
@@ -250,13 +261,15 @@
     "_textureAnimationModule": {
       "__id__": 46
     },
-    "_trailModule": {
+    "_noiseModule": {
       "__id__": 49
     },
-    "renderer": {
-      "__id__": 54
+    "_trailModule": {
+      "__id__": 50
     },
-    "enableCulling": false,
+    "renderer": {
+      "__id__": 55
+    },
     "_prewarm": false,
     "_capacity": 40,
     "_simulationSpace": 0,
@@ -287,8 +300,8 @@
   {
     "__type__": "cc.CurveRange",
     "mode": 3,
-    "constantMin": 2,
-    "constantMax": 8,
+    "constantMin": 1,
+    "constantMax": 2,
     "multiplier": 1
   },
   {
@@ -336,7 +349,7 @@
   {
     "__type__": "cc.CurveRange",
     "mode": 0,
-    "constant": 0.15,
+    "constant": 0.05,
     "multiplier": 1
   },
   {
@@ -385,14 +398,14 @@
     "randomDirectionAmount": 0,
     "sphericalDirectionAmount": 0,
     "randomPositionAmount": 0,
-    "radius": 0.6,
+    "radius": 0.1,
     "radiusThickness": 1,
     "arcMode": 0,
     "arcSpread": 0,
     "arcSpeed": {
       "__id__": 22
     },
-    "length": 5,
+    "length": 1,
     "boxThickness": {
       "__type__": "cc.Vec3",
       "x": 0,
@@ -650,25 +663,42 @@
     "multiplier": 1
   },
   {
+    "__type__": "cc.NoiseModule",
+    "_enable": false,
+    "_strengthX": 10,
+    "_strengthY": 10,
+    "_strengthZ": 10,
+    "_noiseSpeedX": 0,
+    "_noiseSpeedY": 0,
+    "_noiseSpeedZ": 0,
+    "_noiseFrequency": 1,
+    "_remapX": 0,
+    "_remapY": 0,
+    "_remapZ": 0,
+    "_octaves": 1,
+    "_octaveMultiplier": 0.5,
+    "_octaveScale": 2
+  },
+  {
     "__type__": "cc.TrailModule",
     "_enable": false,
     "mode": 0,
     "lifeTime": {
-      "__id__": 50
+      "__id__": 51
     },
     "_minParticleDistance": 0.1,
     "existWithParticles": true,
     "textureMode": 0,
     "widthFromParticle": true,
     "widthRatio": {
-      "__id__": 51
+      "__id__": 52
     },
     "colorFromParticle": false,
     "colorOverTrail": {
-      "__id__": 52
+      "__id__": 53
     },
     "colorOvertime": {
-      "__id__": 53
+      "__id__": 54
     },
     "_space": 0,
     "_particleSystem": {
@@ -715,11 +745,17 @@
     "_velocityScale": 1,
     "_lengthScale": 1,
     "_mesh": null,
+    "_cpuMaterial": {
+      "__uuid__": "ea7478b0-408d-4052-b703-f0d2355e095f",
+      "__expectedType__": "cc.Material"
+    },
+    "_gpuMaterial": null,
     "_mainTexture": {
       "__uuid__": "b5b27ab1-e740-4398-b407-848fc2b2c897@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false
+    "_useGPU": false,
+    "_alignSpace": 2
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -729,18 +765,22 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "8eBAEw87JHaJnCkN/1SRNY"
+    "fileId": "8eBAEw87JHaJnCkN/1SRNY",
+    "instance": null,
+    "targetOverrides": null,
+    "nestedPrefabInstanceRoots": null
   },
   {
     "__type__": "cc.MeshRenderer",
     "_name": "meteorite01<MeshRenderer>",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 2
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 57
+      "__id__": 58
     },
     "_materials": [
       {
@@ -749,18 +789,23 @@
       }
     ],
     "_visFlags": 0,
-    "lightmapSettings": null,
+    "bakeSettings": {
+      "__id__": 59
+    },
     "_mesh": {
       "__uuid__": "c5eb5066-3ba4-4f69-9c8d-058e0112d0d2@5586c",
       "__expectedType__": "cc.Mesh"
     },
     "_shadowCastingMode": 0,
     "_shadowReceivingMode": 1,
+    "_shadowBias": 0,
+    "_shadowNormalBias": 0,
+    "_reflectionProbeId": -1,
+    "_reflectionProbeBlendId": -1,
+    "_reflectionProbeBlendWeight": 0,
+    "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "",
-    "bakeSettings": {
-      "__id__": 58
-    }
+    "_id": ""
   },
   {
     "__type__": "cc.CompPrefabInfo",
@@ -780,7 +825,11 @@
     "_castShadow": false,
     "_receiveShadow": false,
     "_recieveShadow": false,
-    "_lightmapSize": 64
+    "_lightmapSize": 64,
+    "_useLightProbe": false,
+    "_bakeToLightProbe": true,
+    "_reflectionProbeType": 0,
+    "_bakeToReflectionProbe": true
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -790,18 +839,22 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "eeE7hJzuhPLajTLfjfDE+g"
+    "fileId": "eeE7hJzuhPLajTLfjfDE+g",
+    "instance": null,
+    "targetOverrides": null,
+    "nestedPrefabInstanceRoots": null
   },
   {
     "__type__": "cc.Animation",
     "_name": "fireBall01<Animation>",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 1
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 61
+      "__id__": 62
     },
     "playOnLoad": false,
     "_clips": [
@@ -821,30 +874,6 @@
     "fileId": "c3rCG8KLJNfqCU/I0IfCp1"
   },
   {
-    "__type__": "07f78DYBgNKjKZNL1uL0JyA",
-    "_name": "",
-    "_objFlags": 0,
-    "node": {
-      "__id__": 1
-    },
-    "_enabled": true,
-    "__prefab": {
-      "__id__": 63
-    },
-    "effectType": 0,
-    "ani": {
-      "__id__": 60
-    },
-    "keepTime": 0.6,
-    "autoDestroy": false,
-    "playOnStart": false,
-    "_id": ""
-  },
-  {
-    "__type__": "cc.CompPrefabInfo",
-    "fileId": "a7UwadmBJCDJGaJg88FLEl"
-  },
-  {
     "__type__": "cc.PrefabInfo",
     "root": {
       "__id__": 1
@@ -852,6 +881,7 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "fd4raNm8RHVqTzZnb7D2bs"
+    "fileId": "fd4raNm8RHVqTzZnb7D2bs",
+    "targetOverrides": []
   }
 ]

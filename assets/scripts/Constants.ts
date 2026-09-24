@@ -1,75 +1,4 @@
 export class Constants {
-    /**
-     * 场景元素的分组
-     * @enum PANEL_GROUP
-     */
-    static PANEL_GROUP = {
-        /**
-         * ui 分组，静止
-         * @property UI_ROO
-         * @type {Number}
-         * @value 0
-         * @static
-         */
-        UI_ROOT: 0, // ui 分组，静止
-        /**
-         * 游戏分组，运动
-         * @property GAME_ROO
-         * @type {Number}
-         * @value 1
-         * @static
-         */
-        GAME_ROOT: 1, // 游戏分组，运动
-    };
-
-    /**
-     * 层级
-     * @enum PANEL_HIERARCHY
-     * @type {Object}
-     */
-    static PANEL_HIERARCHY = {
-        /**
-         * 基础层级
-         * @property BASE
-         * @type {Number}
-         * @value 1
-         * @static
-         */
-        BASE: 1, // 基础层级
-        /**
-         * 跑马灯层级，在弹窗之下，底层之上
-         * @property MARQUEE
-         * @type {Number}
-         * @value 5000
-         * @static
-         */
-        MARQUEE: 5000, // 跑马灯层级，在弹窗之下，底层之上
-        /**
-         * 二级界面层级，用于常见的界面等
-         * @property MODAL
-         * @type {Number}
-         * @value 10000
-         * @static
-         */
-        MODAL: 10000, // 二级界面层级，用于常见的界面等
-        /**
-         * 三级界面层级，用于二级界面的弹出层等
-         * @property POPUP
-         * @type {Number}
-         * @value 15000
-         * @static
-         */
-        POPUP: 15000, // 三级界面层级，用于二级界面的弹出层等
-        /**
-         * 提示层级，用于浮动提示框、确认提示框等
-         * @property TIPS
-         * @type {Number}
-         * @value 20000
-         * @static
-         */
-        TIPS: 20000, // 提示层级，用于浮动提示框、确认提示框等
-    };
-
     static FIGHTER_TYPE = {
         CLOSE: 1, //近战
         OX: 2, //牛角兵
@@ -79,24 +8,8 @@ export class Constants {
         BOMBER: 6, //投弹手
     };
 
-    //1奥特曼/2牛角/3短剑/4标枪/5投石车/6小丑
-    public static FIGHTER_MODEL: Record<number, string> = {
-        1: "axe",
-        2: "altman",
-        3: "soldier",
-        4: "javelin",
-        5: "catapult",
-        6: "clown",
-    };
-
-    //游戏名称
-    static GAME_NAME = "crazyFight";
-
     //先设置最多50关
     static MAX_LEVEL = 50;
-
-    //配置表加载兜底超时（毫秒）：超时后走错误分支，避免资源异常时首屏黑屏卡死
-    static LOAD_CONFIG_TIMEOUT = 8000;
 
     //士兵移动速度换算基数：166.6 = 10000/60帧
     //原实现中追击分支按“每帧位移”、冲锋分支按“每秒位移”，帧率不同速度就不同，这里统一为按秒计算
@@ -180,22 +93,11 @@ export class Constants {
     //敌人所在队伍
     static ENEMY_TEAM = 2;
 
-    //在线奖励相关
-    public static ONLINE = {
-        MAX_TIME: 1800, //30分钟
-        // MAX_TIME: 60,            //4个小时
-        PROFIT_PER_SECOND: 0.01, //每秒收益 当前买兵价格的1%
-        TIME_PER_CIRCLE: 10, //转一圈所需时间
-    };
-
     //火球伤害范围
     static FIRE_BALL_DISTANCE = 2.5;
 
     //50%的生命最大值
     static FIRE_BALL_DAMAGE_PERCENT = 0.5;
-
-    //火球的冷却时间
-    static FIRE_BALL_COOL_TIME = 10;
 
     //比例：像素 转成 米 的比例，对于物理引擎来说，他是按米来算的，这里取0.1
     static PTM_RATIO = 0.1;

@@ -128,8 +128,7 @@ export class Fighter extends Component {
         //回调必须校验加载代次、identity 与节点有效性，避免旧模型挂到新角色
         const loadGeneration = ++this._loadGeneration;
         const curIdentity = identity;
-        const modelName = Constants.FIGHTER_MODEL[Number(this.fighterInfo.type)];
-        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/model/man/${modelName}`, (pf: Prefab) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/model/role/${this.fighterInfo.model}`, (pf: Prefab) => {
             //代次校验：本次初始化已被回收/重新初始化，或节点已失效时，迟到的加载结果直接丢弃
             if (
                 loadGeneration !== this._loadGeneration ||
@@ -564,7 +563,7 @@ export class Fighter extends Component {
                 }
             } else {
                 //接着移动
-                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.RUN, true);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.WALK, true);
 
                 this._direction.set(offset);
                 //随机扰动 ±0.1：原实现 Math.floor(Math.random() * 0.2) - 0.1 因为 floor 恒为 0，
@@ -612,7 +611,7 @@ export class Fighter extends Component {
                 this._enterStatus(Constants.FIGHTER_STATUS.FIND);
             } else {
                 //接着移动
-                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.RUN, true);
+                this._fighterModel && this._fighterModel.playAniByIdx(Constants.ANI_TYPE.WALK, true);
 
                 this._direction.set(offset);
 

@@ -7,10 +7,12 @@ import {
     Prefab,
     AnimationComponent,
     SkinnedMeshRenderer,
+    MeshRenderer,
+    CCBoolean,
 } from "cc";
 import { Fighter } from "./Fighter";
 import { Constants } from "db://assets/scripts/Constants";
-import { Missile } from "./Missile";
+import { Weapon } from "./Weapon";
 import { GameMgr } from "./GameMgr";
 
 const { ccclass, property } = _decorator;
@@ -19,6 +21,8 @@ const { ccclass, property } = _decorator;
 export class FighterModel extends Component {
     @property([SkinnedMeshRenderer])
     public models: SkinnedMeshRenderer[] = []; //蒙皮网格渲染器组件
+    @property([MeshRenderer])
+    public msrs: MeshRenderer[] = []; //蒙皮网格渲染器组件
 
     @property([Material])
     public aryMaterial: Material[] = []; //材质皮肤数组
@@ -35,15 +39,12 @@ export class FighterModel extends Component {
     public ani: SkeletalAnimation = null!; //骨骼动画组件
 
     @property(Prefab)
-    public pfWeapon: Prefab = null!; //武器预制体
-    @property(Prefab)
-    public pfShield: Prefab = null!; //盾牌预制体
+    public pfThrowWeapon: Prefab = null!; //可以丢弃的武器预制体
+    @property(CCBoolean)
+    public bThrowWeapon: boolean = false; //可以丢弃的武器本体
 
     private _cb: Function = null!; //攻击后的回调函数
     private _target: any = null!; //士兵对应的fighter脚本
-    private _ndWeapon: Node = null!; //武器节点
-    private _ndShield: Node = null!; //武器节点
-    private _ndCrown: Node = null!; //皇冠节点
     private _currentAni: string = ""; //当前动画名称
     private _crownGeneration: number = 0; //皇冠异步加载代次：每次 show()/reset() 递增，防止模型复用后旧皇冠挂到新角色
 
@@ -76,39 +77,9 @@ export class FighterModel extends Component {
         this.models.forEach((model) => {
             model.material = this.aryMaterial[idxMaterial];
         });
-
-        if (this._ndWeapon) {
-            egf.PoolMgr.putNode(this._ndWeapon);
-            this._ndWeapon = null!;
-        }
-
-        if (this._ndCrown) {
-            egf.PoolMgr.putNode(this._ndCrown);
-            this._ndCrown = null!;
-        }
-
-        //生成武器在右手
-        if (this.pfWeapon) {
-            this._ndWeapon = egf.PoolMgr.getNode(this.pfWeapon, this.nodeWeapon);
-
-            // egf.Logger.log("pfWeapon:", this.pfWeapon.data);
-            this._ndWeapon.position = this.nodeWeapon.position;
-            this._ndWeapon.eulerAngles = this.nodeWeapon.eulerAngles;
-            this._ndWeapon.active = true;
-
-            let missile = this._ndWeapon.getComponent(Missile);
-            if (missile) {
-                missile.reset();
-            }
-        }
-        //生成武器在右手
-        if (this.pfShield) {
-            this._ndShield = egf.PoolMgr.getNode(this.pfShield, this.nodeShield);
-
-            this._ndShield.position = this.nodeWeapon.position;
-            this._ndShield.eulerAngles = this.nodeWeapon.eulerAngles;
-            this._ndShield.active = true;
-        }
+        this.msrs.forEach((msr) => {
+            msr.material = this.aryMaterial[idxMaterial];
+        });
 
         this.ndHead.active = !!crown;
 
@@ -192,8 +163,8 @@ export class FighterModel extends Component {
      * 展示手中的武器，远程兵在扔武器的时候会先隐藏手中的武器，扔完后再展示手中的武器
      */
     public showHandWeapon() {
-        if (this._ndWeapon && !this._ndWeapon.active) {
-            this._ndWeapon.active = true;
+        if (this.bThrowWeapon && this.nodeWeapon && !this.nodeWeapon.active) {
+            this.nodeWeapon.active = true;
         }
     }
 
@@ -202,15 +173,21 @@ export class FighterModel extends Component {
      * @param callback
      */
     public throwWeapon(parent: Node, target: Fighter, callback: Function) {
-        let ndThrow = egf.PoolMgr.getNode(this.pfWeapon, parent!);
-        ndThrow.setWorldPosition(this._ndWeapon.worldPosition);
-        ndThrow.setWorldRotation(this._ndWeapon.worldRotation);
+        if (!this.pfThrowWeapon) {
+            egf.Logger.error("throwWeapon error no prefab!");
+            return;
+        }
+        let ndThrow = egf.PoolMgr.getNode(this.pfThrowWeapon, parent!);
+        ndThrow.setWorldPosition(this.nodeWeapon.worldPosition);
+        ndThrow.setWorldRotation(this.nodeWeapon.worldRotation);
         let posTarget = target.node.worldPosition;
-        let scriptMissile = ndThrow.getComponent(Missile) as Missile;
-        scriptMissile.throwMissile(posTarget, 10 * GameMgr.timeScale, target, callback);
+        let weapon = ndThrow.getComponent(Weapon);
+        weapon.throwMissile(posTarget, 10 * GameMgr.timeScale, target, callback);
 
         //隐藏手中的武器
-        this._ndWeapon.active = false;
+        if (this.bThrowWeapon) {
+            this.nodeWeapon.active = false;
+        }
     }
 
     /**

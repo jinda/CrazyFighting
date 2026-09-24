@@ -1,4 +1,4 @@
-关卡,敌方阵容,解锁兵种,金币,系数
+﻿关卡,敌方阵容,解锁兵种,金币,系数
 number,string,string,number,number
 ID,formation,unlock,gold,coefficient
 1,804#1_804#2_804#3,,,1
