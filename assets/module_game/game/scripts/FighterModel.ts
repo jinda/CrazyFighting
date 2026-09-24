@@ -9,6 +9,7 @@ import {
     SkinnedMeshRenderer,
     MeshRenderer,
     CCBoolean,
+    AnimationClip,
 } from "cc";
 import { Fighter } from "./Fighter";
 import { Constants } from "db://assets/scripts/Constants";
@@ -126,7 +127,7 @@ export class FighterModel extends Component {
      * 攻击动画
      */
     public playAttack() {
-        this.playAniByIdx(Constants.ANI_TYPE.ATTACK);
+        this.playAniByIdx(Constants.ANI_TYPE.ATTACK, false);
     }
 
     /**
@@ -156,6 +157,7 @@ export class FighterModel extends Component {
         }
 
         this._currentAni = aniName;
+
         this.ani.play(aniName);
     }
 

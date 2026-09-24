@@ -37,7 +37,7 @@
       "name": "Death_A.animation",
       "userData": {
         "gltfIndex": 1,
-        "wrapMode": 2,
+        "wrapMode": 1,
         "sample": 30,
         "span": {
           "from": 0,
@@ -231,7 +231,7 @@
       "name": "Hit_A.animation",
       "userData": {
         "gltfIndex": 3,
-        "wrapMode": 2,
+        "wrapMode": 1,
         "sample": 30,
         "span": {
           "from": 0,
@@ -422,7 +422,7 @@
             "name": "Death_A",
             "from": 0,
             "to": 1.6666666269302368,
-            "wrapMode": 2,
+            "wrapMode": 1,
             "previousId": "38317"
           }
         ]
@@ -450,7 +450,7 @@
             "name": "Hit_A",
             "from": 0,
             "to": 0.699999988079071,
-            "wrapMode": 2,
+            "wrapMode": 1,
             "previousId": "abc43"
           }
         ]

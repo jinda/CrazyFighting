@@ -1,0 +1,97 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "46828234-5b02-4f5e-9f81-72e09a99c58a",
+  "files": [],
+  "subMetas": {
+    "32717": {
+      "importer": "gltf-scene",
+      "uuid": "46828234-5b02-4f5e-9f81-72e09a99c58a@32717",
+      "displayName": "",
+      "id": "32717",
+      "name": "hex_rock_waterA_empty.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "f9ea2": {
+      "importer": "gltf-mesh",
+      "uuid": "46828234-5b02-4f5e-9f81-72e09a99c58a@f9ea2",
+      "displayName": "",
+      "id": "f9ea2",
+      "name": "Cylinder.835.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 56
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "1f97b": {
+      "importer": "gltf-material",
+      "uuid": "46828234-5b02-4f5e-9f81-72e09a99c58a@1f97b",
+      "displayName": "",
+      "id": "1f97b",
+      "name": "Brown.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true,
+      "matchMeshNames": false
+    },
+    "assetFinder": {
+      "meshes": [
+        "46828234-5b02-4f5e-9f81-72e09a99c58a@f9ea2"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "46828234-5b02-4f5e-9f81-72e09a99c58a@1f97b"
+      ],
+      "scenes": [
+        "46828234-5b02-4f5e-9f81-72e09a99c58a@32717"
+      ]
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

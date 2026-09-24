@@ -1,0 +1,114 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "cbf41ac3-791c-4333-bbda-24884033e89c",
+  "files": [],
+  "subMetas": {
+    "83921": {
+      "importer": "gltf-scene",
+      "uuid": "cbf41ac3-791c-4333-bbda-24884033e89c@83921",
+      "displayName": "",
+      "id": "83921",
+      "name": "square_sand_detail.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "a44e1": {
+      "importer": "gltf-mesh",
+      "uuid": "cbf41ac3-791c-4333-bbda-24884033e89c@a44e1",
+      "displayName": "",
+      "id": "a44e1",
+      "name": "square_sand_detail_Material0.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 36
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "00773": {
+      "importer": "gltf-material",
+      "uuid": "cbf41ac3-791c-4333-bbda-24884033e89c@00773",
+      "displayName": "",
+      "id": "00773",
+      "name": "Beige.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "3fdbc": {
+      "importer": "gltf-material",
+      "uuid": "cbf41ac3-791c-4333-bbda-24884033e89c@3fdbc",
+      "displayName": "",
+      "id": "3fdbc",
+      "name": "BrownDark.material",
+      "userData": {
+        "gltfIndex": 1
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "fbx": {
+      "smartMaterialEnabled": true,
+      "matchMeshNames": false
+    },
+    "assetFinder": {
+      "meshes": [
+        "cbf41ac3-791c-4333-bbda-24884033e89c@a44e1"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "cbf41ac3-791c-4333-bbda-24884033e89c@00773",
+        "cbf41ac3-791c-4333-bbda-24884033e89c@3fdbc"
+      ],
+      "scenes": [
+        "cbf41ac3-791c-4333-bbda-24884033e89c@83921"
+      ]
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

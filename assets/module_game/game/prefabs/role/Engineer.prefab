@@ -2935,7 +2935,7 @@
     "playOnLoad": false,
     "_clips": [
       {
-        "__uuid__": "918b575a-287a-4d96-8ef1-9f3995fbf5be@7b6ce",
+        "__uuid__": "43126fe7-5d86-4732-885d-98b6af04fa84@711c1",
         "__expectedType__": "cc.AnimationClip"
       },
       {
@@ -2968,7 +2968,7 @@
       }
     ],
     "_defaultClip": {
-      "__uuid__": "918b575a-287a-4d96-8ef1-9f3995fbf5be@7b6ce",
+      "__uuid__": "43126fe7-5d86-4732-885d-98b6af04fa84@711c1",
       "__expectedType__": "cc.AnimationClip"
     },
     "_useBakedAnimation": true,
