@@ -2912,7 +2912,19 @@
         "__expectedType__": "cc.Material"
       },
       {
-        "__uuid__": "519887a8-a91a-4344-8375-c6ba559efdf4",
+        "__uuid__": "87f926af-4aff-47c9-9c23-89978c65a6a6",
+        "__expectedType__": "cc.Material"
+      },
+      {
+        "__uuid__": "b6d3023e-59ae-4815-8338-6c25205e1fa7",
+        "__expectedType__": "cc.Material"
+      },
+      {
+        "__uuid__": "9b073859-ab47-41e2-b334-1a54ff9324a6",
+        "__expectedType__": "cc.Material"
+      },
+      {
+        "__uuid__": "30f19be6-4ef9-4588-bffc-29eca7739a8d",
         "__expectedType__": "cc.Material"
       }
     ],
