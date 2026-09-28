@@ -22,3 +22,5 @@ node_modules/
 # WebStorm
 #//////////////////////////
 .idea/
+# AI 个人偏好（不入仓库）
+AGENTS.local.md

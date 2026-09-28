@@ -16,6 +16,7 @@ var resPkg = {
             urls: [
                 "ui_menu/UI_Menu",
                 "game/prefabs/role/Barbarian",
+                "game/prefabs/role/Skeleton_Minion",
                 "game/prefabs/fight/fighter",
                 "game/prefabs/fight/formationCell",
             ],
