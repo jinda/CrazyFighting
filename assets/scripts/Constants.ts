@@ -201,6 +201,24 @@ export class Constants {
      */
     public static LeaderboardMode = "crazyfight_level";
 
+    /**
+     * 资源账本上报场景（对应 ClientApi.gainCoin / consumeResource 的 scene，≤32 字节）
+     * 仅用于服务端审计与幂等键前缀，不影响本地结算逻辑
+     */
+    public static LEDGER_SCENE = {
+        UNKNOWN: "unknown", //未标注场景
+        LEVEL_WIN: "level_win", //关卡胜利结算
+        LEVEL_LOSE: "level_lose", //关卡失败结算
+        ONLINE_REWARD: "online_reward", //在线奖励
+        AD_REWARD: "ad_reward", //看广告领金币
+        DAILY_GIFT: "daily_gift", //每日礼包（看广告）
+        SIGN: "sign", //每日签到
+        SIGN_AD_DOUBLE: "sign_ad_double", //签到看广告双倍
+        UPGRADE_COIN: "upgrade_coin", //金币加成升级
+        UPGRADE_LAND: "upgrade_land", //购买土地
+        BUY_FIGHTER: "buy_fighter", //购买士兵
+    };
+
     // 技能CD时间
     public static SkillCD = 10;
     // 观看视频可领取金币数量

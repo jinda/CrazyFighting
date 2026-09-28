@@ -101,7 +101,7 @@ export class UI_Menu extends egf.UIController {
         egf.AudioMgr.playOneShot("tap");
         const coin = LocalDataMgr.getBuyCoinPrice();
         if (DataMgr.coin > coin) {
-            DataMgr.subCoin(coin);
+            DataMgr.subCoin(coin, Constants.LEDGER_SCENE.UPGRADE_COIN);
             LocalDataMgr.upgradeCoin();
             const layout = this.layout as Layout_Menu;
             layout.updateCoinCost();
@@ -119,7 +119,7 @@ export class UI_Menu extends egf.UIController {
         egf.AudioMgr.playOneShot("tap");
         const land = LocalDataMgr.getBuyCellPrice();
         if (DataMgr.coin > land) {
-            DataMgr.subCoin(land);
+            DataMgr.subCoin(land, Constants.LEDGER_SCENE.UPGRADE_LAND);
             LocalDataMgr.upgradeLand();
             this.addCell();
             const layout = this.layout as Layout_Menu;

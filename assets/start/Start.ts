@@ -137,6 +137,8 @@ export class Start extends Component {
 
         // ClientApi 内部已设置 Authorization Header
         LocalDataMgr.loadDataFromSever();
+        // 补报上次失败留存的账本/通关进度，并拉取一次服务端资源做校准
+        DataMgr.syncWithServer();
         egf.Logger.log("login success, uid:", data.user_info?.uid);
     }
 }

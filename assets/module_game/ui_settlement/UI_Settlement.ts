@@ -29,6 +29,8 @@ export class UI_Settlement extends egf.UIController {
             const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
             layout.showInfo(bWin, DataMgr.level, coin, addCoin);
             this.checkUnlock();
+            //上报通关进度：必须在 nextLevel 之前取当前关卡号（不额外落盘，由 nextLevel 一并保存）
+            DataMgr.reportLevelComplete(DataMgr.level, false);
             DataMgr.nextLevel();
             //播放胜利音效
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.WIN);
@@ -39,7 +41,7 @@ export class UI_Settlement extends egf.UIController {
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.FAIL);
         }
         egf.EventMgr.emit("add_coin_fly", { coin: coin });
-        DataMgr.addCoin(coin);
+        DataMgr.addCoin(coin, bWin ? Constants.LEDGER_SCENE.LEVEL_WIN : Constants.LEDGER_SCENE.LEVEL_LOSE);
     }
 
     private clickBack() {

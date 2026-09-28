@@ -50,14 +50,14 @@ export class UI_Award_Impl extends egf.UIController {
             egf.UIMgr.showUI(UI_CommonTips, null, this, commonParam);
         }
         if (this._params.bOnline) {
-            DataMgr.addCoin(this._params.coin);
+            DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.ONLINE_REWARD);
             egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
             DataMgr.onlineGetTime = Date.now();
             this.close();
         } else if (this._params.bDailyGift) {
             PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
                 if (ret) {
-                    DataMgr.addCoin(this._params.coin);
+                    DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.DAILY_GIFT);
                     egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
                     egf.EventMgr.emit("finish_task", "daily_gift");
                     this.close();
@@ -68,7 +68,7 @@ export class UI_Award_Impl extends egf.UIController {
         } else {
             PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
                 if (ret) {
-                    DataMgr.addCoin(this._params.coin);
+                    DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.AD_REWARD);
                     egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
                     this.close();
                 } else {
@@ -89,7 +89,7 @@ export class UI_Award_Impl extends egf.UIController {
         }
         PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
             if (ret) {
-                DataMgr.addCoin(this._params.coin * 2);
+                DataMgr.addCoin(this._params.coin * 2, Constants.LEDGER_SCENE.AD_REWARD);
                 egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin * 2 });
                 DataMgr.onlineGetTime = Date.now();
                 this.close();

@@ -1,6 +1,7 @@
 import { Layout_Sign } from "./Layout_Sign";
 import { ModuleDef } from "../../scripts/ModuleDef";
-import { game, Sprite, sys } from "cc";
+import { Sprite, sys } from "cc";
+import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { UI_CommonTips } from "../../scripts/UIDef";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
@@ -75,7 +76,7 @@ export class UI_Sign extends egf.UIController {
         if (day == 6) {
             coin = egf.Utils.getRandomInt(this._currentAward[day - 1], this._currentAward[day]);
         }
-        DataMgr.addCoin(coin);
+        DataMgr.addCoin(coin, Constants.LEDGER_SCENE.SIGN);
         egf.EventMgr.emit("add_coin_fly", { coin });
         this.updateSignState();
         this.close();
@@ -95,7 +96,7 @@ export class UI_Sign extends egf.UIController {
                     if (day == 6) {
                         coin = egf.Utils.getRandomInt(this._currentAward[day - 1], this._currentAward[day]);
                     }
-                    DataMgr.addCoin(coin * 2);
+                    DataMgr.addCoin(coin * 2, Constants.LEDGER_SCENE.SIGN_AD_DOUBLE);
                     egf.EventMgr.emit("add_coin_fly", { coin: coin * 2 });
                     this.updateSignState();
                     this.close();
