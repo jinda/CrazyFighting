@@ -29,6 +29,7 @@ export class Start extends Component {
 
         game.frameRate = _FPS;
         egf.AudioMgr.bundleName = ModuleDef.SOUNDS;
+        egf.i18nMgr.bundleName = ModuleDef.I18N;
         egf.UIMgr.setup(this.uiCanvasPrefab!, egf.UILayers.NUM, egf.UILayerNames);
         // 初始化 ClientApi（设置 X-Game-Code Header）
         ClientApi.inst.init();
@@ -55,6 +56,7 @@ export class Start extends Component {
     }
 
     onPreloadingComplete() {
+        egf.i18nMgr.setLanguage(LocalDataMgr.Setting.language);
         director.loadScene(SceneDef.GAME.name);
         PlatformMgr.reportEvent("loading_time", { time: game.totalTime });
     }

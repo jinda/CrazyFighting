@@ -53,13 +53,17 @@ export class UI_Menu extends egf.UIController {
                 layout.richTextTips.node.active = true;
                 layout.richTextTips.string = `<outline color=#5C3118 size=2>${egf.i18nMgr.getText("第#0关解锁#1", [
                     objNextUnlock.level + "",
-                    `<color=#00ff00>${fighter.name}</color>`,
+                    `<color=#00ff00>${egf.i18nMgr.getText(fighter.name)}</color>`,
                 ])}</outline>`;
             }
         }
 
         if (params?.bStartGame) {
             this.clickStart();
+        } else {
+            if (!LocalDataMgr.isSignToday()) {
+                egf.UIMgr.showUI(UI_Sign);
+            }
         }
     }
 
@@ -198,7 +202,7 @@ export class UI_Menu extends egf.UIController {
             ]);
         } else {
             power = 1; //攻击力提升1倍
-            tipsStr = "普通！";
+            tipsStr = egf.i18nMgr.getText("普通！");
         }
         egf.UI_Toast.show(tipsStr, 2);
         egf.Logger.log("showStart:", angleZ, power);

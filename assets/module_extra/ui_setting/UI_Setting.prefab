@@ -3164,7 +3164,7 @@
       "b": 255,
       "a": 255
     },
-    "_string": "震动",
+    "_string": "语言",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_actualFontSize": 34,
@@ -3225,7 +3225,7 @@
     "__prefab": {
       "__id__": 139
     },
-    "i18n_string": "震动",
+    "i18n_string": "语言",
     "i18n_params": [],
     "_id": ""
   },
