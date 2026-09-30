@@ -1,0 +1,80 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "83f69edf-51b4-458b-bb50-43d006ebbbfb",
+  "files": [],
+  "subMetas": {
+    "4e82f": {
+      "importer": "gltf-mesh",
+      "uuid": "83f69edf-51b4-458b-bb50-43d006ebbbfb@4e82f",
+      "displayName": "",
+      "id": "4e82f",
+      "name": "shizi.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 6
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "b50b2": {
+      "importer": "gltf-scene",
+      "uuid": "83f69edf-51b4-458b-bb50-43d006ebbbfb@b50b2",
+      "displayName": "",
+      "id": "b50b2",
+      "name": "strip.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "legacyFbxImporter": false,
+    "assetFinder": {
+      "meshes": [
+        "83f69edf-51b4-458b-bb50-43d006ebbbfb@4e82f"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [],
+      "scenes": [
+        "83f69edf-51b4-458b-bb50-43d006ebbbfb@b50b2"
+      ]
+    },
+    "fbx": {
+      "smartMaterialEnabled": false,
+      "matchMeshNames": false
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

@@ -866,7 +866,7 @@
     "ani": {
       "__id__": 60
     },
-    "keepTime": -1,
+    "keepTime": 0.33,
     "autoDestroy": false,
     "playOnStart": false,
     "_id": ""

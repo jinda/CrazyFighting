@@ -1,9 +1,8 @@
-import { _decorator, Component, Node, Vec3, ParticleSystemComponent, Prefab } from "cc";
+import { _decorator, Component, Node, Vec3, Prefab, v3, ParticleSystemComponent } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
 import { GameCfg } from "./GameConfig";
-import { ModuleDef } from "db://assets/scripts/ModuleDef";
-import { Effect } from "./Effect";
 import { GameMgr } from "./GameMgr";
+
 const { ccclass, property } = _decorator;
 //格子/土地节点脚本
 @ccclass("FormationCell")
@@ -37,8 +36,6 @@ export class FormationCell extends Component {
     private _isShowSimilar: boolean = false; //是否有与格子上士兵相同的士兵/格子上的士兵是否可以合成
     private _select: boolean = false; //是否被选中
     private _similarPos: Vec3 = new Vec3(0, 0.1, 0); //“合并提示特效”位置
-    private _sprintPos: Vec3 = new Vec3(0, 0.1, 0); //“冲刺暴走特效”位置
-    private _combinePos: Vec3 = new Vec3(0, 0.1, 0); //“合并成功特效”位置
     private _cellPos1: Vec3 = new Vec3(); //临时变量，格子位置
     private _cellPos2: Vec3 = new Vec3(); //临时变量，格子位置
 
@@ -150,23 +147,11 @@ export class FormationCell extends Component {
      */
     public showSimilar(isShow: boolean) {
         this._isShowSimilar = isShow;
-
-        if (this._isShowSimilar) {
-            if (!this._ndSimilar) {
-                egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/upLoop01", (pf: Prefab) => {
-                    if (!this.node.activeInHierarchy) {
-                        return;
-                    }
-
-                    if (this._isShowSimilar && !this._ndSimilar) {
-                        this._ndSimilar = egf.PoolMgr.getNode(pf, this.node);
-                        this._similarPos.set(0, 0.1, 0);
-                        this._ndSimilar.position = this._similarPos;
-                        let particle = this._ndSimilar.getComponentInChildren(ParticleSystemComponent);
-                        particle?.play();
-                    }
-                });
-            }
+        // egf.Logger.log("showSimilar:", this._isShowSimilar, this._ndSimilar);
+        if (this._isShowSimilar && !this._ndSimilar) {
+            GameMgr.effectGroup.playEffect("upLoop01", this.node, v3(0, 0.1, 0), undefined, (effectNode: Node) => {
+                this._ndSimilar = effectNode;
+            });
         } else if (this._ndSimilar) {
             let particle = this._ndSimilar.getComponentInChildren(ParticleSystemComponent);
             particle?.clear();
@@ -180,44 +165,13 @@ export class FormationCell extends Component {
      * 展示合并成功特效
      */
     public showCombineSucceed() {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/upClick", (pf: Prefab) => {
-            if (!this.node.activeInHierarchy) {
-                return;
-            }
-            let nodeCombine = egf.PoolMgr.getNode(pf, this.node);
-            this._combinePos.set(0, 0.1, 0);
-            nodeCombine.position = this._combinePos;
-
-            let effect = nodeCombine.getComponent(Effect);
-            effect.play();
-            effect.setEndListener(() => {
-                egf.PoolMgr.putNode(nodeCombine);
-            });
-        });
+        GameMgr.effectGroup.playEffect("upClick", this.node, v3(0, 0.1, 0));
     }
 
     /**
      * 格子上展示冲刺暴走特效
      */
     public showSprint() {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/goBallistic01", (pf: Prefab) => {
-            if (!this.node.activeInHierarchy) {
-                return;
-            }
-
-            let nodeSprint = egf.PoolMgr.getNode(pf, this.node);
-            this._sprintPos.set(0, 0.1, 0);
-            nodeSprint.position = this._sprintPos;
-
-            let effect = nodeSprint.getComponent(Effect);
-            effect.play();
-            effect.setEndListener(() => {
-                egf.PoolMgr.putNode(nodeSprint);
-            });
-        });
+        GameMgr.effectGroup.playEffect("goBallistic01", this.node, v3(0, 0.1, 0));
     }
-
-    // update (deltaTime: number) {
-    //     // Your update function goes here.
-    // }
 }

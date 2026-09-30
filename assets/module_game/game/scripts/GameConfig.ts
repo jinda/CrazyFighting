@@ -21,6 +21,9 @@ class GameConfig {
 
         const levelContent = egf.ResMgr.getAsset(ModuleDef.GAME, "datas/level");
         this._csvManager.addTable("level", levelContent.text);
+
+        const skillContent = egf.ResMgr.getAsset(ModuleDef.GAME, "datas/skill");
+        this._csvManager.addTable("skill", skillContent.text);
     }
 
     /**

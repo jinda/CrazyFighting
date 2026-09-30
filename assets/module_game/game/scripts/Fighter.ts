@@ -6,6 +6,7 @@ import { FighterRigidBody } from "./FighterRigidBody";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
 import { PlatformMgr } from "db://assets/scripts/SDK/PlatformMgr";
 import { GameMgr } from "./GameMgr";
+import { GameCfg } from "./GameConfig";
 
 //敌我双方士兵脚本
 const { ccclass, property } = _decorator;
@@ -26,6 +27,7 @@ export class Fighter extends Component {
     public hpMax: number = 0; //最大血量
     public cellPos: number = 0; //所属格子坐标
     public target: Fighter = null!; //目标敌人的脚本
+    public bPlayingChairEffect = false; //是否正在播放被击中的特效
 
     //刚体半径
     public get radius() {
@@ -48,7 +50,6 @@ export class Fighter extends Component {
     private _fightStartTargetPos: Vec3 = new Vec3(); //开始游戏后士兵到达的第一个位置
     private _nodeModel: Node = null!; //士兵模型
     private _fighterModel: FighterModel = null!; //士兵模型的脚本
-    private _isPlayingChairEffect = false; //是否正在播放被击中的特效
     private _curPos: Vec3 = new Vec3(); //当前位置
     private _outPos: Vec3 = new Vec3(); //士兵阵亡后退的位置
     private _oriEuler: Vec3 = new Vec3(); //士兵初始欧拉角
@@ -57,6 +58,8 @@ export class Fighter extends Component {
     private _forward: Vec3 = new Vec3(); //士兵节点朝向的单位向量
     private _direction: Vec3 = new Vec3(); //士兵朝向目标位移的向量差
     private _startOffset: Vec3 = new Vec3(); //开始位置和目标位置的向量差
+
+    private _skillInfo: any = {};
 
     start() {
         //士兵播放待机动画
@@ -94,6 +97,9 @@ export class Fighter extends Component {
         this.identity = identity;
         this.fighterInfo = fighterInfo;
         this.fightType = fighterInfo.type;
+        const skillInfo = GameCfg.queryByID("skill", fighterInfo.skill);
+        // egf.Logger.log("skill info:", fighterInfo.skill, skillInfo);
+        this._skillInfo = skillInfo;
         this.team = team;
         this.ndShadow.active = true;
 
@@ -103,7 +109,7 @@ export class Fighter extends Component {
         this._coolTime = 0;
         this._isWaitingDamage = false;
         this._isAttacking = false;
-        this._isPlayingChairEffect = false;
+        this.bPlayingChairEffect = false;
 
         this._enterStatus(Constants.FIGHTER_STATUS.IDLE);
 
@@ -161,11 +167,7 @@ export class Fighter extends Component {
         this._damage = this.fighterInfo.attack;
         this._moveSpeed = this.fighterInfo.speed;
 
-        if (
-            this.fightType === Constants.FIGHTER_TYPE.CLOSE ||
-            this.fightType === Constants.FIGHTER_TYPE.OX ||
-            this.fightType === Constants.FIGHTER_TYPE.BAT
-        ) {
+        if (this.fightType === Constants.FIGHTER_TYPE.CLOSE) {
             //近战的会执行速度30%的浮动
             let percent = 0.2;
             this._moveSpeed = Math.floor(
@@ -256,23 +258,13 @@ export class Fighter extends Component {
      * 部分士兵播放攻击特效
      */
     private _playAttackEffect() {
-        let effect = null;
-        if (this.fightType === Constants.FIGHTER_TYPE.OX || this.fightType === Constants.FIGHTER_TYPE.BAT) {
-            effect = "attckRing01";
-        } else if (this.fightType === Constants.FIGHTER_TYPE.CLOSE) {
-            effect = "attck01";
-        }
-
+        const effect = this._skillInfo.release;
         if (effect) {
-            egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/effect/${effect}`, (pf: Prefab) => {
-                let ndEffect = egf.PoolMgr.getNode(pf, this.node);
-                let effect = ndEffect.getComponent(Effect);
-
-                effect.play();
-                effect.setEndListener(() => {
-                    egf.PoolMgr.putNode(ndEffect);
-                });
-            });
+            GameMgr.effectGroup.playEffect(effect, this.node, Vec3.ZERO);
+        }
+        const sound = this._skillInfo.release_sound;
+        if (sound) {
+            egf.AudioMgr.playOneShot(sound);
         }
     }
 
@@ -418,57 +410,43 @@ export class Fighter extends Component {
         this._isWaitingDamage = false;
         if (this.target && !this.target.isDead) {
             //是否远程兵/是否扔武器
-            let isThrowWeapon =
-                this.fightType === Constants.FIGHTER_TYPE.ARCHER ||
-                this.fightType === Constants.FIGHTER_TYPE.AXE ||
-                this.fightType === Constants.FIGHTER_TYPE.BOMBER;
-            if (isThrowWeapon) {
-                let posTarget = this.target.node.worldPosition;
-
+            const flyEffect = this._skillInfo.fly;
+            if (flyEffect) {
                 //扔武器
                 this._fighterModel.throwWeapon(this.node.parent!, this.target, (target: Fighter) => {
                     //触发特效
-                    if (this.fightType === Constants.FIGHTER_TYPE.ARCHER) {
-                        //弓箭手
-                        GameMgr.effectGroup.playBombEffect(posTarget);
-                    } else if (!target._isPlayingChairEffect) {
-                        //如果目标没有正在播放被击中特效，则生成新特效
-
-                        //小丑、枪兵暂用同一个特效
-                        target._isPlayingChairEffect = true;
-                        GameMgr.effectGroup.playChairEffect(posTarget, () => {
-                            target._isPlayingChairEffect = false;
-                        });
-                    }
-
-                    //单个士兵被击中后，如果范围伤害属性大于0，则该士兵和以该士兵为中心的指定范围内的同队士兵受到攻击，否则只有该士兵受到攻击
-                    let range = this.fighterInfo["damageRange"] / 100;
-                    if (range > 0) {
-                        let arrTargets = GameMgr.getEnemyAroundRange(this.team, target.node.position, range);
-
-                        arrTargets.forEach((enemy) => {
-                            enemy.onDamage(this._damage, this.identity);
-                        });
-                    } else if (target && !target.isDead) {
-                        target.onDamage(this._damage, this.identity);
-                    }
+                    this.hitEffect(target);
 
                     //扔完后展示手中的武器
                     this._fighterModel.showHandWeapon();
                 });
             } else {
-                //近战攻击
-                let range = this.fighterInfo["damageRange"] / 100;
-                if (range > 0) {
-                    let arrTargets = GameMgr.getEnemyAroundRange(this.team, this.target.node.position, range);
-
-                    arrTargets.forEach((enemy) => {
-                        enemy.onDamage(this._damage, this.identity);
-                    });
-                } else if (this.target && !this.target.isDead) {
-                    this.target.onDamage(this._damage, this.identity);
-                }
+                //触发特效
+                this.hitEffect(this.target);
             }
+        }
+    }
+
+    private hitEffect(target: Fighter) {
+        const hitEffect = this._skillInfo.hit;
+        if (hitEffect) {
+            const posTarget = this.target.node.worldPosition;
+            GameMgr.effectGroup.playChairEffect(hitEffect, posTarget);
+        }
+        const sound = this._skillInfo.hit_sound;
+        if (sound) {
+            egf.AudioMgr.playOneShot(sound);
+        }
+
+        const range = this.fighterInfo["damageRange"] / 100;
+        if (range > 0) {
+            const arrTargets = GameMgr.getEnemyAroundRange(this.team, target.node.position, range);
+
+            arrTargets.forEach((enemy) => {
+                enemy.onDamage(this._damage, this.identity);
+            });
+        } else if (target && !target.isDead) {
+            target.onDamage(this._damage, this.identity);
         }
     }
 

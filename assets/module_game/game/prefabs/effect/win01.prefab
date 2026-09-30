@@ -735,7 +735,7 @@
     },
     "effectType": 1,
     "ani": null,
-    "keepTime": -1,
+    "keepTime": 1,
     "autoDestroy": false,
     "playOnStart": false,
     "_id": ""

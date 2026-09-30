@@ -1,0 +1,42 @@
+{
+  "ver": "1.0.27",
+  "importer": "image",
+  "imported": true,
+  "uuid": "1f0b5fe3-92d7-4948-adb5-7f9c2c94a359",
+  "files": [
+    ".json",
+    ".png"
+  ],
+  "subMetas": {
+    "6c48a": {
+      "importer": "texture",
+      "uuid": "1f0b5fe3-92d7-4948-adb5-7f9c2c94a359@6c48a",
+      "displayName": "FX_SWave_06_TEX_HKB",
+      "id": "6c48a",
+      "name": "texture",
+      "userData": {
+        "wrapModeS": "repeat",
+        "wrapModeT": "repeat",
+        "minfilter": "linear",
+        "magfilter": "linear",
+        "mipfilter": "none",
+        "anisotropy": 0,
+        "isUuid": true,
+        "imageUuidOrDatabaseUri": "1f0b5fe3-92d7-4948-adb5-7f9c2c94a359",
+        "visible": false
+      },
+      "ver": "1.0.22",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "hasAlpha": true,
+    "type": "texture",
+    "redirect": "1f0b5fe3-92d7-4948-adb5-7f9c2c94a359@6c48a",
+    "fixAlphaTransparencyArtifacts": false
+  }
+}

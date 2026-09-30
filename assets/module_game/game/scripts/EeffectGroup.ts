@@ -1,19 +1,31 @@
-import { _decorator, Component, Vec3, instantiate, Prefab } from "cc";
+import { _decorator, Component, Vec3, instantiate, Prefab, Node } from "cc";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
 import { Effect } from "./Effect";
 const { ccclass } = _decorator;
 //管理特效播放脚本
 @ccclass("EffectGroup")
 export class EffectGroup extends Component {
-    /* class member could be defined like this */
-    // dummy = '';
+    /**
+     * 播放特定节点的特效
+     * @param posWorld
+     * @param endCb
+     */
+    public playEffect(effect: string, parent: Node, pos: Vec3, endCb?: Function, loadCb?: (node: Node) => void) {
+        egf.Logger.log("playEffect:", effect);
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/effect/${effect}`, (pf: Prefab) => {
+            const ndEffect = egf.PoolMgr.getNode(pf, parent);
 
-    /* use `property` decorator if your want the member to be serializable */
-    // @property
-    // serializableDummy = 0;
+            ndEffect.position = pos;
 
-    start() {
-        // Your initialization goes here.
+            const effect = ndEffect.getComponent(Effect);
+            effect?.play();
+            effect?.setEndListener(() => {
+                egf.PoolMgr.putNode(ndEffect);
+
+                endCb && endCb();
+            });
+            loadCb && loadCb(ndEffect);
+        });
     }
 
     /**
@@ -21,18 +33,17 @@ export class EffectGroup extends Component {
      * @param posWorld
      * @param endCb
      */
-    public playChairEffect(posWorld: Vec3, endCb?: Function) {
-        egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/hit01", (pf: Prefab) => {
+    public playChairEffect(effect: string, posWorld: Vec3, endCb?: Function) {
+        egf.Logger.log("playChairEffect:", effect);
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/effect/${effect}`, (pf: Prefab) => {
             const ndEffect = egf.PoolMgr.getNode(pf, this.node);
 
             posWorld.y = 0.1;
             ndEffect.setWorldPosition(posWorld);
 
             const effect = ndEffect.getComponent(Effect);
-
-            effect.play();
-
-            effect.setEndListener(() => {
+            effect?.play();
+            effect?.setEndListener(() => {
                 egf.PoolMgr.putNode(ndEffect);
 
                 endCb && endCb();
@@ -53,10 +64,8 @@ export class EffectGroup extends Component {
             ndEffect.setWorldPosition(posWorld);
 
             const effect = ndEffect.getComponent(Effect);
-
-            effect.play();
-
-            effect.setEndListener(() => {
+            effect?.play();
+            effect?.setEndListener(() => {
                 egf.PoolMgr.putNode(ndEffect);
             });
         });
@@ -73,11 +82,9 @@ export class EffectGroup extends Component {
             ndEffect.parent = this.node;
             ndEffect.setWorldPosition(posWorld);
 
-            const effect = ndEffect.getComponent(Effect) as Effect;
-
-            effect.play();
-
-            effect.setEndListener(() => {
+            const effect = ndEffect.getComponent(Effect);
+            effect?.play();
+            effect?.setEndListener(() => {
                 this.playBombEffect(posWorld, 2);
                 ndEffect.destroy();
                 callback && callback();
@@ -96,19 +103,13 @@ export class EffectGroup extends Component {
             ndEffect.parent = this.node;
             ndEffect.setWorldPosition(posWorld);
 
-            const effect = ndEffect.getComponent(Effect) as Effect;
-
-            effect.play();
-
-            effect.setEndListener(() => {
+            const effect = ndEffect.getComponent(Effect);
+            effect?.play();
+            effect?.setEndListener(() => {
                 ndEffect.destroy();
 
                 callback && callback();
             });
         });
     }
-
-    // update (deltaTime: number) {
-    //     // Your update function goes here.
-    // }
 }

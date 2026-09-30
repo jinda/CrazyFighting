@@ -119,9 +119,11 @@ export class Layout_Menu extends Component {
         this.nodeSoldierCost.active = bEnoughFighter;
         this.nodeSoldierAd.active = !bEnoughFighter;
 
-        const bEnoughLand = DataMgr.coin > coin;
+        const bEnoughLand = DataMgr.coin > land;
         this.nodeLandCost.active = bEnoughLand;
         this.nodeLandAd.active = !bEnoughLand;
+
+        egf.Logger.log("updateCoinCost:", DataMgr.coin, coin, fighter, land);
 
         this.labelCoinLv.string = "Lv." + LocalDataMgr.GameInfo.coinLv;
         this.labelSoldierLv.string = "Lv." + LocalDataMgr.GameInfo.fighterLv;

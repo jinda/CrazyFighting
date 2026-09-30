@@ -1,4 +1,17 @@
-import { _decorator, Component, Node, Prefab, Vec3, Vec2, geometry, PhysicsSystem, BoxCollider, find, view } from "cc";
+import {
+    _decorator,
+    Component,
+    Node,
+    Prefab,
+    Vec3,
+    Vec2,
+    geometry,
+    PhysicsSystem,
+    BoxCollider,
+    find,
+    view,
+    instantiate,
+} from "cc";
 import { Follow } from "./Follow";
 import { EffectGroup } from "./EeffectGroup";
 import { Constants } from "db://assets/scripts/Constants";
@@ -11,6 +24,7 @@ import { GameCfg } from "./GameConfig";
 import { UI_Menu } from "../../ui_menu/UI_Menu";
 import { UI_Fighter } from "../../ui_fighter/UI_Fighter";
 import BackResPkg from "db://assets/scripts/BackResPkg";
+import { ModuleDef } from "db://assets/scripts/ModuleDef";
 
 const { ccclass, property } = _decorator;
 //“管理所有士兵”的脚本
@@ -30,6 +44,8 @@ export class FighterLogic extends Component {
 
     @property(Node)
     public nodeFighters: Node = null!; //战士节点
+    @property(Node)
+    public nodeMap: Node = null!; //战士节点
 
     private _dictCell: any = {}; //存放我方士兵格子节点的字典
     private _aryCell: any[] = []; //存放敌我双方格子节点的数组
@@ -161,6 +177,14 @@ export class FighterLogic extends Component {
         this.initFighters();
 
         this._checkSimilar();
+
+        const randMapId = egf.Utils.getRandomInt(1, 3);
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/map/Map0${randMapId}`, (prefab: Node) => {
+            egf.Logger.log("fight reset map:", randMapId);
+            this.nodeMap.removeAllChildren();
+            const nodeMap = instantiate(prefab);
+            nodeMap.parent = this.nodeMap;
+        });
     }
 
     /*
@@ -203,14 +227,14 @@ export class FighterLogic extends Component {
             fightData = {
                 1: [
                     // 0, 302, 0, 0, 0
-                    301, 302, 603, 0, 105, 0, 102, 103, 0, 101, 401, 402, 0, 403, 201, 0, 202, 203, 0, 204, 601, 602, 0,
-                    303, 0,
+                    // 101, 201, 301, 401, 501, 601,
+                    601,
                 ],
 
                 2: [
                     // 0, 302, 0, 0, 0
-                    104, 0, 303, 302, 301, 101, 102, 103, 0, 0, 401, 0, 403, 402, 201, 203, 202, 0, 0, 204, 601, 0, 603,
-                    0, 602,
+                    // 701, 801, 901, 1001, 1101, 1201, 1301, 1401, 1501,
+                    1101,
                 ],
             };
         }
@@ -240,7 +264,7 @@ export class FighterLogic extends Component {
         this._curTime = 0;
         this._timeScale = 1;
 
-        egf.Logger.log("fightStart power:", power, GameMgr.dictFighter);
+        egf.Logger.log("fightStart power:", power);
 
         //相机跟随
         this.cameraFollow.startGame();
@@ -802,11 +826,7 @@ export class FighterLogic extends Component {
      * @returns
      */
     private _isCloseFighter(type: number) {
-        return (
-            type === Constants.FIGHTER_TYPE.CLOSE ||
-            type === Constants.FIGHTER_TYPE.BAT ||
-            type === Constants.FIGHTER_TYPE.OX
-        );
+        return type === Constants.FIGHTER_TYPE.CLOSE;
     }
 
     /**

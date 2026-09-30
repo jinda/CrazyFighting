@@ -1,0 +1,98 @@
+{
+  "ver": "2.3.14",
+  "importer": "fbx",
+  "imported": true,
+  "uuid": "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf",
+  "files": [],
+  "subMetas": {
+    "5f75d": {
+      "importer": "gltf-mesh",
+      "uuid": "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf@5f75d",
+      "displayName": "",
+      "id": "5f75d",
+      "name": "Plane004.mesh",
+      "userData": {
+        "gltfIndex": 0,
+        "triangleCount": 4
+      },
+      "ver": "1.1.1",
+      "imported": true,
+      "files": [
+        ".bin",
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "ea6e2": {
+      "importer": "gltf-material",
+      "uuid": "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf@ea6e2",
+      "displayName": "",
+      "id": "ea6e2",
+      "name": "DefaultMaterial.material",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    },
+    "93aa4": {
+      "importer": "gltf-scene",
+      "uuid": "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf@93aa4",
+      "displayName": "",
+      "id": "93aa4",
+      "name": "plan_shizi.prefab",
+      "userData": {
+        "gltfIndex": 0
+      },
+      "ver": "1.0.14",
+      "imported": true,
+      "files": [
+        ".json"
+      ],
+      "subMetas": {}
+    }
+  },
+  "userData": {
+    "imageMetas": [],
+    "assetFinder": {
+      "meshes": [
+        "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf@5f75d"
+      ],
+      "skeletons": [],
+      "textures": [],
+      "materials": [
+        "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf@ea6e2"
+      ],
+      "scenes": [
+        "bc7fbee3-9762-44f3-b95c-cccdb84fc0cf@93aa4"
+      ]
+    },
+    "legacyFbxImporter": true,
+    "fbx": {
+      "smartMaterialEnabled": false,
+      "matchMeshNames": false
+    },
+    "lods": {
+      "enable": false,
+      "hasBuiltinLOD": false,
+      "options": [
+        {
+          "screenRatio": 0.25,
+          "faceCount": 1
+        },
+        {
+          "screenRatio": 0.125,
+          "faceCount": 0.25
+        },
+        {
+          "screenRatio": 0.01,
+          "faceCount": 0.1
+        }
+      ]
+    }
+  }
+}

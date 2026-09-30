@@ -286,8 +286,7 @@
     "fileId": "ecvhzyc3FSDIfJ52i987+V",
     "instance": {
       "__id__": 4
-    },
-    "targetOverrides": null
+    }
   },
   {
     "__type__": "cc.PrefabInstance",
@@ -346,7 +345,7 @@
     "value": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -2,
+      "y": -0.1,
       "z": 0
     }
   },
@@ -516,7 +515,7 @@
     "value": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -2.972,
+      "y": -1.098,
       "z": 0
     }
   },
@@ -646,7 +645,7 @@
     "value": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": -2.966,
+      "y": -1.088,
       "z": 0
     }
   },
@@ -9919,6 +9918,7 @@
       "__id__": 0
     },
     "fileId": "b5u9XoNGBPWZk+1TnUyPPB",
+    "instance": null,
     "targetOverrides": null,
     "nestedPrefabInstanceRoots": [
       {

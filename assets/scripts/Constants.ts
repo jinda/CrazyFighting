@@ -1,11 +1,7 @@
 export class Constants {
     static FIGHTER_TYPE = {
         CLOSE: 1, //近战
-        OX: 2, //牛角兵
-        BAT: 3, //球棒兵
-        AXE: 4, //斧头兵
-        ARCHER: 5, //弓箭手
-        BOMBER: 6, //投弹手
+        REMOTE: 2, //远程
     };
 
     //先设置最多50关

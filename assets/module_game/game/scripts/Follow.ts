@@ -47,8 +47,8 @@ export class Follow extends Component {
      */
     public initCamera(isFirstLevel: boolean) {
         //当前视角
-        this.node.setWorldPosition(-27.6, 21, 0);
-        this.node.setWorldRotationFromEuler(-60, -90, 0);
+        this.node.setWorldPosition(-31, 20, 0);
+        this.node.setWorldRotationFromEuler(-50, -90, 0);
 
         //正面视角
         // this.node.setWorldPosition(new Vec3(10, 19, 0));

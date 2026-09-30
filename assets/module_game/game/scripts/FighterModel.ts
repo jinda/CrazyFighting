@@ -9,7 +9,6 @@ import {
     SkinnedMeshRenderer,
     MeshRenderer,
     CCBoolean,
-    AnimationClip,
 } from "cc";
 import { Fighter } from "./Fighter";
 import { Constants } from "db://assets/scripts/Constants";
@@ -179,12 +178,12 @@ export class FighterModel extends Component {
             egf.Logger.error("throwWeapon error no prefab!");
             return;
         }
-        let ndThrow = egf.PoolMgr.getNode(this.pfThrowWeapon, parent!);
+        const ndThrow = egf.PoolMgr.getNode(this.pfThrowWeapon, parent!);
         ndThrow.setWorldPosition(this.nodeWeapon.worldPosition);
         ndThrow.setWorldRotation(this.nodeWeapon.worldRotation);
-        let posTarget = target.node.worldPosition;
-        let weapon = ndThrow.getComponent(Weapon);
-        weapon.throwMissile(posTarget, 10 * GameMgr.timeScale, target, callback);
+        const posTarget = target.node.worldPosition;
+        const weapon = ndThrow.getComponent(Weapon);
+        weapon?.throwMissile(posTarget, 10 * GameMgr.timeScale, target, callback);
 
         //隐藏手中的武器
         if (this.bThrowWeapon) {
@@ -196,7 +195,7 @@ export class FighterModel extends Component {
      * 更新士兵动画速度
      */
     public updateAniSpeed() {
-        let aryClips = this.ani.clips;
+        const aryClips = this.ani.clips;
         aryClips.forEach((clip: any) => {
             clip.speed = GameMgr.timeScale;
         });

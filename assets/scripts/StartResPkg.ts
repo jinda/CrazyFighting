@@ -23,7 +23,7 @@ var resPkg = {
         },
         {
             assetType: TextAsset,
-            urls: ["datas/fighter", "datas/level"],
+            urls: ["datas/fighter", "datas/level", "datas/skill"],
         },
     ],
     module_i18n: [
