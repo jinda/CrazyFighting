@@ -1,4 +1,5 @@
 import { _decorator, Sprite, Component, isValid, CCString } from "cc";
+import { i18nMgr } from "../i18nMgr";
 const { ccclass, property, executeInEditMode, disallowMultiple, requireComponent, menu } = _decorator;
 
 @ccclass
@@ -13,7 +14,7 @@ export class i18nSprite extends Component {
     start() {
         // TODO:
         //@ts-ignore
-        // i18nMgr._addOrDelSprite(this, true);
+        i18nMgr._addOrDelSprite(this, true);
         this._resetValue();
     }
 
@@ -27,12 +28,11 @@ export class i18nSprite extends Component {
 
         let sprite = this.getComponent(Sprite);
         if (isValid(sprite)) {
-            // TODO: Not Implemented
-            // i18nMgr._getSprite(value, (spriteFrame) => {
-            //   if (isValid(sprite)) {
-            //     sprite.spriteFrame = spriteFrame;
-            //   }
-            // });
+            i18nMgr._getSprite(value, (spriteFrame) => {
+                if (isValid(sprite)) {
+                    sprite.spriteFrame = spriteFrame;
+                }
+            });
         }
     }
 
@@ -42,6 +42,6 @@ export class i18nSprite extends Component {
 
     onDestroy() {
         // TODO: Not Implemented
-        // i18nMgr._addOrDelSprite(this, false);
+        i18nMgr._addOrDelSprite(this, false);
     }
 }

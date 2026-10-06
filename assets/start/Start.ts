@@ -24,6 +24,12 @@ export class Start extends Component {
     @property(ProgressBar)
     loadingBar: ProgressBar = null!;
 
+    protected onLoad(): void {
+        PlatformMgr.reportEvent("game_show", {
+            time: game.totalTime,
+        });
+    }
+
     start() {
         egf.ModuleContext.setDefaultModule(ModuleDef.GAME);
 
@@ -53,6 +59,9 @@ export class Start extends Component {
         const percent = ~~((now / total) * 100) + "%";
         this.txtLoading!.string = percent;
         this.loadingBar!.progress = now / total;
+        if (now == 1) {
+            egf.i18nMgr.setLanguage(LocalDataMgr.Setting.language);
+        }
     }
 
     onPreloadingComplete() {

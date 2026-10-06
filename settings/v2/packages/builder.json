@@ -113,5 +113,15 @@
         }
       }
     }
+  },
+  "splash-setting": {
+    "background": {
+      "image": "project://settings/loading.png",
+      "type": "custom"
+    },
+    "logo": {
+      "type": "none"
+    },
+    "totalTime": 500
   }
 }

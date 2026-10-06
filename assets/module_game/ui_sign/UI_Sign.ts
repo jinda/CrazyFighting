@@ -80,6 +80,9 @@ export class UI_Sign extends egf.UIController {
         egf.EventMgr.emit("add_coin_fly", { coin });
         this.updateSignState();
         this.close();
+        PlatformMgr.reportEvent("game_sign", {
+            day: day,
+        });
     }
 
     clickDoubleGet() {
@@ -100,6 +103,9 @@ export class UI_Sign extends egf.UIController {
                     egf.EventMgr.emit("add_coin_fly", { coin: coin * 2 });
                     this.updateSignState();
                     this.close();
+                    PlatformMgr.reportEvent("game_sign_ad", {
+                        day: day,
+                    });
                 }
             } else {
                 egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));

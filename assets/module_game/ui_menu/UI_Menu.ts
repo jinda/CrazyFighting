@@ -1,6 +1,7 @@
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
+import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { UI_Award } from "../../scripts/UIDef";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { GameMgr } from "../game/scripts/GameMgr";
@@ -12,6 +13,8 @@ import { Layout_Menu } from "./Layout_Menu";
 import { EventTouch, Node, Vec2 } from "cc";
 
 export class UI_Menu extends egf.UIController {
+    private _game_count: number = 0;
+
     constructor() {
         super("ui_menu/UI_Menu", egf.UILayers.GAME, Layout_Menu);
     }
@@ -100,6 +103,9 @@ export class UI_Menu extends egf.UIController {
 
         const angleZ = layout.stopPointer();
         this.showStart(angleZ);
+        PlatformMgr.reportEvent("game_start", {
+            coin: DataMgr.coin,
+        });
     }
     private clickCoin() {
         egf.AudioMgr.playOneShot("tap");
@@ -112,6 +118,10 @@ export class UI_Menu extends egf.UIController {
         } else {
             egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
         }
+        PlatformMgr.reportEvent("lvup_prop", {
+            prop_type: 1,
+            level: LocalDataMgr.GameInfo.coinLv,
+        });
     }
 
     private clickSoldier() {
@@ -128,6 +138,10 @@ export class UI_Menu extends egf.UIController {
             this.addCell();
             const layout = this.layout as Layout_Menu;
             layout.updateCoinCost();
+            PlatformMgr.reportEvent("lvup_prop", {
+                prop_type: 3,
+                level: LocalDataMgr.GameInfo.landLv,
+            });
         } else {
             egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
         }

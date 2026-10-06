@@ -113,6 +113,9 @@ export class UI_Rank extends egf.UIController {
             default:
                 break;
         }
+        PlatformMgr.reportEvent("game_rank", {
+            type: type,
+        });
     }
 
     private loadServerRank(period: LeaderboardPeriod) {

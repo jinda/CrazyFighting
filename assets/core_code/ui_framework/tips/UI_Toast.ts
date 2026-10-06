@@ -1,4 +1,4 @@
-import { UIOpacity, instantiate, tween, v3 } from "cc";
+import { UIOpacity, instantiate, isValid, tween, v3 } from "cc";
 import { Layout_Toast } from "./Layout_Toast";
 import { UIController } from "../UIController";
 
@@ -21,6 +21,10 @@ export class UI_Toast extends UIController {
         const layout = this.layout as Layout_Toast;
         if (layout.richTextTips) {
             layout.richTextTips.string = contentStr;
+        }
+        if (!isValid(layout.nodeTips)) {
+            egf.Logger.error("toast show action error tip is null!");
+            return;
         }
         const nodeContent = instantiate(layout.nodeTips)!;
         nodeContent.active = true;

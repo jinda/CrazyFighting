@@ -5,11 +5,12 @@ import { Layout_Fighter } from "./Layout_Fighter";
 import { GameMgr } from "../game/scripts/GameMgr";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { UI_Settlement } from "../ui_settlement/UI_Settlement";
+import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 
 export class UI_Fighter extends egf.UIController {
     private _gold: number = 0; //金币数量
     private _factor: number = 1; //系数：每个士兵掉落金币乘以本关加成系数
-
+    private _gameTime: number = 0; // 游戏开始时间
     constructor() {
         super("ui_fighter/UI_Fighter", egf.UILayers.GAME, Layout_Fighter);
     }
@@ -28,6 +29,7 @@ export class UI_Fighter extends egf.UIController {
         let myCount = GameMgr.getFighterFight(true);
         let enemyCount = GameMgr.getFighterFight(false);
         layout.updateFighterNum(myCount, enemyCount);
+        this._gameTime = Date.now();
     }
 
     /**
@@ -89,6 +91,10 @@ export class UI_Fighter extends egf.UIController {
      */
     private onGameOver(isWin: boolean) {
         egf.Logger.log("onGameOver isWin:", isWin, this._gold);
+        PlatformMgr.reportEvent("game_time", {
+            time: Date.now() - this._gameTime,
+            resulet: isWin ? 1 : 0,
+        });
         setTimeout(() => {
             this.close();
             egf.UIMgr.showUI(UI_Settlement, null, this, { coin: this._gold, bWin: isWin });

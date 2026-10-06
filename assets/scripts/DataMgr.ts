@@ -43,10 +43,10 @@ class DataManager {
     public set userData(v: IUserInfo) {
         this._userData = v;
         // 登录拿到服务器账号信息后，同步进加密字段
-        if (v) {
-            this._coin.set(v.coin ?? 0);
-            this._level.set(v.level ?? 0);
-        }
+        // if (v) {
+        //     this._coin.set(v.coin ?? 0);
+        //     this._level.set(v.level ?? 0);
+        // }
     }
     public onlineGetTime: number = Date.now(); // 在线奖励获取时间
     public bBannerAd: boolean = false; // 是否显示banner

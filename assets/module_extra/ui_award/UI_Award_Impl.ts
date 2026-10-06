@@ -54,6 +54,9 @@ export class UI_Award_Impl extends egf.UIController {
             egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
             DataMgr.onlineGetTime = Date.now();
             this.close();
+            PlatformMgr.reportEvent("game_award", {
+                type: 1,
+            });
         } else if (this._params.bDailyGift) {
             PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
                 if (ret) {
@@ -61,6 +64,9 @@ export class UI_Award_Impl extends egf.UIController {
                     egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
                     egf.EventMgr.emit("finish_task", "daily_gift");
                     this.close();
+                    PlatformMgr.reportEvent("game_award", {
+                        type: 2,
+                    });
                 } else {
                     egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));
                 }
@@ -71,6 +77,9 @@ export class UI_Award_Impl extends egf.UIController {
                     DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.AD_REWARD);
                     egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
                     this.close();
+                    PlatformMgr.reportEvent("game_award", {
+                        type: 0,
+                    });
                 } else {
                     egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));
                 }

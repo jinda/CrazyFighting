@@ -78,6 +78,10 @@ export class UI_BuyFighter extends egf.UIController {
         egf.EventMgr.emit(Constants.EVENT_NAME.BUY_FIGHTER, pos, this._fighterId);
         //顺便更新下战力
         egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
+        PlatformMgr.reportEvent("lvup_prop", {
+            prop_type: 2,
+            level: LocalDataMgr.GameInfo.landLv,
+        });
     }
 
     /**

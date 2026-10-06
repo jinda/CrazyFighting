@@ -11,6 +11,8 @@ import {
     find,
     view,
     instantiate,
+    game,
+    Game,
 } from "cc";
 import { Follow } from "./Follow";
 import { EffectGroup } from "./EeffectGroup";
@@ -98,6 +100,27 @@ export class FighterLogic extends Component {
 
     protected onLoad(): void {
         egf.Logger.log("FighterLogic init");
+        // 监听进入后台
+        game.on(
+            Game.EVENT_HIDE,
+            () => {
+                console.log("游戏进入后台");
+                // 在这里暂停游戏逻辑、音乐音效等
+                egf.AudioMgr.pause();
+            },
+            this,
+        );
+
+        // 监听回到前台
+        game.on(
+            Game.EVENT_SHOW,
+            () => {
+                console.log("游戏回到前台");
+                // 在这里恢复游戏逻辑、音乐音效等
+                egf.AudioMgr.resume();
+            },
+            this,
+        );
         this._gameInit();
         GameCfg.loadConfig();
     }
