@@ -1,5 +1,6 @@
 import { _decorator, Component, Vec3 } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
+import { GameMgr } from "./GameMgr";
 const { ccclass } = _decorator;
 
 @ccclass("FighterRigidBody")
@@ -25,7 +26,7 @@ export class FighterRigidBody extends Component {
      * @param radius
      * @returns
      */
-    public initBody(world: any, radius: number = 1) {
+    public initBody(radius: number = 1) {
         //@ts-ignore
         const bodyDef = new box2d.b2BodyDef();
 
@@ -33,7 +34,7 @@ export class FighterRigidBody extends Component {
             return;
         }
 
-        this._world = world;
+        this._world = GameMgr.world;
 
         //@ts-ignore 动态刚体
         bodyDef.type = box2d.b2BodyType.b2_dynamicBody;
@@ -46,7 +47,7 @@ export class FighterRigidBody extends Component {
         this._bodyDef = bodyDef;
 
         //将刚体添加到物理世界
-        this._b2Body = world.CreateBody(this._bodyDef);
+        this._b2Body = this._world.CreateBody(this._bodyDef);
 
         //@ts-ignore 标准圆，参数为半径，后续需要做转换
         const circle = new box2d.b2CircleShape(radius / Constants.PTM_RATIO);

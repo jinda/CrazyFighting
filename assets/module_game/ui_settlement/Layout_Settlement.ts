@@ -42,7 +42,7 @@ export class Layout_Settlement extends Component {
         this.nodeWinEffect2.active = bWin;
         this.btnNext.node.active = bWin;
         this.btnRetry.node.active = !bWin;
-        this.nodeUnlock.active = bWin;
+        this.nodeUnlock.active = false;
     }
 
     showUnlockHero(model: string, name: string) {

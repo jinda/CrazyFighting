@@ -85,7 +85,7 @@ export class Fighter extends Component {
      */
     public init(identity: number, team: number, fighterInfo: any, posWorld: Vec3, cellPos: number) {
         this.rigidBody = this.getComponent(FighterRigidBody) as FighterRigidBody;
-        this.rigidBody.initBody(GameMgr.world, 0.3);
+        this.rigidBody.initBody(0.3);
         this.rigidBody.setWorldPosition(posWorld);
 
         //开启刚体数据同步

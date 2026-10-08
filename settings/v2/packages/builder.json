@@ -181,7 +181,7 @@
   },
   "splash-setting": {
     "background": {
-      "image": "project://settings/loading.png",
+      "image": "project://settings/loading.jpg",
       "type": "custom"
     },
     "logo": {
