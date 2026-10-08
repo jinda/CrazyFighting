@@ -286,9 +286,6 @@ export class Fighter extends Component {
         //部分兵种带有攻击特效
         this._playAttackEffect();
 
-        //振动
-        PlatformMgr.vibrate(100);
-
         //音效
         egf.AudioMgr.playOneShot(`${this.fightType}_${egf.Utils.getRandomInt(1, 2)}`);
 
@@ -324,7 +321,7 @@ export class Fighter extends Component {
         if (this.isDead) {
             return;
         }
-
+        // egf.Logger.log("onDamage:", this.identity, damageValue, attacker, this._hp);
         this._hp -= damageValue;
 
         if (this._hp <= 0) {

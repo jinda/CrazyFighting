@@ -114,7 +114,7 @@ export class UI_Rank extends egf.UIController {
                 break;
         }
         PlatformMgr.reportEvent("game_rank", {
-            type: type,
+            rank_type: type,
         });
     }
 

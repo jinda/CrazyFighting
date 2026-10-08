@@ -29,7 +29,7 @@ export class Layout_BuyFighter extends Component {
             this.labelCoin.color = new Color().fromHEX("#f23160");
         }
         //展示对应卡片
-        egf.ResMgr.getAsset(ModuleDef.GAME, `texture/card/${fighter["type"]}/spriteFrame`, (sp: SpriteFrame) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, `texture/card/${fighter["model"]}/spriteFrame`, (sp: SpriteFrame) => {
             if (isValid(this.spriteItem)) {
                 this.spriteItem.spriteFrame = sp;
             }

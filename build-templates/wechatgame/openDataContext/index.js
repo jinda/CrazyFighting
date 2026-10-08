@@ -62,7 +62,7 @@ __env.onMessage(data => {
         return;
     }
     console.log('sub rank onMessage:', data);
-    if (eventData.event === 'withdrawal_level') {
+    if (eventData.event === 'crazyfight_level') {
         showRankList(eventData.event, eventData);
     }
 });

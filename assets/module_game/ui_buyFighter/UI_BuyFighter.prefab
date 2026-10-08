@@ -2028,8 +2028,8 @@
     },
     "_lscale": {
       "__type__": "cc.Vec3",
-      "x": 1.6,
-      "y": 1.6,
+      "x": 1,
+      "y": 1,
       "z": 1
     },
     "_mobility": 0,
@@ -2092,10 +2092,7 @@
       "b": 255,
       "a": 255
     },
-    "_spriteFrame": {
-      "__uuid__": "42675dfa-1c18-4dd7-b431-bfcbc05ab187@f9941",
-      "__expectedType__": "cc.SpriteFrame"
-    },
+    "_spriteFrame": null,
     "_type": 0,
     "_fillType": 0,
     "_sizeMode": 1,

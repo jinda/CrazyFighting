@@ -1,6 +1,8 @@
+import { isValid, SpriteFrame, v3 } from "cc";
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
+import { ModuleDef } from "../../scripts/ModuleDef";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { UI_Menu } from "../ui_menu/UI_Menu";
 import { Layout_Settlement } from "./Layout_Settlement";
@@ -71,6 +73,10 @@ export class UI_Settlement extends egf.UIController {
             return;
         }
         let unlock = levelInfo["unlock"];
+        let layout = this.layout as Layout_Settlement;
+        layout.nodeUnlock.active = unlock ? true : false;
+        layout.nodeWin.position = unlock ? v3(0, 440, 0) : v3(0, 264, 0);
+
         if (unlock) {
             //有待解锁的士兵
             if (LocalDataMgr.GameInfo.unlock.indexOf(unlock) === -1) {
@@ -79,6 +85,9 @@ export class UI_Settlement extends egf.UIController {
                 LocalDataMgr.saveGameInfoData();
 
                 DataMgr.waitingBuy = unlock;
+                const fighter = GameCfg.queryByID("fighter", unlock.toString());
+
+                layout.showUnlockHero(fighter["model"], fighter["name"]);
             }
         }
     }

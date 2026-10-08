@@ -104,7 +104,7 @@ export class UI_Menu extends egf.UIController {
         const angleZ = layout.stopPointer();
         this.showStart(angleZ);
         PlatformMgr.reportEvent("game_start", {
-            coin: DataMgr.coin,
+            mode: 0,
         });
     }
     private clickCoin() {

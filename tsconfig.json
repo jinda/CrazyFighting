@@ -15,5 +15,12 @@
     "noUnusedLocals": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
-  }
+  },
+  "exclude": [
+    "temp",
+    "build",
+    "library",
+    "node_modules",
+    "integration",
+  ]
 }

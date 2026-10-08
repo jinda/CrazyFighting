@@ -1,6 +1,7 @@
 import { _decorator, Component, Vec3, instantiate, Prefab, Node } from "cc";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
 import { Effect } from "./Effect";
+import { PlatformMgr } from "db://assets/scripts/SDK/PlatformMgr";
 const { ccclass } = _decorator;
 //管理特效播放脚本
 @ccclass("EffectGroup")
@@ -57,6 +58,8 @@ export class EffectGroup extends Component {
      * @param scale
      */
     public playBombEffect(posWorld: Vec3, scale: number = 1) {
+        //振动
+        PlatformMgr.vibrate(100);
         egf.ResMgr.getAsset(ModuleDef.GAME, "game/prefabs/effect/hitBoom01", (pf: Prefab) => {
             const ndEffect = egf.PoolMgr.getNode(pf, this.node);
             ndEffect.setScale(scale, scale, scale);
