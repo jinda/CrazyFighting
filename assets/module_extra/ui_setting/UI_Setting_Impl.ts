@@ -19,9 +19,7 @@ export class UI_Setting_Impl extends UI_Setting {
 
     protected onCreated(params?: any): void {
         let layout = this.layout as Layout_Setting;
-        this.onButtonEvent(layout.btnClose, () => {
-            this.close();
-        });
+        this.onButtonEvent(layout.btnClose, this.onClose, this);
         // egf.Logger.log("Setting onCreated:", params, this, layout);
         this.onButtonEvent(layout.btnMenu, this.clickMenu, this);
         this.onButtonEvent(layout.btnRestart, this.clickRestart, this);
@@ -65,11 +63,21 @@ export class UI_Setting_Impl extends UI_Setting {
         egf.EventMgr.emit(Constants.EVENT_NAME.GAME_RESUME);
     }
 
+    protected onClose(): void {
+        egf.AudioMgr.playOneShot("tap");
+        this.close();
+    }
+
     protected onMusic(toggle: Toggle): void {
         egf.AudioMgr.playOneShot("tap");
         let volume = toggle.isChecked ? 1 : 0;
         egf.Logger.log("onMusic:", volume);
         egf.AudioMgr.musicVolume = volume;
+        if (volume > 0) {
+            egf.AudioMgr.play(Constants.AUDIO_SOUND.BACKGROUND);
+        } else {
+            egf.AudioMgr.stop();
+        }
         LocalDataMgr.Setting.musicVolume = volume;
         LocalDataMgr.saveSettingData();
     }

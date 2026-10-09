@@ -7,7 +7,7 @@ const adunitVideo = "adunit-57415739ee47a411";
 const adunitInterstitial = "adunit-54cdc3174f761e60";
 const adunitBanner = "adunit-b9179edb023af2a9";
 const gamelink =
-    "-SSEykJvFV3pORt5kTNpSzo-JCM6Pwgf2qttpQe0ZITVWcMxumdL8w-83OO9DxNB_o6RXla5Yxp9HsmLgzF9X-IiSoBjjEbj3I2fowdrYIA_-hhDYMGY_4MCt-SsRY8Gb6ZLCczvyiKHvVK_ZNhQiR20KunPY1T2gW1kpLj2jZyozovrf0QEzISnJOHg-lBrPGkmJhvwZuMuo5quantGqxNmslKAE27nmKXgzgyr_lcZWzfINl85W_A4IxU01e8_s8v-3yKCVSRTvLRqyNT5-NO5novJi91x7QS-ZFzm0IrIzK1iuAic1ihpDeaz4kxyxYQDoA7qS2MrLdWde5D09A";
+    "-SSEykJvFV3pORt5kTNpSyVVfsEg4nDw2GllMERzeP4TmfV8ASA0tdIi46W1-QRVKUP0kIOfZgju_zZ1JpdBbz8rFFQy5t6K3Sn6nnRUzK0zsAjVrWSnlxtzvzUGGgScyczD369VU22NbgPYtXRDOuCzfcm1h90I5jtq2DBGFnjqTTnS8KLdi1Z1kvHUDASBzq-nCOl4Bn3gPcLYr0mGcpWo6xdR2bA-qxa0IqRPVV35a3JmM7rawn481oJYxtN2DxysMhaszYv1XPBpUYQRdouk29mjPyBnFBhY5PZ4cFANfd_I6psV3qDOinJbl3cH-Tc4UM5sgsLcSCI_1RswuQ";
 
 export class IWeChat extends SDKBase {
     private _bannerAd: any = null;

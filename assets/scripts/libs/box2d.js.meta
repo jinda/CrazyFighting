@@ -6,10 +6,11 @@
   "files": [],
   "subMetas": {},
   "userData": {
-    "isPlugin": false,
+    "loadPluginInEditor": false,
     "loadPluginInWeb": true,
     "loadPluginInNative": true,
-    "loadPluginInEditor": false,
+    "loadPluginInMiniGame": true,
+    "isPlugin": false,
     "moduleId": "project:///assets/scripts/libs/box2d.js",
     "simulateGlobals": []
   }

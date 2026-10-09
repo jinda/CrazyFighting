@@ -227,6 +227,8 @@ class DataManager {
                 egf.Logger.log("[DataMgr] 服务端资源 coin:", res.coin, "本地金币:", this.coin);
                 if (res.coin !== this.coin) {
                     egf.Logger.warn("[DataMgr] 本地金币与服务端账本不一致（方案约定以本地为准）:", this.coin, res.coin);
+                    const offset = this.coin - res.coin;
+                    this.queueLedgerReport(offset > 0 ? "gain" : "consume", Math.abs(offset), "sync local coin");
                 }
             },
             (errcode, errmsg) => {

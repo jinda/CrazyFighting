@@ -20,6 +20,8 @@ export class Layout_Menu extends Component {
     btnLand: Button = null!;
     @property(Button)
     btnRank: Button = null!;
+    @property(Button)
+    btnGameCircle: Button = null!;
     @property(Label)
     labelLevel: Label = null!;
     @property(Label)

@@ -129,7 +129,7 @@ class LocalDataManager {
             try {
                 const decryptStr = AES.decrypt(encryptStr, AES_KEY).toString(CryptoTS.enc.Utf8);
                 this._setting = egf.SafeJSON.parse(decryptStr) as ISetting;
-
+                egf.Logger.log("loadSettingData:", this._setting);
                 egf.AudioMgr.musicVolume = this._setting.musicVolume;
                 egf.AudioMgr.soundVolume = this._setting.soundVolume;
 

@@ -1,8 +1,7 @@
-import { isValid, SpriteFrame, v3 } from "cc";
+import { v3 } from "cc";
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
-import { ModuleDef } from "../../scripts/ModuleDef";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { UI_Menu } from "../ui_menu/UI_Menu";
 import { Layout_Settlement } from "./Layout_Settlement";
@@ -34,13 +33,9 @@ export class UI_Settlement extends egf.UIController {
             //上报通关进度：必须在 nextLevel 之前取当前关卡号（不额外落盘，由 nextLevel 一并保存）
             DataMgr.reportLevelComplete(DataMgr.level, false);
             DataMgr.nextLevel();
-            //播放胜利音效
-            egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.WIN);
         } else {
             const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
             layout.showInfo(bWin, DataMgr.level, coin, addCoin);
-            //播放失败音效
-            egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.FAIL);
         }
         egf.EventMgr.emit("add_coin_fly", { coin: coin });
         DataMgr.addCoin(coin, bWin ? Constants.LEDGER_SCENE.LEVEL_WIN : Constants.LEDGER_SCENE.LEVEL_LOSE);

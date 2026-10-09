@@ -45,12 +45,16 @@ class GameManager {
         if (this.world) {
             return;
         }
-        //@ts-ignore 设置重力
-        const gravity = box2d.b2Vec2.ZERO;
-        //@ts-ignore 物理世界
-        const world = new box2d.b2World(gravity);
+        try {
+            //@ts-ignore 设置重力
+            const gravity = box2d.b2Vec2.ZERO;
+            //@ts-ignore 物理世界
+            const world = new box2d.b2World(gravity);
 
-        this.world = world;
+            this.world = world;
+        } catch (error) {
+            egf.Logger.error("init box2d World error:", error);
+        }
     }
     /**
      * 根据人数获取士兵位置

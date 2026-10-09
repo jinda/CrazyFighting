@@ -14,6 +14,16 @@ export class Constants {
     //士兵朝向随机扰动幅度（实际扰动为 ±幅度/2）
     static FIGHTER_DIRECTION_RANDOM = 0.2;
 
+    // ===== 范围伤害（damageRange > 0）的衰减与上限 =====
+    //背景：原实现是「圈内所有敌人各吃满额伤害」，命中 N 人即 N 倍输出、不衰减，
+    //      导致群伤兵实战强度远超配置表 role_mul 的折算（1.15~1.40），
+    //      也让"群伤"退化成无脑更强而非多目标取舍。
+    //改为：主目标全额，其余目标按命中次序逐个衰减，且总命中数设上限。
+    static AOE_PRIMARY_FULL = true;   //主目标是否吃满额伤害（主目标＝攻击锁定的目标）
+    static AOE_FALLOFF = 0.3;         //每个后续目标的伤害衰减比例（0.3 → 第2个 70%、第3个 40%）
+    static AOE_MIN_RATIO = 0.3;       //单个目标的伤害下限比例（衰减不会低于此值）
+    static AOE_MAX_TARGETS = 3;       //单次攻击最多命中的敌人数（含主目标）
+
     //物理世界固定步长（秒）与单帧最多步进次数：避免每帧固定 Step 导致高刷新率设备物理推进加速
     static PHYSICS_STEP = 1 / 30;
     static PHYSICS_MAX_STEPS = 3;
@@ -120,14 +130,14 @@ export class Constants {
 
     //音效常量
     public static AUDIO_SOUND = {
-        BACKGROUND: "background", //背景音乐
-        BUY_CELL: "buyCell", //购买格子
+        BACKGROUND: "bg", //背景音乐
+        BUY_CELL: "ui_sfx_valer_level_up", //购买格子
         BUY_FIGHTER: "buyFighter", //购买人物
         COMBINE: "combine", //合并成功
-        FIGHT_START: "fightStart", //开场号角
+        FIGHT_START: "ReadyGo", //开场号角
         WIN: "win", //战斗胜利
         FAIL: "fail", //战斗失败
-        FIRE_BALL: "fireBall", //陨石
+        FIRE_BALL: "granada", //陨石
         RAMPAGE: "rampage", //暴走
     };
 

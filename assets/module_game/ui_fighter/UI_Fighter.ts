@@ -95,6 +95,9 @@ export class UI_Fighter extends egf.UIController {
             time: Date.now() - this._gameTime,
             resulet: isWin ? 1 : 0,
         });
+        //播放胜利音效
+        const sound = isWin ? Constants.AUDIO_SOUND.WIN : Constants.AUDIO_SOUND.FAIL;
+        egf.AudioMgr.playOneShot(sound);
         setTimeout(() => {
             this.close();
             egf.UIMgr.showUI(UI_Settlement, null, this, { coin: this._gold, bWin: isWin });

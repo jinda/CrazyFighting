@@ -12,7 +12,7 @@ export class EffectGroup extends Component {
      * @param endCb
      */
     public playEffect(effect: string, parent: Node, pos: Vec3, endCb?: Function, loadCb?: (node: Node) => void) {
-        egf.Logger.log("playEffect:", effect);
+        // egf.Logger.log("playEffect:", effect);
         egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/effect/${effect}`, (pf: Prefab) => {
             const ndEffect = egf.PoolMgr.getNode(pf, parent);
 
@@ -35,7 +35,7 @@ export class EffectGroup extends Component {
      * @param endCb
      */
     public playChairEffect(effect: string, posWorld: Vec3, endCb?: Function) {
-        egf.Logger.log("playChairEffect:", effect);
+        // egf.Logger.log("playChairEffect:", effect);
         egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/effect/${effect}`, (pf: Prefab) => {
             const ndEffect = egf.PoolMgr.getNode(pf, this.node);
 

@@ -1,7 +1,7 @@
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
-import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
+import { EPlatform, PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { UI_Award } from "../../scripts/UIDef";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { GameMgr } from "../game/scripts/GameMgr";
@@ -28,6 +28,7 @@ export class UI_Menu extends egf.UIController {
         this.onButtonEvent(layout.btnSoldier, this.clickSoldier, this);
         this.onButtonEvent(layout.btnLand, this.clickLand, this);
         this.onButtonEvent(layout.btnRank, this.clickRank, this);
+        this.onButtonEvent(layout.btnGameCircle, this.clickGameCircle, this);
 
         egf.EventMgr.on(Constants.EVENT_NAME.UPDATE_FORMATION, this.onUpdateFormation, this);
         egf.EventMgr.on(Constants.EVENT_NAME.UPDATE_LEVEL, this.onUpdateLevel, this);
@@ -60,6 +61,8 @@ export class UI_Menu extends egf.UIController {
                 ])}</outline>`;
             }
         }
+
+        layout.btnGameCircle.node.active = PlatformMgr.platform == EPlatform.WeChat;
 
         if (params?.bStartGame) {
             this.clickStart();
@@ -150,6 +153,11 @@ export class UI_Menu extends egf.UIController {
     private clickRank() {
         egf.AudioMgr.playOneShot("tap");
         egf.UIMgr.showUI(UI_Rank);
+    }
+
+    private clickGameCircle() {
+        egf.AudioMgr.playOneShot("tap");
+        PlatformMgr.showGameCircle();
     }
 
     private onUpdateFormation() {

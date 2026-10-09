@@ -286,9 +286,6 @@ export class Fighter extends Component {
         //部分兵种带有攻击特效
         this._playAttackEffect();
 
-        //音效
-        egf.AudioMgr.playOneShot(`${this.fightType}_${egf.Utils.getRandomInt(1, 2)}`);
-
         this._isWaitingDamage = true;
         this._attackAniTime = 0;
 
@@ -437,11 +434,35 @@ export class Fighter extends Component {
 
         const range = this.fighterInfo["damageRange"] / 100;
         if (range > 0) {
+            //范围伤害：圈内敌人不再各吃满额伤害
+            //原实现的 N 人即 N 倍输出会让群伤兵远超配置表的战力折算，这里改为
+            //「主目标全额 + 其余按远近距离逐个衰减 + 总命中数上限」，
+            //让 damageRange 从"无脑更强"回归"多目标取舍"。
             const arrTargets = GameMgr.getEnemyAroundRange(this.team, target.node.position, range);
 
-            arrTargets.forEach((enemy) => {
-                enemy.onDamage(this._damage, this.identity);
+            //按到主目标的距离升序 → 越靠近爆心伤害越高（主目标距离 0，必然排第一）
+            const posCenter = target.node.position;
+            arrTargets.sort((a: Fighter, b: Fighter) => {
+                const da = a.node.position.clone().subtract(posCenter);
+                const db = b.node.position.clone().subtract(posCenter);
+                return (da.x * da.x + da.z * da.z) - (db.x * db.x + db.z * db.z);
             });
+
+            const maxHit = Constants.AOE_MAX_TARGETS;
+            const hitCount = Math.min(arrTargets.length, maxHit);
+            for (let i = 0; i < hitCount; i++) {
+                const enemy = arrTargets[i];
+                //第 0 个（主目标）全额；其后每个依次衰减，但不低于 AOE_MIN_RATIO
+                let ratio = 1;
+                if (i > 0) {
+                    const isPrimary = Constants.AOE_PRIMARY_FULL && enemy === target;
+                    ratio = isPrimary
+                        ? 1
+                        : Math.max(Constants.AOE_MIN_RATIO, 1 - Constants.AOE_FALLOFF * i);
+                }
+                const dmg = i === 0 ? this._damage : Math.floor(this._damage * ratio);
+                enemy.onDamage(dmg, this.identity);
+            }
         } else if (target && !target.isDead) {
             target.onDamage(this._damage, this.identity);
         }

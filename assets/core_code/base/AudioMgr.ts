@@ -1,5 +1,6 @@
 //AudioMgr.ts
 import { Node, AudioSource, AudioClip, director, assetManager } from "cc";
+import { EDITOR_NOT_IN_PREVIEW } from "cc/env";
 /**
  * @en
  * this is a sington class for audio play, can be easily called from anywhere in you project.
@@ -17,7 +18,7 @@ class AudioManager {
         return this._inst;
     }
 
-    private _musicSource: AudioSource;
+    private _musicSource: AudioSource = null!;
     private _effectSources: Array<AudioSource> = [];
     private _musicVolume = 1.0;
     private _musicVolumeScale = 1.0;
@@ -25,6 +26,9 @@ class AudioManager {
     private _bundleName = "resources";
     private _currentEffect = 0;
     constructor() {
+        if (EDITOR_NOT_IN_PREVIEW) {
+            return;
+        }
         //@en create a node as audioMgr
         //@zh 创建一个节点作为 audioMgr
         let audioMgr = director.getScene()?.getChildByName("__audioMgr__");
@@ -43,12 +47,22 @@ class AudioManager {
 
         //@en add AudioSource componrnt to play audios.
         //@zh 添加 AudioSource 组件，用于播放音频。
-        this._musicSource = audioMgr?.getComponent(AudioSource) || audioMgr!.addComponent(AudioSource);
+        const audioSources = audioMgr.getComponents(AudioSource);
+        console.log("AudioMgr audioSources:", audioSources.length);
+        if (audioSources.length > 0) {
+            this._musicSource = audioSources[0];
+        } else {
+            this._musicSource = audioMgr.addComponent(AudioSource);
+        }
 
         for (var i = 0; i < EFFECT_NUM; i++) {
-            var as = audioMgr!.getComponent(AudioSource) || audioMgr!.addComponent(AudioSource);
-            this._effectSources.push(as);
-            as.volume = this._soundVolume;
+            if (audioSources.length > i + 1) {
+                this._effectSources.push(audioSources[i + 1]);
+            } else {
+                var as = audioMgr.addComponent(AudioSource);
+                this._effectSources.push(as);
+            }
+            this._effectSources[i].volume = this._soundVolume;
         }
     }
 
@@ -130,6 +144,7 @@ class AudioManager {
         bundleName = bundleName || this._bundleName;
         if (sound instanceof AudioClip) {
             this._musicSource.stop();
+            this._musicSource.clip = null;
             this._musicSource.clip = sound;
             this._musicSource.play();
             this._musicSource.loop = true;
@@ -140,7 +155,9 @@ class AudioManager {
                 if (err) {
                     egf.Logger.log("AudioMgr play error", err);
                 } else {
+                    egf.Logger.log("AudioMgr play clip:", clip.name);
                     this._musicSource.stop();
+                    this._musicSource.clip = null;
                     this._musicSource.clip = clip;
                     this._musicSource.play();
                     this._musicSource.loop = true;
@@ -154,6 +171,7 @@ class AudioManager {
      * stop the audio play
      */
     stop() {
+        egf.Logger.log("AudioMgr stop");
         this._musicSource.stop();
         this._musicSource.clip = null;
     }
