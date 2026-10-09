@@ -10,6 +10,8 @@ export class Layout_Settlement extends Component {
     btnNext: Button = null!;
     @property(Button)
     btnRetry: Button = null!;
+    @property(Button)
+    btnShare: Button = null!;
     @property(Label)
     labelLevel: Label = null!;
     @property(Label)

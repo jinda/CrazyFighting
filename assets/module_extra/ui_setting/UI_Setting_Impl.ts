@@ -74,7 +74,7 @@ export class UI_Setting_Impl extends UI_Setting {
         egf.Logger.log("onMusic:", volume);
         egf.AudioMgr.musicVolume = volume;
         if (volume > 0) {
-            egf.AudioMgr.play(Constants.AUDIO_SOUND.BACKGROUND);
+            egf.AudioMgr.play(Constants.AUDIO_SOUND.BACKGROUND, 0.8);
         } else {
             egf.AudioMgr.stop();
         }

@@ -13,7 +13,7 @@ export class FightScene extends Component {
             bHelp: false,
             bGameing: GameMgr.isGameStart,
         });
-        egf.AudioMgr.play(Constants.AUDIO_SOUND.BACKGROUND);
+        egf.AudioMgr.play(Constants.AUDIO_SOUND.BACKGROUND, 0.8);
     }
 
     protected onDisable(): void {

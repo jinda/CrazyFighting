@@ -1,4 +1,17 @@
-import { Scene, Sprite, SpriteFrame, Texture2D, assetManager, director, isValid, sp, Node, game, Asset } from "cc";
+import {
+    Scene,
+    Sprite,
+    SpriteFrame,
+    Texture2D,
+    assetManager,
+    director,
+    isValid,
+    sp,
+    Node,
+    game,
+    Asset,
+    ImageAsset,
+} from "cc";
 // 预加载总任务
 interface IResTask {
     name: string;
@@ -286,7 +299,9 @@ class ResManager {
     }
 
     download(url: string, cb: Function) {
-        assetManager.loadRemote(url, (err, asset) => {
+        const hasExt = /\.(png|jpe?g|webp|gif|bmp)(\?|#|$)/i.test(url);
+        const options = hasExt ? null : { ext: ".png" };
+        assetManager.loadRemote<ImageAsset>(url, options, (err, asset) => {
             cb && cb(err, asset);
         });
     }
@@ -341,7 +356,7 @@ class ResManager {
     }
 
     private loadRemoteRes(resUrl: string, type: any, cb: Function) {
-        if (type === sp.SkeletonData) {
+        if (type === sp?.SkeletonData) {
             this.downloadSpineInfo(resUrl, (err: Error, assets: Array<any>) => {
                 if (err) {
                     return;

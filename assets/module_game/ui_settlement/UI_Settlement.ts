@@ -5,8 +5,10 @@ import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { UI_Menu } from "../ui_menu/UI_Menu";
 import { Layout_Settlement } from "./Layout_Settlement";
+import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 
 export class UI_Settlement extends egf.UIController {
+    private _bWin: boolean = false;
     constructor() {
         super("ui_settlement/UI_Settlement", egf.UILayers.POPUP, Layout_Settlement);
     }
@@ -16,11 +18,12 @@ export class UI_Settlement extends egf.UIController {
         this.onButtonEvent(layout.btnBack, this.clickBack, this);
         this.onButtonEvent(layout.btnNext, this.clickNext, this);
         this.onButtonEvent(layout.btnRetry, this.clickRetry, this);
+        this.onButtonEvent(layout.btnShare, this.clickShare, this);
 
         let coin = params.coin;
-        const bWin = params.bWin;
+        this._bWin = params.bWin;
 
-        if (bWin) {
+        if (this._bWin) {
             let levelInfo = GameCfg.queryByID("level", DataMgr.level.toString());
             let winCoin = 0;
             if (levelInfo && levelInfo.gold) {
@@ -28,17 +31,22 @@ export class UI_Settlement extends egf.UIController {
             }
             coin += winCoin;
             const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
-            layout.showInfo(bWin, DataMgr.level, coin, addCoin);
+            layout.showInfo(this._bWin, DataMgr.level, coin, addCoin);
             this.checkUnlock();
             //上报通关进度：必须在 nextLevel 之前取当前关卡号（不额外落盘，由 nextLevel 一并保存）
             DataMgr.reportLevelComplete(DataMgr.level, false);
+            const scoreData = {
+                key: Constants.LeaderboardMode,
+                score: DataMgr.level,
+            };
+            PlatformMgr.setUserCloudStorage(scoreData);
             DataMgr.nextLevel();
         } else {
             const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
-            layout.showInfo(bWin, DataMgr.level, coin, addCoin);
+            layout.showInfo(this._bWin, DataMgr.level, coin, addCoin);
         }
         egf.EventMgr.emit("add_coin_fly", { coin: coin });
-        DataMgr.addCoin(coin, bWin ? Constants.LEDGER_SCENE.LEVEL_WIN : Constants.LEDGER_SCENE.LEVEL_LOSE);
+        DataMgr.addCoin(coin, this._bWin ? Constants.LEDGER_SCENE.LEVEL_WIN : Constants.LEDGER_SCENE.LEVEL_LOSE);
     }
 
     private clickBack() {
@@ -58,6 +66,17 @@ export class UI_Settlement extends egf.UIController {
         this.close();
         egf.EventMgr.emit(Constants.EVENT_NAME.FIGHT_RESET);
         egf.UIMgr.showUI(UI_Menu, null, this, { bStartGame: true });
+    }
+
+    private clickShare() {
+        egf.AudioMgr.playOneShot("tap");
+        const params = {
+            content: egf.i18nMgr.getText(
+                this._bWin ? "我通关了，快来试试这款游戏吧！" : "差一点就过关了，快来帮帮我！",
+            ),
+            channel: "invite",
+        };
+        PlatformMgr.share(params);
     }
 
     checkUnlock() {
