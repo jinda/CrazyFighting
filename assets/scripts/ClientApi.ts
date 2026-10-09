@@ -16,6 +16,7 @@ import {
     IProgressCompleteData,
     IPushScoreResp,
     IRedeemCodeData,
+    IReportEventData,
     IResourceData,
     ISaveDataItem,
     IUserInfo,
@@ -309,6 +310,34 @@ export class ClientApi {
      */
     public completeProgress(level: number, cb?: (data: IProgressCompleteData) => void, errCb?: TApiErrCallback) {
         this.request<IProgressCompleteData>("/client/progress/complete", { level }, cb, errCb);
+    }
+
+    // ---------- 4.2 上报游戏事件 ----------
+
+    /**
+     * 上报游戏事件：逐条记录已登录玩家的行为事件，仅用于分析，不触发奖励/资源/任务
+     * 同一游戏、同一玩家、同一 event_id 重试返回 duplicate=true，不覆盖首次写入
+     * @param eventId 客户端生成的幂等 ID，非空，最多 128 字节（可用 ClientApi.createReqId 生成）
+     * @param eventName 自由事件名称，非空，最多 128 字节
+     * @param properties 自由 JSON 对象，省略时为 {}；JSON 原始编码最多 16 KiB
+     * @param occurredAt RFC3339 发生时间，省略时取服务端接收时间
+     */
+    public reportEvent(
+        eventId: string,
+        eventName: string,
+        properties?: { [key: string]: unknown },
+        occurredAt?: string,
+        cb?: (data: IReportEventData) => void,
+        errCb?: TApiErrCallback,
+    ) {
+        const params: TRequestParams = { event_id: eventId, event_name: eventName };
+        if (properties !== undefined) {
+            params.properties = properties;
+        }
+        if (occurredAt) {
+            params.occurred_at = occurredAt;
+        }
+        this.request<IReportEventData>("/client/event/report", params, cb, errCb);
     }
 
     // ---------- 5. 获取排行榜 ----------

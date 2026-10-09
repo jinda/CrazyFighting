@@ -146,6 +146,16 @@ export class Start extends Component {
         // 保存到 DataMgr 兼容旧代码
         DataMgr.userData = data.user_info;
 
+        if (DataMgr.userData.coin !== DataMgr.coin) {
+            egf.Logger.warn(
+                "[DataMgr] 本地金币与服务端账本不一致（方案约定以本地为准）:",
+                DataMgr.coin,
+                DataMgr.userData.coin,
+            );
+            const offset = DataMgr.coin - (DataMgr.userData.coin || 0);
+            DataMgr.queueLedgerReport(offset > 0 ? "gain" : "consume", Math.abs(offset), "sync local coin");
+        }
+
         // ClientApi 内部已设置 Authorization Header
         LocalDataMgr.loadDataFromSever();
         // 补报上次失败留存的账本/通关进度，并拉取一次服务端资源做校准

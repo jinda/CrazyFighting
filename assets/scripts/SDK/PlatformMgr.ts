@@ -5,6 +5,7 @@ import { IWeChat } from "./IWeChat";
 import { ITT } from "./ITT";
 import { IAndroid } from "./IAndroid";
 import { LocalDataMgr } from "../LocalDataMgr";
+import { ClientApi } from "../ClientApi";
 
 export enum EPlatform {
     Unkown = 0,
@@ -170,6 +171,7 @@ class PlatformManager {
      */
     public reportEvent(name: string, params?: any) {
         this._sdkInterface?.reportEvent(name, params);
+        ClientApi.inst.reportEvent(egf.Utils.createReqId(name), name, params); // 同步上报到服务端
     }
 
     /**

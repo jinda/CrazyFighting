@@ -27,6 +27,37 @@
 
 ---
 
+## 0. 游戏隐私政策页面
+
+隐私政策是公开 HTML 页面，不属于 `/client` JSON API，也不需要登录、token 或 `X-Game-Code`：
+
+```http
+GET /privacy/{game_code}?lang=en
+```
+
+- `game_code` 只从路径读取；请求 header 或 body 不能覆盖。
+- 支持 `zh-CN`、`zh-TW`、`en`、`hi`、`pt`、`es`、`ar`、`ja`。显式 `lang` 优先；省略时按 `Accept-Language` 的 `q` 权重协商，同权重保持出现顺序，`q=0` 不参与匹配；为限制请求开销，协商只接受最多 4 KiB、最多 32 个语言范围的请求头，超限时回退英文。
+- `zh-Hans`、`zh-CN`、`zh-SG` 和裸 `zh` 归为 `zh-CN`；`zh-Hant`、`zh-TW`、`zh-HK`、`zh-MO` 归为 `zh-TW`；其他支持语言按基础语言匹配，例如 `pt-BR` 归为 `pt`。
+- 请求语言尚未发布或无法匹配时显示已发布英文版，并显示本地化回退提示。语言切换器只列当前游戏已发布的语言。
+- 页面展示游戏名称、政策标题、Markdown 正文和发布时间；阿拉伯语页面使用 RTL。响应包含 `Content-Language` 和 `Cache-Control: no-store`。
+- 游戏不存在、已删除或尚未发布英文版时返回 HTTP `404`。停用游戏的已发布政策仍可访问。数据库读取失败返回 HTTP `503`。
+- Markdown 支持标题、列表和普通链接；原始 HTML、危险链接和图片不会作为活动内容输出，页面不加载外部脚本、字体或图片。
+
+### 管理与发布
+
+后台“游戏管理 → 隐私政策”使用当前管理员认证上下文与 `X-Game-Code`，需要权限 ID `42`；代理账号不可访问。所有响应沿用后台 `{errcode, errmsg, data}` envelope。
+
+| 方法与路径 | 请求字段 | 说明 |
+|---|---|---|
+| `POST /api/getgameprivacyconfig` | 无 | 读取当前游戏八种语言的草稿修订和发布状态 |
+| `POST /api/savegameprivacydraft` | `language`, `title`, `content` | 保存当前语言草稿并递增修订号，不改变公开版本 |
+| `POST /api/previewgameprivacy` | `language`, `title`, `content` | 使用与公开页相同的安全 Markdown 渲染，仅返回预览，不写数据库 |
+| `POST /api/publishgameprivacy` | `language`, `revision` | 原子发布指定草稿修订；旧修订会被拒绝 |
+
+管理约束：语言必须使用上述规范代码；标题最多 200 个 Unicode 字符，正文最多 256 KiB UTF-8 字节；未完成草稿可以保存，但发布时标题和正文必须非空。必须先发布英文版，才能发布其他语言。每次发布只替换当前游戏、当前语言的公开快照；修改或保存新草稿不会改变已公开内容。
+
+---
+
 ## 1. 登录 / 注册
 
 首次登录自动注册为新用户。
@@ -257,6 +288,56 @@ POST /client/progress/complete
 - 兼容升级前的历史数据时，服务端会按当前游戏和用户清理超出 `1..9006` 的榜单成员，并将越界的 `max_level` 归一到本次能够验证的最高合法关卡，不会把非法值扩散到其他玩法。
 - MongoDB 中的 `max_level` 是进度事实源，Redis 榜单是派生视图。任一必需存储操作失败返回 `10000`；跨存储不回滚，客户端应使用相同或更低的 `level` 重试以补齐榜单，重试不会降低进度。
 - 用户已不存在时返回 `10004`。
+
+### 4.2 上报游戏事件
+
+逐条记录已登录玩家的行为事件。事件只用于分析，不触发奖励、资源或任务。
+
+```
+POST /client/event/report
+```
+
+**认证**: 需要 `Authorization: Bearer {client JWT}`。玩家 UID 只从 JWT 派生，游戏只从 JWT 与 `X-Game-Code` 一致的认证上下文派生；请求体中的同名字段不会覆盖认证身份。未登录、冻结玩家或 JWT 游戏与 Header 不一致时沿用客户端认证错误响应。
+
+**请求参数**:
+
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|------|------|
+| event_id | string | ✅ | 客户端生成的幂等 ID，非空，最多 128 字节 |
+| event_name | string | ✅ | 自由事件名称，非空，最多 128 字节 |
+| properties | object | | 自由 JSON 对象；省略时为 `{}`，该 JSON 值的原始编码最多 16 KiB |
+| occurred_at | string | | RFC3339 发生时间；省略时取服务端接收时间 |
+
+完整 JSON 请求体最多 32 KiB。`properties` 不接受 `null`、数组或其他非对象 JSON 值。
+
+**请求示例**:
+
+```json
+{
+  "event_id": "01J9QZXE5N0F4YH3W8RTQ6PB2V",
+  "event_name": "level_complete",
+  "properties": {
+    "level": 12,
+    "duration_ms": 18340
+  },
+  "occurred_at": "2026-10-05T13:42:11Z"
+}
+```
+
+**首次写入响应**:
+
+```json
+{
+  "errcode": 0,
+  "errmsg": "操作成功!",
+  "data": {
+    "event_id": "01J9QZXE5N0F4YH3W8RTQ6PB2V",
+    "duplicate": false
+  }
+}
+```
+
+同一游戏、同一玩家和同一 `event_id` 重试返回 `duplicate: true`，并保留首次写入的名称、属性和时间；即使重试内容不同也不会覆盖。不同游戏或玩家可以复用相同 `event_id`。记录按服务端 `created_at` 保留 90 天，MongoDB TTL 清理是异步的，因此不会保证在到期时刻立即删除；记录清理后相同 `event_id` 可重新写入。非法参数/时间返回 `10001`，存储失败返回 `10000`。
 
 ---
 
@@ -631,9 +712,9 @@ curl -s -X POST $BASE/client/getdata \
 
 ---
 
-## 10. 多渠道登录(游客/微信/Google/Apple)
+## 10. 多渠道登录(游客/微信/Google/Apple/SUD)
 
-统一登录接口,除现有 uid 登录(第 1 节)外的四种登录方式。
+统一登录接口,除现有 uid 登录(第 1 节)外的五种登录方式。
 
 ```
 POST /client/oauthlogin
@@ -645,9 +726,9 @@ POST /client/oauthlogin
 
 | 字段 | 类型 | 必填 | 说明 |
 |------|------|------|------|
-| login_type | string | ✅ | `guest` / `wechat` / `google` / `apple` |
+| login_type | string | ✅ | `guest` / `wechat` / `google` / `apple` / `sud` |
 | device_id | string | guest 必填 | 设备唯一标识(≤128 字节),首次自动注册 |
-| code | string | wechat 必填 | wx.login 获取的临时 code |
+| code | string | wechat/sud 必填 | `wx.login` 或 `sud.login` 获取的一次性临时 code |
 | id_token | string | google 必填 | Google Sign-In 返回的 ID Token |
 | identity_token | string | apple 必填 | Sign in with Apple 返回的 identityToken |
 | nickname | string | | 新注册时使用,缺省按渠道生成 |
@@ -688,9 +769,20 @@ POST /client/oauthlogin
 { "login_type": "google", "id_token": "eyJhbGciOiJSUzI1NiIs..." }
 // Apple
 { "login_type": "apple", "identity_token": "eyJraWQiOi..." }
+// SUD
+{ "login_type": "sud", "code": "one-time-sud-code" }
 ```
 
 同一渠道同一标识重复登录返回同一账号(is_new=false),不同渠道账号互相独立。
+
+### SUD 登录流程
+
+1. 客户端调用 `sud.login` 获取一次性 `code`。
+2. 客户端把该原始 `code` 以 `{ "login_type": "sud", "code": "..." }` 提交到 `/client/oauthlogin`；不要提交 openid、unionid、Game ID 或 Game Secret。
+3. 服务端使用当前 `X-Game-Code` 对应的 SUD Game ID/Secret 调用 SUD `auth.code2session`，校验成功后以响应中 trim 后的 `openid` 作为该游戏内的稳定账号标识。
+4. 服务端返回与其他渠道相同的 `token`、`user_info` 和 `is_new`，不会返回 openid、unionid、Game Secret 或 session_key。
+
+SUD `code` 是一次性凭证，有效期与重复消费规则由 SUD 判定。Game Secret 只能在管理后台配置并由服务端持有。本轮登录流程即使收到 `session_key` 也会立即丢弃，不保存到 MongoDB/Redis、不缓存且不下发。当前游戏未启用登录配置或缺少 SUD Game ID/Secret 时返回 `10007`；code 缺失/空白返回 `10001`；SUD 网络、HTTP、响应格式或业务校验失败返回 `10008`。
 
 ---
 
@@ -803,4 +895,4 @@ mail_ids 必须包含 1–100 个互不重复的合法 ID。服务端先校验�
 - **排行榜**: `游戏管理 > 排行榜管理` → 新增玩法并勾选开启周期(mode 即为请求中的 mode,周期 1/2/3/4 对应日/周/月/总榜)
 - **广告**: `游戏管理 > 广告管理` → 微信/AdMob 为默认渠道；可动态新增渠道代码和名称，再分别填写激励视频/插屏/Banner 的广告单元 ID 并启用
 - **游戏**: `游戏管理 > 游戏列表` → 新增游戏（`X-Game-Code` header 对应游戏代码）
-- **登录配置**: `游戏管理 > 登录配置` → 按游戏填写微信 appid/secret、Google client_id、Apple bundle_id,并启用。未配置的渠道客户端登录返回 10007。
+- **登录配置**: `游戏管理 > 登录配置` → 按游戏填写微信 appid/secret、Google client_id、Apple bundle_id、SUD Game ID/Secret,并启用。未配置的渠道客户端登录返回 10007；SUD Game Secret 仅供服务端调用 SUD OpenPaaS。

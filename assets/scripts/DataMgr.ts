@@ -121,7 +121,7 @@ class DataManager {
      * @param amount 数量
      * @param scene 上报场景，见 Constants.LEDGER_SCENE
      */
-    private queueLedgerReport(op: "gain" | "consume", amount: number, scene: string) {
+    public queueLedgerReport(op: "gain" | "consume", amount: number, scene: string) {
         const value = op === "gain" ? Math.floor(amount) : Math.round(amount);
         if (value === 0) {
             //没有实际数量变化，无需上报
@@ -220,21 +220,6 @@ class DataManager {
         if (LocalDataMgr.pendingLevels.length > 0) {
             this.reportLevelComplete(Math.max(...LocalDataMgr.pendingLevels), false);
         }
-
-        ClientApi.inst.getResource(
-            (res) => {
-                //注意：服务器存档是异步加载的，此处比对只作近似校准，不覆盖本地数值
-                egf.Logger.log("[DataMgr] 服务端资源 coin:", res.coin, "本地金币:", this.coin);
-                if (res.coin !== this.coin) {
-                    egf.Logger.warn("[DataMgr] 本地金币与服务端账本不一致（方案约定以本地为准）:", this.coin, res.coin);
-                    const offset = this.coin - res.coin;
-                    this.queueLedgerReport(offset > 0 ? "gain" : "consume", Math.abs(offset), "sync local coin");
-                }
-            },
-            (errcode, errmsg) => {
-                egf.Logger.warn("[DataMgr] 拉取服务端资源失败:", errcode, errmsg);
-            },
-        );
     }
 }
 

@@ -250,6 +250,20 @@ export interface IProgressCompleteData {
 }
 
 /**
+ * 上报游戏事件响应数据
+ */
+export interface IReportEventData {
+    /**
+     * 回显本次上报的幂等 ID
+     */
+    event_id: string;
+    /**
+     * true=重试/重复上报，保留首次写入的内容
+     */
+    duplicate: boolean;
+}
+
+/**
  * 查询资源响应数据
  */
 export interface IResourceData {

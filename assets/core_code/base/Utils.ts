@@ -337,6 +337,17 @@ export class Utils {
     }
 
     /**
+     * 生成客户端幂等 ID（可用于 req_id / event_id 等幂等键，长度 ≤128 字节）
+     * 同一笔业务重试必须复用同一个 ID，不能重新生成
+     * @param prefix 业务前缀，如 "level_enter"、"level_complete"；省略则无前缀
+     */
+    public static createReqId(prefix?: string): string {
+        const random = Math.random().toString(36).slice(2, 10);
+        const time = Date.now().toString(36);
+        return prefix ? `${prefix}-${time}-${random}` : `${time}-${random}`;
+    }
+
+    /**
      * 获取字符串长度
      * @param {string} render
      * @returns
