@@ -2,7 +2,7 @@
  * 网络数据管理器
  */
 
-import { Camera, Vec3, Node, geometry, screen, PhysicsSystem, PhysicsSystem2D, Vec2 } from "cc";
+import { Camera, Vec3, Node, geometry, screen, PhysicsSystem } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
 import { GameCfg } from "./GameConfig";
 import { DataMgr } from "db://assets/scripts/DataMgr";
@@ -23,7 +23,6 @@ class GameManager {
     public isGameOver: boolean = false; //游戏是否结束
     public dictFighter: any = {}; //存放敌我士兵的字典
     public effectGroup: EffectGroup = null!; //特效管理的脚本
-    public world: any = null; //物理世界对象
     public timeScale: number = 1; //时间缩放，用于加快攻击及移动速度, 也可以理解成游戏速度
 
     //暂停请求计数：设置界面、奖励界面、激励视频等多个来源可能同时请求暂停，计数归零才真正恢复
@@ -38,24 +37,6 @@ class GameManager {
         return this._pauseCount > 0;
     }
 
-    /**
-     * 初始化物理世界
-     */
-    public initWorld() {
-        if (this.world) {
-            return;
-        }
-        try {
-            //@ts-ignore 设置重力
-            const gravity = box2d.b2Vec2.ZERO;
-            //@ts-ignore 物理世界
-            const world = new box2d.b2World(gravity);
-
-            this.world = world;
-        } catch (error) {
-            egf.Logger.error("init box2d World error:", error);
-        }
-    }
     /**
      * 根据人数获取士兵位置
      * @param posCell
@@ -166,7 +147,7 @@ class GameManager {
 
         let next = GameCfg.queryOneByCondition("fighter", {
             level: fighterInfo.level + 1,
-            type: fighterInfo.type,
+            ID: fighterInfo.ID + 1,
         });
         if (next) {
             return Number(next.ID);

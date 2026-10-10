@@ -1,10 +1,7 @@
 import { _decorator, Component, Node, Vec3, Tween, Prefab, isValid } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
-import { Effect } from "./Effect";
 import { FighterModel } from "./FighterModel";
-import { FighterRigidBody } from "./FighterRigidBody";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
-import { PlatformMgr } from "db://assets/scripts/SDK/PlatformMgr";
 import { GameMgr } from "./GameMgr";
 import { GameCfg } from "./GameConfig";
 
@@ -20,7 +17,6 @@ export class Fighter extends Component {
 
     public fighterInfo: any; //士兵数据
     public identity: number = 0; //唯一标识
-    public rigidBody: FighterRigidBody = null!; //士兵刚体组件
     public fightType: number = 0; //攻击类型/士兵类型（1奥特曼/2牛角/3短剑/4标枪/5投石车/6小丑）
     public team: number = 0; //队伍
     public isDead: boolean = false; //是否阵亡
@@ -84,12 +80,7 @@ export class Fighter extends Component {
      * @param cellPos 对应的格子
      */
     public init(identity: number, team: number, fighterInfo: any, posWorld: Vec3, cellPos: number) {
-        this.rigidBody = this.getComponent(FighterRigidBody) as FighterRigidBody;
-        this.rigidBody.initBody(0.3);
-        this.rigidBody.setWorldPosition(posWorld);
-
-        //开启刚体数据同步
-        this.rigidBody.enableSync = true;
+        this.node.worldPosition = posWorld;
 
         this.isDead = false;
         this.target = null!;
@@ -160,7 +151,6 @@ export class Fighter extends Component {
 
         let scale = this.fighterInfo.scale;
         this.node.setScale(scale, scale, scale);
-        this.rigidBody.updateRadius(0.3 * scale);
 
         this._hp = this.fighterInfo.hp;
         this.hpMax = this._hp;
@@ -343,7 +333,6 @@ export class Fighter extends Component {
         this._enterStatus(Constants.FIGHTER_STATUS.DEAD);
 
         this.ndShadow.active = false;
-        this.rigidBody.destroyBody();
 
         if (this._tweenDead) {
             this._tweenDead.stop();
@@ -376,9 +365,6 @@ export class Fighter extends Component {
      * 士兵开始战斗
      */
     public fightStart(attackAddition: number, posFightStart: Vec3) {
-        //开启刚体对模型的属性同步，避免刚体与模型分离
-        this.rigidBody.enableSync = true;
-
         //攻击加成
         this._damage = Math.floor(this.fighterInfo.attack * attackAddition);
 
@@ -459,9 +445,7 @@ export class Fighter extends Component {
                 let ratio = 1;
                 if (i > 0) {
                     const isPrimary = Constants.AOE_PRIMARY_FULL && enemy === target;
-                    ratio = isPrimary
-                        ? 1
-                        : Math.max(Constants.AOE_MIN_RATIO, 1 - Constants.AOE_FALLOFF * i);
+                    ratio = isPrimary ? 1 : Math.max(Constants.AOE_MIN_RATIO, 1 - Constants.AOE_FALLOFF * i);
                 }
                 const dmg = i === 0 ? this._damage : Math.floor(this._damage * ratio);
                 enemy.onDamage(dmg, this.identity);
@@ -496,8 +480,6 @@ export class Fighter extends Component {
             //已经回收过了
             return;
         }
-
-        this.rigidBody.destroyBody();
 
         //使当前代次的异步加载全部失效：本节点即将回池复用，旧回调不得再挂载模型/皇冠
         this._loadGeneration++;
@@ -585,7 +567,7 @@ export class Fighter extends Component {
                 this._curPos.add(this._direction);
 
                 //设置刚体位置
-                this.rigidBody.setWorldPosition(this._curPos);
+                this.setWorldPosition(this._curPos);
 
                 this._moveTime += deltaTime;
                 if (this._moveTime > 0.1) {
@@ -634,7 +616,7 @@ export class Fighter extends Component {
                 this._nowPos.add(this._direction);
 
                 //设置刚体的下一步位置
-                this.rigidBody.setWorldPosition(this._nowPos);
+                this.setWorldPosition(this._nowPos);
 
                 this._moveTime += deltaTime;
 
@@ -664,5 +646,9 @@ export class Fighter extends Component {
                 }
             }
         }
+    }
+
+    public setWorldPosition(pos: Vec3) {
+        this.node.worldPosition = pos;
     }
 }

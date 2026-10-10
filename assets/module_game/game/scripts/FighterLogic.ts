@@ -66,9 +66,6 @@ export class FighterLogic extends Component {
     private _outRay1: any = new geometry.Ray(); //射线
     private _curTouchPos: Vec2 = new Vec2(); //touchMove触摸移动的位置
 
-    //物理步长累加器：按固定步长推进物理世界，避免设备帧率影响物理速度
-    private _physicsAccumulator: number = 0;
-
     onEnable() {
         egf.EventMgr.on(Constants.EVENT_NAME.FIGHT_START, this._fightStart, this);
         egf.EventMgr.on(Constants.EVENT_NAME.FIGHT_RESET, this._fightReset, this);
@@ -156,7 +153,6 @@ export class FighterLogic extends Component {
         this._isInit = true;
 
         GameMgr.effectGroup = this.effectGroup;
-        GameMgr.initWorld();
     }
 
     /**
@@ -182,7 +178,6 @@ export class FighterLogic extends Component {
         this._preTime = 0;
         this._curTime = 0;
         this._timeScale = 1;
-        this._physicsAccumulator = 0;
 
         //第1关特殊处理
         this.cameraFollow.initCamera(DataMgr.level === 1);
@@ -571,9 +566,6 @@ export class FighterLogic extends Component {
 
                     if (ndFighter) {
                         ndFighter.setPosition(worPos);
-                        let scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
-                        //禁用刚体数据同步，等到时候确定了哪个位置，设置过去并启用
-                        scriptFighter.rigidBody.enableSync = false;
                     }
                 }
 
@@ -659,7 +651,16 @@ export class FighterLogic extends Component {
         this._arySelectFighterIdentity.forEach((identity) => {
             let ndFighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity];
             let scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
-            scriptFighter.rigidBody.enableSync = true;
+            let cell = this._dictCell[scriptFighter.cellPos].getComponent(FormationCell);
+
+            this._tempPos.set(cell.node.worldPosition);
+            let arrPos = GameMgr.getFighterPosByNum(this._tempPos, cell.aryIdentity.length);
+
+            cell.aryIdentity.forEach((identity: any, index: number) => {
+                let fighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
+                fighter.cellPos = cell.pos;
+                fighter.setWorldPosition(arrPos[index]);
+            });
         });
     }
 
@@ -690,8 +691,7 @@ export class FighterLogic extends Component {
             cellTarget.aryIdentity.forEach((identity: any, index: number) => {
                 let fighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
                 fighter.cellPos = cellTarget.pos;
-                fighter.rigidBody.setWorldPosition(arrPos[index]);
-                fighter.rigidBody.enableSync = true;
+                fighter.setWorldPosition(arrPos[index]);
             });
         }
 
@@ -703,8 +703,7 @@ export class FighterLogic extends Component {
             cellSelect.aryIdentity.forEach((identity: any, index: number) => {
                 let fighter = GameMgr.dictFighter[Constants.PLAYER_TEAM][identity].getComponent(Fighter) as Fighter;
                 fighter.cellPos = cellSelect.pos;
-                fighter.rigidBody.setWorldPosition(arrPos[index]);
-                fighter.rigidBody.enableSync = true;
+                fighter.setWorldPosition(arrPos[index]);
             });
         }
 
@@ -719,7 +718,7 @@ export class FighterLogic extends Component {
     private _combineCell(cellSelect: FormationCell, cellTarget: FormationCell) {
         //下一等级的士兵
         let nextId = GameMgr.getFighterNextId(cellSelect.fighterId);
-
+        egf.Logger.log("combineCell nextId:", nextId, "cellSelect.fighterId:", cellSelect.fighterId);
         //有找到，可升级
         if (nextId > 0) {
             //数据更新
@@ -862,6 +861,10 @@ export class FighterLogic extends Component {
         let disSqr = Constants.FIRE_BALL_DISTANCE * Constants.FIRE_BALL_DISTANCE;
 
         this.effectGroup.playFireBallEffect(this._ballPos, () => {
+            if (GameMgr.isGameOver) {
+                egf.Logger.log("游戏已结束，技能无效");
+                return;
+            }
             //触发后，计算伤害
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.FIRE_BALL);
 
@@ -1015,29 +1018,122 @@ export class FighterLogic extends Component {
 
     update(deltaTime: number) {
         // Your update function goes here.
-        //暂停/结束时物理世界不步进，并清空累加器，避免恢复后一次性补步进
+        //暂停/结束时不做士兵分离
         if (!GameMgr.isGameStart || GameMgr.isGamePause || GameMgr.isGameOver) {
-            this._physicsAccumulator = 0;
             return;
         }
 
         this._checkTimeScale(deltaTime);
 
-        if (GameMgr.world) {
-            //固定步长 + 累加器：物理推进只与真实时间有关，不受设备帧率影响
-            this._physicsAccumulator += deltaTime;
+        //box2d 已移除，改为每帧执行一次轻量“圆-圆分离”，避免近战时士兵互相重叠
+        this._separateFighters();
+    }
 
-            let steps = 0;
-            //参数：1、逻辑帧的时间长度（1秒30帧），2、速度计算迭代次数（迭代的次数越多，碰撞传导的速度越快），3、位移计算迭代次数（迭代的次数越多，解决刚体重叠的速度越快）
-            while (this._physicsAccumulator >= Constants.PHYSICS_STEP && steps < Constants.PHYSICS_MAX_STEPS) {
-                GameMgr.world.Step(Constants.PHYSICS_STEP, 6, 2);
-                this._physicsAccumulator -= Constants.PHYSICS_STEP;
-                steps++;
+    /**
+     * 轻量手动分离：替代原 box2d 的碰撞分离。
+     * 在 XZ 平面用空间哈希加速，把互相重叠的士兵（双方队伍）沿连线推开，保持“人群不堆叠”。
+     */
+    private _separateFighters() {
+        //收集参与分离的士兵：双方队伍、未死亡、且 enableSync 开启（阵型调整期间跳过）
+        const items: { node: Node; r: number }[] = [];
+        for (const team in GameMgr.dictFighter) {
+            const dictFighter = GameMgr.dictFighter[team];
+            for (const identity in dictFighter) {
+                const ndFighter = dictFighter[identity] as Node;
+                if (!ndFighter) {
+                    continue;
+                }
+                const fighter = ndFighter.getComponent(Fighter);
+                if (!fighter || fighter.isDead) {
+                    continue;
+                }
+                items.push({ node: ndFighter, r: fighter.radius });
             }
+        }
 
-            if (steps >= Constants.PHYSICS_MAX_STEPS) {
-                //严重卡顿（例如切后台回来）时丢弃剩余时间，避免追帧雪崩
-                this._physicsAccumulator = 0;
+        if (items.length < 2) {
+            return;
+        }
+
+        let maxR = 0;
+        for (const it of items) {
+            if (it.r > maxR) {
+                maxR = it.r;
+            }
+        }
+        //格子尺寸不小于最大直径，保证可能碰撞的两个圆必在同一格或相邻格
+        const cellSize = Math.max(maxR * 2, 0.6);
+
+        //空间哈希：把士兵落入 XZ 平面网格，之后只在相邻格内做两两检测
+        const buckets = new Map<string, number[]>();
+        const cellKey = (cx: number, cz: number) => `${cx},${cz}`;
+        const cellCX = new Array<number>(items.length);
+        const cellCZ = new Array<number>(items.length);
+        for (let i = 0; i < items.length; i++) {
+            const it = items[i];
+            const cx = Math.floor(it.node.position.x / cellSize);
+            const cz = Math.floor(it.node.position.z / cellSize);
+            cellCX[i] = cx;
+            cellCZ[i] = cz;
+            const key = cellKey(cx, cz);
+            let bucket = buckets.get(key);
+            if (!bucket) {
+                bucket = [];
+                buckets.set(key, bucket);
+            }
+            bucket.push(i);
+        }
+
+        //多轮松弛，逼近原 box2d 的软推开效果
+        const ITERATIONS = 2;
+        for (let iter = 0; iter < ITERATIONS; iter++) {
+            for (let i = 0; i < items.length; i++) {
+                const itemA = items[i];
+                const nodeA = itemA.node;
+                const cx = cellCX[i];
+                const cz = cellCZ[i];
+
+                for (let oi = -1; oi <= 1; oi++) {
+                    for (let oj = -1; oj <= 1; oj++) {
+                        const bucket = buckets.get(cellKey(cx + oi, cz + oj));
+                        if (!bucket) {
+                            continue;
+                        }
+                        for (const j of bucket) {
+                            if (j <= i) {
+                                continue; //每对只处理一次
+                            }
+                            const itemB = items[j];
+                            const nodeB = itemB.node;
+                            const dx = nodeB.position.x - nodeA.position.x;
+                            const dz = nodeB.position.z - nodeA.position.z;
+                            const minDist = itemA.r + itemB.r;
+                            const distSq = dx * dx + dz * dz;
+                            if (distSq >= minDist * minDist) {
+                                continue;
+                            }
+
+                            const dist = Math.sqrt(distSq);
+                            if (dist < 1e-6) {
+                                //完全重叠：沿伪随机方向直接摆开，避免确定性堆叠
+                                const angle = (i * 0.618 + iter) * Math.PI;
+                                nodeB.setPosition(
+                                    nodeA.position.x + Math.cos(angle) * minDist,
+                                    0,
+                                    nodeA.position.z + Math.sin(angle) * minDist,
+                                );
+                                continue;
+                            }
+
+                            const overlap = minDist - dist;
+                            const push = overlap * 0.5; //双方各推开一半
+                            const nx = dx / dist;
+                            const nz = dz / dist;
+                            nodeA.setPosition(nodeA.position.x - nx * push, 0, nodeA.position.z - nz * push);
+                            nodeB.setPosition(nodeB.position.x + nx * push, 0, nodeB.position.z + nz * push);
+                        }
+                    }
+                }
             }
         }
     }

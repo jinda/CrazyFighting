@@ -19,14 +19,10 @@ export class Constants {
     //      导致群伤兵实战强度远超配置表 role_mul 的折算（1.15~1.40），
     //      也让"群伤"退化成无脑更强而非多目标取舍。
     //改为：主目标全额，其余目标按命中次序逐个衰减，且总命中数设上限。
-    static AOE_PRIMARY_FULL = true;   //主目标是否吃满额伤害（主目标＝攻击锁定的目标）
-    static AOE_FALLOFF = 0.3;         //每个后续目标的伤害衰减比例（0.3 → 第2个 70%、第3个 40%）
-    static AOE_MIN_RATIO = 0.3;       //单个目标的伤害下限比例（衰减不会低于此值）
-    static AOE_MAX_TARGETS = 3;       //单次攻击最多命中的敌人数（含主目标）
-
-    //物理世界固定步长（秒）与单帧最多步进次数：避免每帧固定 Step 导致高刷新率设备物理推进加速
-    static PHYSICS_STEP = 1 / 30;
-    static PHYSICS_MAX_STEPS = 3;
+    static AOE_PRIMARY_FULL = true; //主目标是否吃满额伤害（主目标＝攻击锁定的目标）
+    static AOE_FALLOFF = 0.3; //每个后续目标的伤害衰减比例（0.3 → 第2个 70%、第3个 40%）
+    static AOE_MIN_RATIO = 0.3; //单个目标的伤害下限比例（衰减不会低于此值）
+    static AOE_MAX_TARGETS = 3; //单次攻击最多命中的敌人数（含主目标）
 
     //基础兵，默认解锁
     static BASE_FIGHTER = 101;
@@ -104,9 +100,6 @@ export class Constants {
 
     //50%的生命最大值
     static FIRE_BALL_DAMAGE_PERCENT = 0.5;
-
-    //比例：像素 转成 米 的比例，对于物理引擎来说，他是按米来算的，这里取0.1
-    static PTM_RATIO = 0.1;
 
     //引导步奏
     public static GUIDE_STEP = {

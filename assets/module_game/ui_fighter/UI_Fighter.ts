@@ -49,6 +49,10 @@ export class UI_Fighter extends egf.UIController {
     }
 
     private clickSkill() {
+        if (GameMgr.isGameOver) {
+            egf.Logger.log("游戏已结束，技能按钮点击无效");
+            return;
+        }
         const layout = this.layout as Layout_Fighter;
         layout.showSkillStatus(true);
         egf.EventMgr.emit(Constants.EVENT_NAME.USE_FIRE_BALL);

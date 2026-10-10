@@ -35,7 +35,6 @@ export class FormationCell extends Component {
     private _team: number = 0; //队伍
     private _isShowSimilar: boolean = false; //是否有与格子上士兵相同的士兵/格子上的士兵是否可以合成
     private _select: boolean = false; //是否被选中
-    private _similarPos: Vec3 = new Vec3(0, 0.1, 0); //“合并提示特效”位置
     private _cellPos1: Vec3 = new Vec3(); //临时变量，格子位置
     private _cellPos2: Vec3 = new Vec3(); //临时变量，格子位置
 
