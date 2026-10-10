@@ -140,7 +140,7 @@ export class Weapon extends Component {
             }
 
             //百分比
-            let percent = Number((this.currentTime / this.totalTime).toFixed(2));
+            let percent = this.currentTime / this.totalTime;
 
             //目标高度
             let height = this.maxHeight * Math.cos(percent * Math.PI - Math.PI / 2);
@@ -160,7 +160,7 @@ export class Weapon extends Component {
                 if (this.rotateCoolTime < 0) {
                     this.rotateCoolTime = 0.1;
 
-                    percent = Number(((this.currentTime + 0.1) / this.totalTime).toFixed(2));
+                    percent = (this.currentTime + 0.1) / this.totalTime;
                     if (percent < 1) {
                         //下一个目标位置的高度
                         height = this.maxHeight * Math.cos(percent * Math.PI - Math.PI / 2);

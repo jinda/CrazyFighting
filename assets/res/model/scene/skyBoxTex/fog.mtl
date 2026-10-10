@@ -1,6 +1,6 @@
 {
   "__type__": "cc.Material",
-  "_name": "fog",
+  "_name": "",
   "_objFlags": 0,
   "__editorExtras__": {},
   "_native": "",
@@ -10,17 +10,69 @@
   },
   "_techIdx": 0,
   "_defines": [
+    {
+      "USE_INSTANCING": true
+    },
+    {},
+    {},
+    {},
+    {},
     {}
   ],
   "_states": [
     {
       "rasterizerState": {},
+      "depthStencilState": {},
       "blendState": {
         "targets": [
           {}
         ]
-      },
-      "depthStencilState": {}
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
     }
   ],
   "_props": [
@@ -31,9 +83,13 @@
         "y": 0.588235318660736,
         "z": 0.588235318660736
       },
-      "metallic": 0.400000005960464,
       "roughness": 0.70710676908493,
-      "occlusion": 0
-    }
+      "metallic": 0.400000005960464
+    },
+    {},
+    {},
+    {},
+    {},
+    {}
   ]
 }

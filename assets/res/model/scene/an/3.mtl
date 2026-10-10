@@ -1,6 +1,6 @@
 {
   "__type__": "cc.Material",
-  "_name": "3",
+  "_name": "",
   "_objFlags": 0,
   "__editorExtras__": {},
   "_native": "",
@@ -11,35 +11,84 @@
   "_techIdx": 0,
   "_defines": [
     {
+      "USE_INSTANCING": true,
       "USE_ALBEDO_MAP": true
-    }
+    },
+    {},
+    {},
+    {},
+    {},
+    {}
   ],
   "_states": [
     {
       "rasterizerState": {},
+      "depthStencilState": {},
       "blendState": {
         "targets": [
           {}
         ]
-      },
-      "depthStencilState": {}
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
+    },
+    {
+      "rasterizerState": {},
+      "depthStencilState": {},
+      "blendState": {
+        "targets": [
+          {}
+        ]
+      }
     }
   ],
   "_props": [
     {
+      "roughness": 0.70710676908493,
+      "metallic": 0.400000005960464,
       "mainTexture": {
         "__uuid__": "a01bd6de-537f-46e2-b381-4e133073b368@b10ef",
         "__expectedType__": "cc.Texture2D"
-      },
-      "albedoScale": {
-        "__type__": "cc.Vec3",
-        "x": 1,
-        "y": 1,
-        "z": 1
-      },
-      "metallic": 0.400000005960464,
-      "roughness": 0.70710676908493,
-      "occlusion": 0
-    }
+      }
+    },
+    {},
+    {},
+    {},
+    {},
+    {}
   ]
 }

@@ -33,6 +33,8 @@ export class Effect extends Component {
     public playOnStart = true;
 
     private _endListenerCb: Function = null!; //特效播放完后的回调函数
+    private _arrParticle: ParticleSystemComponent[] | null = null; //粒子组件缓存（节点回池后子树不变，避免每次 getComponentsInChildren 分配）
+    private _arrAni: AnimationComponent[] | null = null; //动画组件缓存
 
     start() {
         if (this.playOnStart) {
@@ -54,15 +56,19 @@ export class Effect extends Component {
         //  start() 会在调用方 setEndListener 之后再调一次 play()，清掉会丢回调）
         this.unscheduleAllCallbacks();
 
-        let arrParticle = this.node.getComponentsInChildren(ParticleSystemComponent);
-        arrParticle.forEach((particle: ParticleSystemComponent) => {
+        if (!this._arrParticle) {
+            this._arrParticle = this.node.getComponentsInChildren(ParticleSystemComponent);
+        }
+        this._arrParticle.forEach((particle: ParticleSystemComponent) => {
             particle.clear();
             particle.stop();
             particle.play();
         });
 
-        let arrAni = this.node.getComponentsInChildren(AnimationComponent);
-        arrAni.forEach((ani) => {
+        if (!this._arrAni) {
+            this._arrAni = this.node.getComponentsInChildren(AnimationComponent);
+        }
+        this._arrAni.forEach((ani: AnimationComponent) => {
             ani.play();
         });
 

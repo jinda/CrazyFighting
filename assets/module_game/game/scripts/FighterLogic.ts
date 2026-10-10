@@ -380,49 +380,10 @@ export class FighterLogic extends Component {
                     //提速
                     this._timeScale = timeScale;
 
-                    console.log("提速:", this._timeScale, this._preTime);
                     GameMgr.timeScale = this._timeScale;
                 }
             }
         }
-    }
-
-    /**
-     * 获取距离士兵最近的对方士兵
-     * @param who
-     * @returns
-     */
-    public getNearestEnemy(who: Fighter) {
-        let minDistance = 999999;
-        let enemy: Node = null!;
-        let posWho = who.node.position;
-
-        for (let team in GameMgr.dictFighter) {
-            if (who.team === Number(team)) {
-                continue;
-            }
-
-            let objFighters = GameMgr.dictFighter[team];
-            for (let fPos in objFighters) {
-                let fighter = objFighters[fPos];
-
-                let pos = fighter.position.clone();
-                let offset = pos.subtract(posWho);
-                if (Math.abs(offset.x) < minDistance || Math.abs(offset.y) < minDistance) {
-                    let dis = offset.length();
-
-                    if (dis < minDistance) {
-                        minDistance = dis;
-                        enemy = fighter;
-
-                        //@ts-ignore,自定义属性，敌人距离自己的最短距离
-                        enemy["tmpMinDis"] = minDistance;
-                    }
-                }
-            }
-        }
-
-        return enemy;
     }
 
     /**

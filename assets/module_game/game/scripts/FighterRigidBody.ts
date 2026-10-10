@@ -79,29 +79,11 @@ export class FighterRigidBody extends Component {
      * @param pos
      */
     public setWorldPosition(pos: Vec3) {
-        let posBody = {
-            x: pos.x / Constants.PTM_RATIO,
-            y: pos.z / Constants.PTM_RATIO,
-        };
         if (this._b2Body) {
-            this._b2Body.SetPosition(posBody);
+            this._b2Body.SetPositionXY(pos.x / Constants.PTM_RATIO, pos.z / Constants.PTM_RATIO);
         }
 
         this.node.setPosition(pos);
-    }
-
-    /**
-     * 获取刚体的世界坐标
-     * @returns
-     */
-    private _getWorldPosition() {
-        let out = { x: 0, y: 0 };
-        if (this._b2Body) {
-            let pos = this._b2Body.GetPosition();
-            out.x = pos.x * Constants.PTM_RATIO;
-            out.y = pos.y * Constants.PTM_RATIO;
-        }
-        return out;
     }
 
     /**
@@ -136,12 +118,15 @@ export class FighterRigidBody extends Component {
         // Your update function goes here.
         //每帧去同步数据过来
         if (this._b2Body && this.enableSync) {
-            let pos = this._getWorldPosition();
-            let posNode = this.node.position;
+            const bodyPos = this._b2Body.GetPosition();
+            const posNode = this.node.position;
+
+            const worldX = bodyPos.x * Constants.PTM_RATIO;
+            const worldZ = bodyPos.y * Constants.PTM_RATIO;
 
             //同步士兵节点位置
-            if (pos.x !== posNode.x || pos.y !== posNode.z) {
-                this.node.setPosition(pos.x, 0, pos.y);
+            if (worldX !== posNode.x || worldZ !== posNode.z) {
+                this.node.setPosition(worldX, 0, worldZ);
             }
         }
     }

@@ -453,7 +453,7 @@
       "__uuid__": "39d93d89-fe52-49f0-bb52-61460a6ca996@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -2115,10 +2115,7 @@
       "__id__": 143
     },
     "_materials": [
-      {
-        "__uuid__": "83706d50-e488-4546-8025-98a715387c79",
-        "__expectedType__": "cc.Material"
-      },
+      null,
       null
     ],
     "_visFlags": 0,
@@ -2460,7 +2457,7 @@
       "__uuid__": "c5439b96-f2d4-4b0c-8489-f6781840f93d@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {

@@ -441,11 +441,14 @@ export class Fighter extends Component {
             const arrTargets = GameMgr.getEnemyAroundRange(this.team, target.node.position, range);
 
             //按到主目标的距离升序 → 越靠近爆心伤害越高（主目标距离 0，必然排第一）
-            const posCenter = target.node.position;
+            const centerX = target.node.position.x;
+            const centerZ = target.node.position.z;
             arrTargets.sort((a: Fighter, b: Fighter) => {
-                const da = a.node.position.clone().subtract(posCenter);
-                const db = b.node.position.clone().subtract(posCenter);
-                return (da.x * da.x + da.z * da.z) - (db.x * db.x + db.z * db.z);
+                const dax = a.node.position.x - centerX;
+                const daz = a.node.position.z - centerZ;
+                const dbx = b.node.position.x - centerX;
+                const dbz = b.node.position.z - centerZ;
+                return dax * dax + daz * daz - (dbx * dbx + dbz * dbz);
             });
 
             const maxHit = Constants.AOE_MAX_TARGETS;

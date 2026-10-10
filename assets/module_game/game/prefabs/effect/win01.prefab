@@ -120,10 +120,7 @@
       "__id__": 4
     },
     "_materials": [
-      {
-        "__uuid__": "4b52ba6e-0f68-4046-8623-43035aaf34ca",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -705,7 +702,7 @@
       "__uuid__": "a75cf868-31da-4fd3-a38e-75c75fe1dcb9@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -736,7 +733,7 @@
     "effectType": 1,
     "ani": null,
     "keepTime": 1,
-    "autoDestroy": false,
+    "autoDestroy": true,
     "playOnStart": false,
     "_id": ""
   },

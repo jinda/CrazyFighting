@@ -3,18 +3,19 @@
     "__type__": "cc.Prefab",
     "_name": "trail01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_native": "",
     "data": {
       "__id__": 1
     },
     "optimizationPolicy": 0,
-    "asyncLoadAssets": false,
     "persistent": false
   },
   {
     "__type__": "cc.Node",
     "_name": "trail01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [],
     "_active": true,
@@ -24,7 +25,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 55
+      "__id__": 56
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -45,6 +46,7 @@
       "y": 1,
       "z": 1
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -58,6 +60,7 @@
     "__type__": "cc.ParticleSystem",
     "_name": "New Particle<ParticleSystem>",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 1
     },
@@ -130,6 +133,13 @@
         "__id__": 17
       }
     ],
+    "_renderCulling": false,
+    "_cullingMode": 0,
+    "_aabbHalfX": 0,
+    "_aabbHalfY": 0,
+    "_aabbHalfZ": 0,
+    "_dataCulling": false,
+    "enableCulling": false,
     "_colorOverLifetimeModule": {
       "__id__": 19
     },
@@ -154,13 +164,15 @@
     "_textureAnimationModule": {
       "__id__": 46
     },
-    "_trailModule": {
+    "_noiseModule": {
       "__id__": 49
     },
-    "renderer": {
-      "__id__": 54
+    "_trailModule": {
+      "__id__": 50
     },
-    "enableCulling": false,
+    "renderer": {
+      "__id__": 55
+    },
     "_prewarm": false,
     "_capacity": 20,
     "_simulationSpace": 1,
@@ -561,25 +573,42 @@
     "multiplier": 1
   },
   {
+    "__type__": "cc.NoiseModule",
+    "_enable": false,
+    "_strengthX": 10,
+    "_strengthY": 10,
+    "_strengthZ": 10,
+    "_noiseSpeedX": 0,
+    "_noiseSpeedY": 0,
+    "_noiseSpeedZ": 0,
+    "_noiseFrequency": 1,
+    "_remapX": 0,
+    "_remapY": 0,
+    "_remapZ": 0,
+    "_octaves": 1,
+    "_octaveMultiplier": 0.5,
+    "_octaveScale": 2
+  },
+  {
     "__type__": "cc.TrailModule",
     "_enable": true,
     "mode": 0,
     "lifeTime": {
-      "__id__": 50
+      "__id__": 51
     },
     "_minParticleDistance": 1,
     "existWithParticles": true,
     "textureMode": 0,
     "widthFromParticle": false,
     "widthRatio": {
-      "__id__": 51
+      "__id__": 52
     },
     "colorFromParticle": false,
     "colorOverTrail": {
-      "__id__": 52
+      "__id__": 53
     },
     "colorOvertime": {
-      "__id__": 53
+      "__id__": 54
     },
     "_space": 0,
     "_particleSystem": {
@@ -626,8 +655,11 @@
     "_velocityScale": 1,
     "_lengthScale": 1,
     "_mesh": null,
+    "_cpuMaterial": null,
+    "_gpuMaterial": null,
     "_mainTexture": null,
-    "_useGPU": false
+    "_useGPU": true,
+    "_alignSpace": 2
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -637,6 +669,8 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "3abEHoPpdPKJdvgMRwS5v4"
+    "fileId": "3abEHoPpdPKJdvgMRwS5v4",
+    "instance": null,
+    "targetOverrides": null
   }
 ]

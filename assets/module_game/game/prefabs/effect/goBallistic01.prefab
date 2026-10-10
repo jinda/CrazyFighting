@@ -28,14 +28,14 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 60
+        "__id__": 61
       },
       {
-        "__id__": 62
+        "__id__": 63
       }
     ],
     "_prefab": {
-      "__id__": 64
+      "__id__": 65
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -203,7 +203,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 59
+      "__id__": 60
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -247,10 +247,7 @@
       "__id__": 9
     },
     "_materials": [
-      {
-        "__uuid__": "cfc9cb44-ef51-4935-814e-f5ba60af6d99",
-        "__expectedType__": "cc.Material"
-      },
+      null,
       null
     ],
     "_visFlags": 0,
@@ -338,12 +335,14 @@
     "_textureAnimationModule": {
       "__id__": 50
     },
-    "_noiseModule": null,
-    "_trailModule": {
+    "_noiseModule": {
       "__id__": 53
     },
+    "_trailModule": {
+      "__id__": 54
+    },
     "renderer": {
-      "__id__": 58
+      "__id__": 59
     },
     "_prewarm": false,
     "_capacity": 10,
@@ -742,25 +741,42 @@
     "multiplier": 1
   },
   {
+    "__type__": "cc.NoiseModule",
+    "_enable": false,
+    "_strengthX": 10,
+    "_strengthY": 10,
+    "_strengthZ": 10,
+    "_noiseSpeedX": 0,
+    "_noiseSpeedY": 0,
+    "_noiseSpeedZ": 0,
+    "_noiseFrequency": 1,
+    "_remapX": 0,
+    "_remapY": 0,
+    "_remapZ": 0,
+    "_octaves": 1,
+    "_octaveMultiplier": 0.5,
+    "_octaveScale": 2
+  },
+  {
     "__type__": "cc.TrailModule",
     "_enable": false,
     "mode": 0,
     "lifeTime": {
-      "__id__": 54
+      "__id__": 55
     },
     "_minParticleDistance": 0.1,
     "existWithParticles": true,
     "textureMode": 0,
     "widthFromParticle": true,
     "widthRatio": {
-      "__id__": 55
+      "__id__": 56
     },
     "colorFromParticle": false,
     "colorOverTrail": {
-      "__id__": 56
+      "__id__": 57
     },
     "colorOvertime": {
-      "__id__": 57
+      "__id__": 58
     },
     "_space": 0,
     "_particleSystem": {
@@ -819,7 +835,7 @@
       "__uuid__": "822c42a1-9007-46b0-82b3-2038b3b7ceae@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -845,7 +861,7 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 61
+      "__id__": 62
     },
     "playOnLoad": false,
     "_clips": [
@@ -878,11 +894,11 @@
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 63
+      "__id__": 64
     },
     "effectType": 0,
     "ani": {
-      "__id__": 60
+      "__id__": 61
     },
     "keepTime": 0.58,
     "autoDestroy": false,

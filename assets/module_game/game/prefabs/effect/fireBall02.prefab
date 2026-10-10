@@ -171,10 +171,7 @@
       "__id__": 5
     },
     "_materials": [
-      {
-        "__uuid__": "ea7478b0-408d-4052-b703-f0d2355e095f",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -754,7 +751,7 @@
       "__uuid__": "b5b27ab1-e740-4398-b407-848fc2b2c897@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {

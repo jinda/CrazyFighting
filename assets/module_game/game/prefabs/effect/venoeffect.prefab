@@ -1344,7 +1344,7 @@
       "__uuid__": "39d93d89-fe52-49f0-bb52-61460a6ca996@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {

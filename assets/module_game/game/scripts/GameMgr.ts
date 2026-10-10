@@ -197,33 +197,37 @@ class GameManager {
      * @returns
      */
     public getNearestEnemy(who: Fighter) {
-        let minDistance = 999999;
+        let minDisSq = Number.MAX_VALUE;
         let enemy: Node = null!;
-        let posWho = who.node.position;
+        const posX = who.node.position.x;
+        const posZ = who.node.position.z;
 
-        for (let team in this.dictFighter) {
+        for (const team in this.dictFighter) {
             if (who.team === Number(team)) {
                 continue;
             }
 
-            let objFighters = this.dictFighter[team];
-            for (let fPos in objFighters) {
-                let fighter = objFighters[fPos];
+            const objFighters = this.dictFighter[team];
+            for (const identity in objFighters) {
+                const fighter = objFighters[identity] as Node;
+                if (!fighter) {
+                    continue;
+                }
 
-                let pos = fighter.position.clone();
-                let offset = pos.subtract(posWho);
-                if (Math.abs(offset.x) < minDistance || Math.abs(offset.y) < minDistance) {
-                    let dis = offset.length();
-
-                    if (dis < minDistance) {
-                        minDistance = dis;
-                        enemy = fighter;
-
-                        //@ts-ignore,自定义属性，敌人距离自己的最短距离
-                        enemy["tmpMinDis"] = minDistance;
-                    }
+                const dx = fighter.position.x - posX;
+                const dz = fighter.position.z - posZ;
+                const disSq = dx * dx + dz * dz;
+                if (disSq < minDisSq) {
+                    minDisSq = disSq;
+                    enemy = fighter;
                 }
             }
+        }
+
+        if (enemy) {
+            //自定义属性：敌人距离自己的最短距离（供攻击范围判定使用）
+            const enemyWithDist = enemy as Node & { tmpMinDis?: number };
+            enemyWithDist.tmpMinDis = Math.sqrt(minDisSq);
         }
 
         return enemy;
@@ -323,7 +327,10 @@ class GameManager {
      */
     public getEnemyAroundRange(team: number, posWorld: Vec3, range: number) {
         const enemyTeam = team === 1 ? 2 : 1;
-        const arrEnemy = [];
+        const arrEnemy: Fighter[] = [];
+        const rangeSq = range * range;
+        const centerX = posWorld.x;
+        const centerZ = posWorld.z;
 
         const dictFighters = this.dictFighter[enemyTeam];
         for (const identity in dictFighters) {
@@ -335,13 +342,10 @@ class GameManager {
             if (!fighter || fighter.isDead) {
                 continue;
             }
-            const pos = ndFighter.position.clone();
-            const offset = pos.subtract(posWorld);
-            if (offset.x <= range && offset.z <= range) {
-                //判定距离是否在一定范围内
-                if (offset.x * offset.x + offset.z * offset.z <= range * range) {
-                    arrEnemy.push(fighter);
-                }
+            const dx = ndFighter.position.x - centerX;
+            const dz = ndFighter.position.z - centerZ;
+            if (dx * dx + dz * dz <= rangeSq) {
+                arrEnemy.push(fighter);
             }
         }
 

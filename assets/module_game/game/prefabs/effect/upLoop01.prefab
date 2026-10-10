@@ -3,18 +3,19 @@
     "__type__": "cc.Prefab",
     "_name": "upLoop01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_native": "",
     "data": {
       "__id__": 1
     },
     "optimizationPolicy": 0,
-    "asyncLoadAssets": false,
     "persistent": false
   },
   {
     "__type__": "cc.Node",
     "_name": "upLoop01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": null,
     "_children": [
       {
@@ -27,11 +28,11 @@
     "_active": true,
     "_components": [
       {
-        "__id__": 60
+        "__id__": 61
       }
     ],
     "_prefab": {
-      "__id__": 62
+      "__id__": 63
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -52,6 +53,7 @@
       "y": 1,
       "z": 1
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -65,6 +67,7 @@
     "__type__": "cc.Node",
     "_name": "upBox01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": {
       "__id__": 1
     },
@@ -97,6 +100,7 @@
       "y": 0.76,
       "z": 0.4
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -110,6 +114,7 @@
     "__type__": "cc.MeshRenderer",
     "_name": "upBox01<MeshRenderer>",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 2
     },
@@ -124,18 +129,23 @@
       }
     ],
     "_visFlags": 0,
-    "lightmapSettings": null,
+    "bakeSettings": {
+      "__id__": 5
+    },
     "_mesh": {
       "__uuid__": "730d28ac-bf49-477b-94d8-06be62c6162c@1ac29",
       "__expectedType__": "cc.Mesh"
     },
     "_shadowCastingMode": 0,
     "_shadowReceivingMode": 1,
+    "_shadowBias": 0,
+    "_shadowNormalBias": 0,
+    "_reflectionProbeId": -1,
+    "_reflectionProbeBlendId": -1,
+    "_reflectionProbeBlendWeight": 0,
+    "_enabledGlobalStandardSkinObject": false,
     "_enableMorph": true,
-    "_id": "",
-    "bakeSettings": {
-      "__id__": 5
-    }
+    "_id": ""
   },
   {
     "__type__": "cc.CompPrefabInfo",
@@ -155,7 +165,11 @@
     "_castShadow": false,
     "_receiveShadow": false,
     "_recieveShadow": false,
-    "_lightmapSize": 64
+    "_lightmapSize": 64,
+    "_useLightProbe": false,
+    "_bakeToLightProbe": true,
+    "_reflectionProbeType": 0,
+    "_bakeToReflectionProbe": true
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -165,12 +179,16 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "baXyYIM9lLBquHloCXA9IJ"
+    "fileId": "baXyYIM9lLBquHloCXA9IJ",
+    "instance": null,
+    "targetOverrides": null,
+    "nestedPrefabInstanceRoots": null
   },
   {
     "__type__": "cc.Node",
     "_name": "upLight01",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "_parent": {
       "__id__": 1
     },
@@ -182,7 +200,7 @@
       }
     ],
     "_prefab": {
-      "__id__": 59
+      "__id__": 60
     },
     "_lpos": {
       "__type__": "cc.Vec3",
@@ -203,6 +221,7 @@
       "y": 2.6,
       "z": 0.8
     },
+    "_mobility": 0,
     "_layer": 1073741824,
     "_euler": {
       "__type__": "cc.Vec3",
@@ -216,6 +235,7 @@
     "__type__": "cc.ParticleSystem",
     "_name": "upLight01<ParticleSystem>",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 7
     },
@@ -224,10 +244,7 @@
       "__id__": 9
     },
     "_materials": [
-      {
-        "__uuid__": "7cb53a26-6403-4233-9ebd-1e8c8819f8c3",
-        "__expectedType__": "cc.Material"
-      },
+      null,
       null
     ],
     "_visFlags": 0,
@@ -284,6 +301,13 @@
       "__id__": 22
     },
     "bursts": [],
+    "_renderCulling": false,
+    "_cullingMode": 0,
+    "_aabbHalfX": 0,
+    "_aabbHalfY": 0,
+    "_aabbHalfZ": 0,
+    "_dataCulling": false,
+    "enableCulling": false,
     "_colorOverLifetimeModule": {
       "__id__": 23
     },
@@ -308,13 +332,15 @@
     "_textureAnimationModule": {
       "__id__": 50
     },
-    "_trailModule": {
+    "_noiseModule": {
       "__id__": 53
     },
-    "renderer": {
-      "__id__": 58
+    "_trailModule": {
+      "__id__": 54
     },
-    "enableCulling": false,
+    "renderer": {
+      "__id__": 59
+    },
     "_prewarm": false,
     "_capacity": 15,
     "_simulationSpace": 1,
@@ -708,25 +734,42 @@
     "multiplier": 1
   },
   {
+    "__type__": "cc.NoiseModule",
+    "_enable": false,
+    "_strengthX": 10,
+    "_strengthY": 10,
+    "_strengthZ": 10,
+    "_noiseSpeedX": 0,
+    "_noiseSpeedY": 0,
+    "_noiseSpeedZ": 0,
+    "_noiseFrequency": 1,
+    "_remapX": 0,
+    "_remapY": 0,
+    "_remapZ": 0,
+    "_octaves": 1,
+    "_octaveMultiplier": 0.5,
+    "_octaveScale": 2
+  },
+  {
     "__type__": "cc.TrailModule",
     "_enable": false,
     "mode": 0,
     "lifeTime": {
-      "__id__": 54
+      "__id__": 55
     },
     "_minParticleDistance": 0.1,
     "existWithParticles": true,
     "textureMode": 0,
     "widthFromParticle": true,
     "widthRatio": {
-      "__id__": 55
+      "__id__": 56
     },
     "colorFromParticle": false,
     "colorOverTrail": {
-      "__id__": 56
+      "__id__": 57
     },
     "colorOvertime": {
-      "__id__": 57
+      "__id__": 58
     },
     "_space": 0,
     "_particleSystem": {
@@ -773,11 +816,17 @@
     "_velocityScale": 1,
     "_lengthScale": 1,
     "_mesh": null,
+    "_cpuMaterial": {
+      "__uuid__": "7cb53a26-6403-4233-9ebd-1e8c8819f8c3",
+      "__expectedType__": "cc.Material"
+    },
+    "_gpuMaterial": null,
     "_mainTexture": {
       "__uuid__": "c87a5390-e0da-409a-959a-55b5414418e8@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false
+    "_useGPU": true,
+    "_alignSpace": 2
   },
   {
     "__type__": "cc.PrefabInfo",
@@ -787,18 +836,22 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "06TWY4/RZKMaxwSirReHlM"
+    "fileId": "06TWY4/RZKMaxwSirReHlM",
+    "instance": null,
+    "targetOverrides": null,
+    "nestedPrefabInstanceRoots": null
   },
   {
     "__type__": "cc.Animation",
     "_name": "upLoop01<Animation>",
     "_objFlags": 0,
+    "__editorExtras__": {},
     "node": {
       "__id__": 1
     },
     "_enabled": true,
     "__prefab": {
-      "__id__": 61
+      "__id__": 62
     },
     "playOnLoad": true,
     "_clips": [
@@ -825,6 +878,8 @@
     "asset": {
       "__id__": 0
     },
-    "fileId": "7fISfqVtdBGZx0Yg3YTwBl"
+    "fileId": "7fISfqVtdBGZx0Yg3YTwBl",
+    "instance": null,
+    "targetOverrides": null
   }
 ]

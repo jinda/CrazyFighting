@@ -144,10 +144,7 @@
       "__id__": 4
     },
     "_materials": [
-      {
-        "__uuid__": "ef52a240-d4d5-4699-a2dc-2c94d938a53e",
-        "__expectedType__": "cc.Material"
-      },
+      null,
       null
     ],
     "_visFlags": 0,
@@ -537,7 +534,7 @@
       "__uuid__": "41960d9a-de34-4702-ab7e-732843723487@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -613,10 +610,7 @@
       "__id__": 41
     },
     "_materials": [
-      {
-        "__uuid__": "fae9ccc2-b46e-4f64-84fe-6890210621f8",
-        "__expectedType__": "cc.Material"
-      },
+      null,
       null
     ],
     "_visFlags": 0,
@@ -973,7 +967,7 @@
       "__uuid__": "41089c88-9060-4395-a959-321f2b5aa96f@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -1049,10 +1043,7 @@
       "__id__": 77
     },
     "_materials": [
-      {
-        "__uuid__": "1261b077-dabd-4b38-a9e8-9b66d7fee66d",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -1548,7 +1539,7 @@
       "__uuid__": "19c42cb0-b15e-4fb4-8da1-ae7772ecf732@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -1624,10 +1615,7 @@
       "__id__": 121
     },
     "_materials": [
-      {
-        "__uuid__": "e33d2d14-dc67-4836-9da5-2e4de3ed6273",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -2014,7 +2002,7 @@
       "__uuid__": "c4a98e54-a2ed-48ee-b3f2-9b0a3223a11e@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -2090,10 +2078,7 @@
       "__id__": 154
     },
     "_materials": [
-      {
-        "__uuid__": "e33d2d14-dc67-4836-9da5-2e4de3ed6273",
-        "__expectedType__": "cc.Material"
-      },
+      null,
       null
     ],
     "_visFlags": 0,
@@ -2424,7 +2409,7 @@
       "__uuid__": "c4a98e54-a2ed-48ee-b3f2-9b0a3223a11e@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -2500,10 +2485,7 @@
       "__id__": 185
     },
     "_materials": [
-      {
-        "__uuid__": "a86b55f1-ad6e-4530-9dfa-bf5bb7a32c95",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -2933,7 +2915,7 @@
       "__uuid__": "f9fc9f1e-64ac-420f-afcf-000b90b03a7c@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -3009,10 +2991,7 @@
       "__id__": 224
     },
     "_materials": [
-      {
-        "__uuid__": "c3246058-eb3f-41ce-a2ef-41fff8f0b0c9",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -3425,7 +3404,7 @@
       "__uuid__": "7b95a3a0-c128-4c6b-a2a8-a25a355b30a4@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
@@ -3501,10 +3480,7 @@
       "__id__": 258
     },
     "_materials": [
-      {
-        "__uuid__": "116b7004-96d7-427d-8fd7-f372b180347b",
-        "__expectedType__": "cc.Material"
-      }
+      null
     ],
     "_visFlags": 0,
     "startColor": {
@@ -3926,7 +3902,7 @@
       "__uuid__": "1abc7e70-3c73-4995-9d47-b92f613d1d25@6c48a",
       "__expectedType__": "cc.Texture2D"
     },
-    "_useGPU": false,
+    "_useGPU": true,
     "_alignSpace": 2
   },
   {
