@@ -146,6 +146,8 @@ export class Start extends Component {
         // 保存到 DataMgr 兼容旧代码
         DataMgr.userData = data.user_info;
 
+        ClientApi.inst.foreground(ClientApi.createSessionId());
+
         if (DataMgr.userData.coin !== DataMgr.coin) {
             egf.Logger.warn(
                 "[DataMgr] 本地金币与服务端账本不一致（方案约定以本地为准）:",

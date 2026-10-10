@@ -402,16 +402,21 @@ class GameManager {
     /**
      * 回收士兵节点和刚体
      * @param identity 士兵唯一标识
+     * @param team 所属队伍，默认我方以兼容现有调用
      */
-    public removeFighter(identity: number) {
-        const ndFighter = this.dictFighter[Constants.PLAYER_TEAM][identity];
+    public removeFighter(identity: number, team: number = Constants.PLAYER_TEAM) {
+        const teamFighters = this.dictFighter[team];
+        if (!teamFighters) {
+            return;
+        }
+        const ndFighter = teamFighters[identity];
 
         if (ndFighter) {
             const scriptFighter = ndFighter.getComponent(Fighter) as Fighter;
             scriptFighter.recycle();
         }
 
-        delete this.dictFighter[Constants.PLAYER_TEAM][identity];
+        delete teamFighters[identity];
     }
 }
 

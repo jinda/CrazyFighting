@@ -187,7 +187,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 192.1499481201172,
+      "width": 600,
       "height": 50.4
     },
     "_anchorPoint": {
@@ -225,7 +225,7 @@
       "b": 255,
       "a": 255
     },
-    "_maxWidth": 0,
+    "_maxWidth": 600,
     "_fontFamily": "Arial",
     "_font": {
       "__uuid__": "208bc5b9-d022-4776-b8d4-3a29132b729c",
@@ -272,7 +272,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 392.1499481201172,
+      "width": 800,
       "height": 55
     },
     "_anchorPoint": {

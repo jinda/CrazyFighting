@@ -67,6 +67,42 @@ export interface ILoginData {
 }
 
 /**
+ * 前台/后台会话状态
+ */
+export enum ESessionStatus {
+    /**
+     * 前台会话正在计时
+     */
+    Active = "active",
+    /**
+     * 已配对结束并记录时长
+     */
+    Completed = "completed",
+    /**
+     * 未结束会话已被新前台替换，不计入时长
+     */
+    Discarded = "discarded",
+    /**
+     * 后台请求没有匹配的会话，已忽略
+     */
+    Ignored = "ignored",
+}
+
+/**
+ * 游戏进入前台 / 后台上报响应数据
+ */
+export interface ISessionData {
+    /**
+     * 会话 ID（回显本次上报的 UUID）
+     */
+    session_id: string;
+    /**
+     * 会话状态，见 ESessionStatus
+     */
+    status: string;
+}
+
+/**
  * 玩法榜单列表项
  */
 export interface ILeaderboardMode {
@@ -580,4 +616,8 @@ export enum EApiErrcode {
      * 邮件无可领取附件
      */
     MailNoReward = 10063,
+    /**
+     * 前台会话创建过于频繁，请稍后重试
+     */
+    SessionTooFrequent = 10064,
 }

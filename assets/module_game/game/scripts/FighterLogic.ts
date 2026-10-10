@@ -27,6 +27,7 @@ import { UI_Menu } from "../../ui_menu/UI_Menu";
 import { UI_Fighter } from "../../ui_fighter/UI_Fighter";
 import BackResPkg from "db://assets/scripts/BackResPkg";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
+import { ClientApi } from "db://assets/scripts/ClientApi";
 
 const { ccclass, property } = _decorator;
 //“管理所有士兵”的脚本
@@ -104,6 +105,7 @@ export class FighterLogic extends Component {
                 console.log("游戏进入后台");
                 // 在这里暂停游戏逻辑、音乐音效等
                 egf.AudioMgr.pause();
+                ClientApi.inst.background(ClientApi.createSessionId());
             },
             this,
         );
@@ -115,6 +117,7 @@ export class FighterLogic extends Component {
                 console.log("游戏回到前台");
                 // 在这里恢复游戏逻辑、音乐音效等
                 egf.AudioMgr.resume();
+                ClientApi.inst.foreground(ClientApi.createSessionId());
             },
             this,
         );
@@ -716,18 +719,32 @@ export class FighterLogic extends Component {
      * @param cellTarge
      */
     private _combineCell(cellSelect: FormationCell, cellTarget: FormationCell) {
+        if (
+            cellSelect === cellTarget ||
+            cellSelect.fighterId <= 0 ||
+            cellSelect.fighterId !== cellTarget.fighterId ||
+            cellSelect.aryIdentity.length === 0 ||
+            cellTarget.aryIdentity.length === 0
+        ) {
+            this._resetCellFighterPos();
+            return;
+        }
+
         //下一等级的士兵
         let nextId = GameMgr.getFighterNextId(cellSelect.fighterId);
         egf.Logger.log("combineCell nextId:", nextId, "cellSelect.fighterId:", cellSelect.fighterId);
         //有找到，可升级
         if (nextId > 0) {
-            //数据更新
-            LocalDataMgr.combineCell(cellSelect.pos, cellTarget.pos, nextId);
-
             //目标格子生成下一等级的士兵
-            cellTarget.updateFighter(nextId);
+            if (!cellTarget.updateFighter(nextId)) {
+                this._resetCellFighterPos();
+                return;
+            }
             //清空玩家选中的格子上的士兵
             cellSelect.updateFighter(0);
+
+            //双方旧士兵回收成功后再保存，创建失败时仍保留原阵型。
+            LocalDataMgr.combineCell(cellSelect.pos, cellTarget.pos, nextId);
             cellTarget.showCombineSucceed();
 
             egf.AudioMgr.playOneShot(Constants.AUDIO_SOUND.COMBINE);

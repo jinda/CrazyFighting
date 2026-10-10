@@ -2,6 +2,7 @@ import { _decorator, Component, Node, Vec3, Prefab, v3, ParticleSystemComponent 
 import { Constants } from "db://assets/scripts/Constants";
 import { GameCfg } from "./GameConfig";
 import { GameMgr } from "./GameMgr";
+import { Fighter } from "./Fighter";
 
 const { ccclass, property } = _decorator;
 //格子/土地节点脚本
@@ -18,7 +19,7 @@ export class FormationCell extends Component {
 
     public pos: number = 0; //格子索引
     public fighterId: number = 0; //士兵编号/种类
-    public aryIdentity: any = []; //当前格子上的士兵唯一标识的数组
+    public aryIdentity: number[] = []; //当前格子上的士兵唯一标识的数组
 
     //设置是否展示“选择提示”特效
     public set select(isSelect) {
@@ -86,37 +87,55 @@ export class FormationCell extends Component {
      * 更新格子上的士兵
      *
      * @param {number} fighterId
-     * @returns
+     * @returns 是否完成替换；创建失败时保留原士兵
      * @memberof FormationCell
      */
-    public updateFighter(fighterId: number) {
-        //移除原来格子关联的士兵ID
-        if (this.aryIdentity.length > 0) {
-            this.aryIdentity.forEach((identity: any) => {
-                GameMgr.removeFighter(identity);
-            });
+    public updateFighter(fighterId: number): boolean {
+        const newIdentities: number[] = [];
+        const newNodes: Node[] = [];
 
-            this.aryIdentity = [];
+        //先完成新士兵创建，再替换旧士兵，避免创建异常导致格子和阵型数据不一致。
+        if (fighterId > 0) {
+            try {
+                const fighterInfo = GameCfg.queryByID("fighter", fighterId.toString());
+                if (!fighterInfo || !this.node.parent) {
+                    egf.Logger.error("FormationCell updateFighter: missing config or parent", this.pos, fighterId);
+                    return false;
+                }
+
+                this._cellPos1.set(this.node.worldPosition);
+                const arrPos = GameMgr.getFighterPosByNum(this._cellPos1, fighterInfo.num);
+                for (const fighterPos of arrPos) {
+                    const ndFighter = egf.PoolMgr.getNode(this.pfFighter, this.node.parent);
+                    //init 可能抛错，必须在注册前记录节点，才能回收未注册的半成品。
+                    newNodes.push(ndFighter);
+                    const identity = GameMgr.addFighter(ndFighter, this._team, fighterPos, fighterInfo, this.pos);
+                    newIdentities.push(identity);
+                }
+            } catch (error) {
+                //updateFighter 同时用于敌方初始化，按所属队伍清理本次创建的登记。
+                for (const identity of newIdentities) {
+                    GameMgr.removeFighter(identity, this._team);
+                }
+                for (const node of newNodes) {
+                    const fighter = node.getComponent(Fighter);
+                    if (fighter) {
+                        fighter.recycle();
+                    } else {
+                        egf.PoolMgr.putNode(node);
+                    }
+                }
+                egf.Logger.error("FormationCell updateFighter failed", this.pos, fighterId, error);
+                return false;
+            }
         }
 
+        for (const identity of this.aryIdentity) {
+            GameMgr.removeFighter(identity, this._team);
+        }
+        this.aryIdentity = newIdentities;
         this.fighterId = fighterId;
-
-        if (this.fighterId <= 0) {
-            //如果是0，则置空，无需再操作
-            return;
-        }
-
-        let fighterInfo = GameCfg.queryByID("fighter", fighterId.toString());
-        let num = fighterInfo["num"];
-
-        this._cellPos1.set(this.node.worldPosition);
-
-        let arrPos = GameMgr.getFighterPosByNum(this._cellPos1, num);
-        arrPos.forEach((fighterPos) => {
-            let ndFighter = egf.PoolMgr.getNode(this.pfFighter, this.node.parent!);
-            let identity = GameMgr.addFighter(ndFighter, this._team, fighterPos, fighterInfo, this.pos);
-            this.aryIdentity.push(identity);
-        });
+        return true;
     }
 
     /**

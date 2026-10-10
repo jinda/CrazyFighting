@@ -19,6 +19,7 @@ import {
     IReportEventData,
     IResourceData,
     ISaveDataItem,
+    ISessionData,
     IUserInfo,
     TApiErrCallback,
     TQueryParams,
@@ -217,6 +218,38 @@ export class ClientApi {
             }
             egf.Logger.log("[ClientApi] login success is_new:", data.is_new, "uid:", data.user_info?.uid);
         }
+    }
+
+    // ---------- 1.1 游戏进入前台 / 后台 ----------
+
+    /**
+     * 生成前台/后台会话 UUID（每次进入前台调用一次；上报失败重试必须沿用同一 UUID，不能重新生成）
+     * 版本 4（variant 10xx）格式，例如 "12345678-1234-4234-8234-123456789abc"
+     */
+    public static createSessionId(): string {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
+            const r = (Math.random() * 16) | 0;
+            const v = c === "x" ? r : (r & 0x3) | 0x8;
+            return v.toString(16);
+        });
+    }
+
+    /**
+     * 上报游戏进入前台（需要登录 token）
+     * 登录成功后，每次应用进入前台生成新的 UUID 调用；收到成功响应后，进入后台时复用同一 session_id
+     * @param sessionId 会话 UUID（可用 ClientApi.createSessionId 生成）
+     */
+    public foreground(sessionId: string, cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
+        this.request<ISessionData>("/client/foreground", { session_id: sessionId }, cb, errCb);
+    }
+
+    /**
+     * 上报游戏进入后台（需要登录 token）
+     * 前台上报成功收到响应后，进入后台时用同一个 session_id 调用；请求失败重试沿用原 UUID
+     * @param sessionId 与前台上报一致的会话 UUID
+     */
+    public background(sessionId: string, cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
+        this.request<ISessionData>("/client/background", { session_id: sessionId }, cb, errCb);
     }
 
     // ---------- 2. 获取玩家信息 ----------
