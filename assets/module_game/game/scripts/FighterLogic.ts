@@ -105,7 +105,8 @@ export class FighterLogic extends Component {
                 console.log("游戏进入后台");
                 // 在这里暂停游戏逻辑、音乐音效等
                 egf.AudioMgr.pause();
-                ClientApi.inst.background(ClientApi.createSessionId());
+                ClientApi.inst.background();
+                LocalDataMgr.saveData();
             },
             this,
         );
@@ -117,7 +118,7 @@ export class FighterLogic extends Component {
                 console.log("游戏回到前台");
                 // 在这里恢复游戏逻辑、音乐音效等
                 egf.AudioMgr.resume();
-                ClientApi.inst.foreground(ClientApi.createSessionId());
+                ClientApi.inst.foreground();
             },
             this,
         );

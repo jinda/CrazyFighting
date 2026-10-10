@@ -196,7 +196,6 @@ class AudioManager {
      */
     pause() {
         this._musicSource.pause();
-        this._effectSources.forEach((as) => as.pause());
     }
 
     /**
@@ -204,7 +203,6 @@ class AudioManager {
      */
     resume() {
         this._musicSource.play();
-        this._effectSources.forEach((as) => as.play());
     }
 }
 

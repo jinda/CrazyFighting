@@ -55,6 +55,7 @@ export class ClientApi {
     private _token: string = "";
     private _userInfo: IUserInfo | null = null;
     private _adConfig: IAdConfigData | null = null;
+    private _sessionId: string = "";
 
     public get token(): string {
         return this._token;
@@ -239,8 +240,9 @@ export class ClientApi {
      * 登录成功后，每次应用进入前台生成新的 UUID 调用；收到成功响应后，进入后台时复用同一 session_id
      * @param sessionId 会话 UUID（可用 ClientApi.createSessionId 生成）
      */
-    public foreground(sessionId: string, cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
-        this.request<ISessionData>("/client/foreground", { session_id: sessionId }, cb, errCb);
+    public foreground(cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
+        this._sessionId = ClientApi.createSessionId();
+        this.request<ISessionData>("/client/foreground", { session_id: this._sessionId }, cb, errCb);
     }
 
     /**
@@ -248,8 +250,8 @@ export class ClientApi {
      * 前台上报成功收到响应后，进入后台时用同一个 session_id 调用；请求失败重试沿用原 UUID
      * @param sessionId 与前台上报一致的会话 UUID
      */
-    public background(sessionId: string, cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
-        this.request<ISessionData>("/client/background", { session_id: sessionId }, cb, errCb);
+    public background(cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
+        this.request<ISessionData>("/client/background", { session_id: this._sessionId }, cb, errCb);
     }
 
     // ---------- 2. 获取玩家信息 ----------

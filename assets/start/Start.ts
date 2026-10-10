@@ -146,7 +146,7 @@ export class Start extends Component {
         // 保存到 DataMgr 兼容旧代码
         DataMgr.userData = data.user_info;
 
-        ClientApi.inst.foreground(ClientApi.createSessionId());
+        ClientApi.inst.foreground();
 
         if (DataMgr.userData.coin !== DataMgr.coin) {
             egf.Logger.warn(
