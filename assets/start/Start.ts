@@ -135,9 +135,16 @@ export class Start extends Component {
                 break;
         }
         // 拉取广告配置（无需认证）
-        ClientApi.inst.getAdConfig(channel, (data: IAdConfigData) => {
-            PlatformMgr.initAd(data);
-        });
+        ClientApi.inst.getAdConfig(
+            channel,
+            (data: IAdConfigData) => {
+                PlatformMgr.initAd(data);
+            },
+            (errcode, errmsg) => {
+                egf.Logger.warn("getAdConfig fail:", errcode, errmsg);
+                PlatformMgr.initAd(null);
+            },
+        );
     }
     /**
      * 登录成功后处理

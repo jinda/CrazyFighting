@@ -3,9 +3,9 @@ import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
 
 let wx = (<any>window).wx;
 
-const adunitVideo = "adunit-57415739ee47a411";
-const adunitInterstitial = "adunit-54cdc3174f761e60";
-const adunitBanner = "adunit-b9179edb023af2a9";
+const adunitVideo = "adunit-1299ee38a033d8ab";
+const adunitInterstitial = "adunit-827bfde533614675";
+const adunitBanner = "adunit-846ab3de180c263c";
 const gamelink =
     "-SSEykJvFV3pORt5kTNpSyVVfsEg4nDw2GllMERzeP4TmfV8ASA0tdIi46W1-QRVKUP0kIOfZgju_zZ1JpdBbz8rFFQy5t6K3Sn6nnRUzK0zsAjVrWSnlxtzvzUGGgScyczD369VU22NbgPYtXRDOuCzfcm1h90I5jtq2DBGFnjqTTnS8KLdi1Z1kvHUDASBzq-nCOl4Bn3gPcLYr0mGcpWo6xdR2bA-qxa0IqRPVV35a3JmM7rawn481oJYxtN2DxysMhaszYv1XPBpUYQRdouk29mjPyBnFBhY5PZ4cFANfd_I6psV3qDOinJbl3cH-Tc4UM5sgsLcSCI_1RswuQ";
 
