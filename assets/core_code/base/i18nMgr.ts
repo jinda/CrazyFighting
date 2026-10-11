@@ -36,7 +36,8 @@ class i18nManager {
         return this._inst;
     }
 
-    private _language = ELanguage[sys.languageCode as keyof typeof ELanguage]; // 当前语言
+    private _language: ELanguage =
+        this.resolveLanguage(sys.languageCode) ?? this.resolveLanguage(sys.language) ?? ELanguage.en; // 当前语言
     private _labelArr: i18nLabel.i18nLabel[] = []; // i18nLabel 列表
     private _labelData: { [key: string]: string } = {}; // 文字配置
     private _spriteArr: i18nSprite.i18nSprite[] = []; // i18nSprite 列表
@@ -63,11 +64,45 @@ class i18nManager {
         return this._language;
     }
 
+    private resolveLanguage(language: unknown): ELanguage | null {
+        if (typeof language !== "string" || !language.trim()) {
+            return null;
+        }
+        const code = language.trim().toLowerCase().replace(/_/g, "-");
+        const parts = code.split("-");
+        switch (parts[0]) {
+            case "zh":
+                return parts.some((part) => ["tw", "hk", "mo", "hant"].includes(part))
+                    ? ELanguage["zh-tw"]
+                    : ELanguage["zh-cn"];
+            case "en":
+                return ELanguage.en;
+            case "hi":
+                return ELanguage.hi;
+            case "pt":
+                return ELanguage.pt;
+            case "es":
+                return ELanguage.es;
+            case "ar":
+                return ELanguage.ar;
+            case "ja":
+                return ELanguage.ja;
+            default:
+                return null;
+        }
+    }
+
     public setLanguage(language: string) {
-        if ((this._language === language && Object.keys(this._labelData).length !== 0) || !language) {
+        const resolvedLanguage = this.resolveLanguage(language);
+        if (language && !resolvedLanguage) {
+            egf.Logger.warn("Unsupported language, keeping current language:", language, this._language);
+        }
+        //首次启动的存档语言为空，也要加载系统语言或默认英文的翻译资源。
+        const nextLanguage = resolvedLanguage ?? this._language;
+        if (this._language === nextLanguage && Object.keys(this._labelData).length !== 0) {
             return;
         }
-        this._language = language as ELanguage;
+        this._language = nextLanguage;
         egf.Logger.log("current language:", this._language);
 
         this.reloadLabel();

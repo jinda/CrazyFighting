@@ -26,14 +26,26 @@ export class Layout_DownSelect extends Component {
     @property(Node)
     nodeDowwnSelect: Node = null!;
 
-    private _selectId: number | string = 0;
+    private _selectId: number | string | null = null;
 
-    showInfo(selectId: number | string, selects: ISelectNames[] = [], cb: (selectId: number | string) => void) {
-        this._selectId = selectId;
+    showInfo(
+        selectId: number | string | null | undefined,
+        selects: ISelectNames[] = [],
+        cb: (selectId: number | string) => void,
+    ) {
+        this._selectId = selectId ?? null;
+        const validSelects = selects.filter(
+            (select) => select && (typeof select.selectId === "string" || typeof select.selectId === "number"),
+        );
+        if (validSelects.length !== selects.length) {
+            egf.Logger.warn("Layout_DownSelect: ignoring options with missing selectId");
+        }
         // clog.log('Layout_DownSelect showInfo', this.node.name, idx, selects);
-        const idx = selects.findIndex((select) => select.selectId == selectId);
-        if (selects[idx]) {
-            this.showSelectName(selects[idx].name1, selects[idx].name2, selects[idx].color);
+        const selected = validSelects.find(
+            (select) => this._selectId !== null && String(select.selectId) === String(this._selectId),
+        );
+        if (selected) {
+            this.showSelectName(selected.name1, selected.name2, selected.color);
         } else {
             this.showSelectName("", "--");
         }
@@ -41,14 +53,16 @@ export class Layout_DownSelect extends Component {
         this.nodeDowwnSelect.active = false;
         this.btnBack.node.active = false;
 
+        //刷新内容时先解除旧监听，避免一次点击重复展开和收起。
+        this.removeButtonListeners();
         this.btnSelect.node.on(Button.EventType.CLICK, this.showDownSelect, this);
         this.btnBack.node.on(Button.EventType.CLICK, this.showDownSelect, this);
 
         this.nodeDowwnSelect.removeAllChildren();
-        selects.forEach((select) => {
+        validSelects.forEach((select) => {
             const nodeSelect = instantiate(this.nodeSelect);
             nodeSelect.parent = this.nodeDowwnSelect;
-            nodeSelect.name = select.selectId.toString();
+            nodeSelect.name = String(select.selectId);
             const label1 = find("Layout/Label1", nodeSelect);
             const sprite1 = find("Layout/Sprite1", nodeSelect);
             if (label1) {
@@ -61,9 +75,9 @@ export class Layout_DownSelect extends Component {
             }
             // clog.log('showInfo:', select.selectId, selectId);
 
-            if (select.selectId == selectId) {
-                const select = find("SpriteSelect", nodeSelect)!;
-                select.active = true;
+            const selectMarker = find("SpriteSelect", nodeSelect);
+            if (selectMarker) {
+                selectMarker.active = select === selected;
             }
 
             const label2 = find("Layout/Label2", nodeSelect)!.getComponent(Label)!;
@@ -116,11 +130,21 @@ export class Layout_DownSelect extends Component {
         this.nodeDowwnSelect.active = !this.nodeDowwnSelect.active;
         this.btnBack.node.active = this.nodeDowwnSelect.active;
         if (this.nodeDowwnSelect.active) {
+            const selectedId =
+                typeof this._selectId === "string" || typeof this._selectId === "number"
+                    ? String(this._selectId)
+                    : null;
             this.nodeDowwnSelect.children.forEach((nodeSelect) => {
-                const select = find("SpriteSelect", nodeSelect)!;
-                const bSelect = nodeSelect.name == this._selectId.toString();
-                select.active = bSelect;
+                const select = find("SpriteSelect", nodeSelect);
+                if (select) {
+                    select.active = nodeSelect.name === selectedId;
+                }
             });
         }
+    }
+
+    private removeButtonListeners() {
+        this.btnSelect?.node.off(Button.EventType.CLICK, this.showDownSelect, this);
+        this.btnBack?.node.off(Button.EventType.CLICK, this.showDownSelect, this);
     }
 }
