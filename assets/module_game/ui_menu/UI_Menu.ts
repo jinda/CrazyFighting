@@ -88,8 +88,7 @@ export class UI_Menu extends egf.UIController {
 
     private clickOnline() {
         egf.AudioMgr.playOneShot("tap");
-        const time = Date.now() - DataMgr.onlineGetTime;
-        egf.UIMgr.showUI(UI_Award, null, this, { bOnline: true, coin: Math.floor(time / 60000) });
+        egf.UIMgr.showUI(UI_Award, null, this, { bOnline: true, coin: DataMgr.onlineCoin });
     }
     private clickSign() {
         egf.AudioMgr.playOneShot("tap");

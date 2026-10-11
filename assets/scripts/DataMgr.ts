@@ -10,6 +10,27 @@ import { EPlatform, PlatformMgr } from "./SDK/PlatformMgr";
 
 window.onerror = function (message, source, lineno, colno, error) {
     egf.Logger.error("捕获到全局错误: ", message, source, lineno, colno, error);
+    ClientApi.inst.reportError(
+        {
+            /** 一次异常的稳定 ID，非空，最多 128 字节；重试必须复用 */
+            event_id: ClientApi.createReqId("global_error"),
+            error_type: "runtime",
+            /** 非空，最多 2 KiB；发送前移除敏感信息 */
+            message: message.toString(),
+            /** 最多 16 KiB；发送前移除敏感信息 */
+            stack: source?.toString(),
+            /** 最多 128 字节 */
+            game_version: DataMgr.version,
+            /** 最多 128 字节 */
+            platform: PlatformMgr.platform.toString(),
+        },
+        (data) => {
+            egf.Logger.log("reportError success:", data);
+        },
+        (errcode, errmsg) => {
+            egf.Logger.warn("reportError fail:", errcode, errmsg);
+        },
+    );
     return true; // 返回true可以阻止错误冒泡
 };
 export interface IMaintenance {
@@ -35,6 +56,7 @@ class DataManager {
     // 内存加密存储，防止内存扫描篡改金币/关卡
     private _coin: egf.SecureValue = new egf.SecureValue(0);
     private _level: egf.SecureValue = new egf.SecureValue(0);
+    private _onlineCoin: egf.SecureValue = new egf.SecureValue(0);
 
     private _userData: IUserInfo = { money: 0, level: 0, coin: 0 }; // 用户数据
     public get userData(): IUserInfo {
@@ -52,6 +74,7 @@ class DataManager {
     public bBannerAd: boolean = false; // 是否显示banner
     public isDebugMode: boolean = false; // 调试模式
     public waitingBuy: number = -1; //优先安排购买
+    public version: string = "1.0.0"; // 版本号
 
     public get coin() {
         return this._coin.get();
@@ -102,6 +125,14 @@ class DataManager {
         this._level.set(Math.min(this._level.get() + 1, Constants.MAX_LEVEL));
         LocalDataMgr.GameInfo.level = this._level.get();
         LocalDataMgr.saveGameInfoData();
+    }
+
+    public get onlineCoin() {
+        return this._onlineCoin.get();
+    }
+
+    public set onlineCoin(value: number) {
+        this._onlineCoin.set(value);
     }
 
     // ---------- 服务端账本与通关进度上报（本地权威 + 幂等异步上报） ----------

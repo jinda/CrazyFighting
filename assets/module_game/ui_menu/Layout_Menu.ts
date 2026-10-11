@@ -2,6 +2,7 @@ import { _decorator, Node, Button, Component, Label, RichText, tween, v3, Vec3, 
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 import { LevelTips } from "./LevelTips";
+import { Constants } from "../../scripts/Constants";
 const { ccclass, property } = _decorator;
 
 @ccclass("Layout_Menu")
@@ -82,8 +83,12 @@ export class Layout_Menu extends Component {
         this.unscheduleAllCallbacks();
         this.schedule(() => {
             const time = Date.now() - DataMgr.onlineGetTime;
-            this.labelOnlineCoin.string = Math.floor(time / 60000).toString();
-            if (Math.floor(time / 60000) > 10 && !this.bCanOnline) {
+            DataMgr.onlineCoin = Math.floor(time / 60000);
+            if (DataMgr.onlineCoin > Constants.maxOnlineCoin) {
+                DataMgr.onlineCoin = Constants.maxOnlineCoin;
+            }
+            this.labelOnlineCoin.string = DataMgr.onlineCoin.toString();
+            if (DataMgr.onlineCoin > 10 && !this.bCanOnline) {
                 this.bCanOnline = true;
                 tween(this.btnOnline.node)
                     .to(0.5, { scale: new Vec3(1.2, 1.2, 1.2) })

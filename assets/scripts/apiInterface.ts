@@ -300,6 +300,37 @@ export interface IReportEventData {
 }
 
 /**
+ * 上报客户端异常请求参数（字符串限制按 UTF-8 字节计）
+ */
+export interface IReportErrorParams {
+    /** 一次异常的稳定 ID，非空，最多 128 字节；重试必须复用 */
+    event_id: string;
+    error_type: "runtime" | "unhandled_rejection" | "manual";
+    /** 非空，最多 2 KiB；发送前移除敏感信息 */
+    message: string;
+    /** 最多 16 KiB；发送前移除敏感信息 */
+    stack?: string;
+    /** 最多 128 字节 */
+    game_version?: string;
+    /** 最多 128 字节 */
+    platform?: string;
+    /** 最多 128 字节 */
+    scene?: string;
+    /** RFC3339 时间，最多 128 字节；省略或空字符串取服务端时间 */
+    occurred_at?: string;
+}
+
+/**
+ * 上报客户端异常响应数据
+ */
+export interface IReportErrorData {
+    /** 回显本次上报的稳定 ID */
+    event_id: string;
+    /** true=重复上报，保留第一次的内容和时间 */
+    duplicate: boolean;
+}
+
+/**
  * 查询资源响应数据
  */
 export interface IResourceData {

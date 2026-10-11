@@ -16,6 +16,8 @@ import {
     IProgressCompleteData,
     IPushScoreResp,
     IRedeemCodeData,
+    IReportErrorData,
+    IReportErrorParams,
     IReportEventData,
     IResourceData,
     ISaveDataItem,
@@ -373,6 +375,31 @@ export class ClientApi {
             params.occurred_at = occurredAt;
         }
         this.request<IReportEventData>("/client/event/report", params, cb, errCb);
+    }
+
+    // ---------- 4.3 上报客户端异常 ----------
+
+    /**
+     * 上报客户端异常（登录后使用），请求体最多 32 KiB，不接受 uid/game_code 或自定义上下文。
+     * 调用方须先移除消息、堆栈中的 token、密码和请求凭据；不能再次上报本接口自身的失败。
+     * 临时依赖失败（10000/网络失败）由调用方采用有上限的退避重试，沿用相同 event_id；
+     * 参数错误（10001）、认证错误（2）、限流（10065）不立即重试。
+     * @param params 异常信息；event_id 可用 ClientApi.createReqId 生成，同一次异常重试不得重新生成
+     */
+    public reportError(params: IReportErrorParams, cb?: (data: IReportErrorData) => void, errCb?: TApiErrCallback) {
+        const body: TRequestParams = {
+            event_id: params.event_id,
+            error_type: params.error_type,
+            message: params.message,
+        };
+        //逐项构造请求，避免运行时对象携带文档不允许的身份字段或其他上下文。
+        const optionalKeys = ["stack", "game_version", "platform", "scene", "occurred_at"] as const;
+        for (const key of optionalKeys) {
+            if (params[key] !== undefined) {
+                body[key] = params[key];
+            }
+        }
+        this.request<IReportErrorData>("/client/error/report", body, cb, errCb);
     }
 
     // ---------- 5. 获取排行榜 ----------

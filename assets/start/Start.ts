@@ -8,6 +8,7 @@ import { ClientApi } from "../scripts/ClientApi";
 import { EPlatform, PlatformMgr } from "../scripts/SDK/PlatformMgr";
 import { IAdConfigData, ILoginData } from "../scripts/apiInterface";
 import { LocalDataMgr } from "../scripts/LocalDataMgr";
+import { GetEnvConfig } from "../scripts/config/EnvConfig";
 
 const { ccclass, property } = _decorator;
 
@@ -37,6 +38,9 @@ export class Start extends Component {
         egf.AudioMgr.bundleName = ModuleDef.SOUNDS;
         egf.i18nMgr.bundleName = ModuleDef.I18N;
         egf.UIMgr.setup(this.uiCanvasPrefab!, egf.UILayers.NUM, egf.UILayerNames);
+
+        const { version } = GetEnvConfig();
+        DataMgr.version = version;
         // 初始化 ClientApi（设置 X-Game-Code Header）
         ClientApi.inst.init();
 
@@ -154,16 +158,15 @@ export class Start extends Component {
         DataMgr.userData = data.user_info;
 
         ClientApi.inst.foreground();
-
         if (DataMgr.userData.coin !== DataMgr.coin) {
-            egf.Logger.warn(
-                "[DataMgr] 本地金币与服务端账本不一致（方案约定以本地为准）:",
+            egf.Logger.error(
+                "本地金币与服务端账本不一致（方案约定以服务器为准）:",
                 DataMgr.coin,
                 DataMgr.userData.coin,
             );
-            const offset = DataMgr.coin - (DataMgr.userData.coin || 0);
-            DataMgr.queueLedgerReport(offset > 0 ? "gain" : "consume", Math.abs(offset), "sync local coin");
         }
+        DataMgr.coin = data.user_info.coin || 0;
+        DataMgr.level = data.user_info.level || 1;
 
         // ClientApi 内部已设置 Authorization Header
         LocalDataMgr.loadDataFromSever();
