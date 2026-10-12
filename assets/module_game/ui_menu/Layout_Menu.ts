@@ -1,4 +1,4 @@
-import { _decorator, Node, Button, Component, Label, RichText, tween, v3, Vec3, Tween } from "cc";
+import { _decorator, Node, Button, Component, Label, RichText, tween, v3, Vec3, Tween, Color } from "cc";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 import { LevelTips } from "./LevelTips";
@@ -119,16 +119,19 @@ export class Layout_Menu extends Component {
         this.labelLandCost.string = "x" + land;
 
         const bEnoughCoin = DataMgr.coin > coin;
-        this.nodeCoinCost.active = bEnoughCoin;
-        this.nodeCoinAd.active = !bEnoughCoin;
+        this.labelCoinCost.color = bEnoughCoin ? new Color().fromHEX("#f23160") : new Color().fromHEX("#FFFFFF");
+        // this.nodeCoinCost.active = bEnoughCoin;
+        // this.nodeCoinAd.active = !bEnoughCoin;
 
         const bEnoughFighter = DataMgr.coin > fighter;
-        this.nodeSoldierCost.active = bEnoughFighter;
-        this.nodeSoldierAd.active = !bEnoughFighter;
+        this.labelSoldierCost.color = bEnoughFighter ? new Color().fromHEX("#f23160") : new Color().fromHEX("#FFFFFF");
+        // this.nodeSoldierCost.active = bEnoughFighter;
+        // this.nodeSoldierAd.active = !bEnoughFighter;
 
         const bEnoughLand = DataMgr.coin > land;
-        this.nodeLandCost.active = bEnoughLand;
-        this.nodeLandAd.active = !bEnoughLand;
+        this.labelLandCost.color = bEnoughLand ? new Color().fromHEX("#f23160") : new Color().fromHEX("#FFFFFF");
+        // this.nodeLandCost.active = bEnoughLand;
+        // this.nodeLandAd.active = !bEnoughLand;
 
         egf.Logger.log("updateCoinCost:", DataMgr.coin, coin, fighter, land);
 

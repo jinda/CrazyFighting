@@ -221,7 +221,7 @@ export class Constants {
     // 技能CD时间
     public static SkillCD = 10;
     // 观看视频可领取金币数量
-    public static awardCoin = 100;
+    public static awardCoin = 500;
     // 金币加成配置
     public static goldRate = { default: 1, step: 0.1, maxLv: 50 };
     public static maxOnlineCoin = 300;
