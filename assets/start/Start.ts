@@ -25,6 +25,10 @@ export class Start extends Component {
     @property(ProgressBar)
     loadingBar: ProgressBar = null!;
 
+    private resourcesReady = false;
+    private dataReady = false;
+    private sceneLoadStarted = false;
+
     protected onLoad(): void {
         PlatformMgr.reportEvent("game_show", {
             time: game.totalTime,
@@ -44,15 +48,25 @@ export class Start extends Component {
         // 初始化 ClientApi（设置 X-Game-Code Header）
         ClientApi.inst.init();
 
-        PlatformMgr.init((params: any) => {
-            egf.Logger.log("Platform init info:", params);
+        PlatformMgr.init(() => {
+            egf.Logger.log("Platform init complete");
         });
 
         egf.ResMgr.preloadResPackage("start", StartResPkg, this.onResLoaded.bind(this), () => {
             this.onPreloadingComplete();
         });
 
-        LocalDataMgr.loadData();
+        void LocalDataMgr.prepareInitialData(() => DataMgr.startCoinSync(Start.loginServer))
+            .then((result) => {
+                egf.Logger.log("[Start] data ready:", result.source, result.state);
+                this.dataReady = true;
+                this.tryEnterGame();
+            })
+            .catch((error: unknown) => {
+                egf.Logger.error("[Start] data preparation failed:", error);
+                this.dataReady = true;
+                this.tryEnterGame();
+            });
 
         this.login();
     }
@@ -69,14 +83,21 @@ export class Start extends Component {
     }
 
     onPreloadingComplete() {
+        this.resourcesReady = true;
+        this.tryEnterGame();
+    }
+
+    private tryEnterGame() {
+        if (!this.resourcesReady || !this.dataReady || this.sceneLoadStarted) {
+            return;
+        }
+        this.sceneLoadStarted = true;
         egf.i18nMgr.setLanguage(LocalDataMgr.Setting.language);
         director.loadScene(SceneDef.GAME.name);
         PlatformMgr.reportEvent("loading_time", { time: game.totalTime });
     }
 
     login() {
-        DataMgr.startCoinSync(Start.loginServer);
-
         let channel = "wechat";
         switch (PlatformMgr.platform) {
             case EPlatform.WeChat:
