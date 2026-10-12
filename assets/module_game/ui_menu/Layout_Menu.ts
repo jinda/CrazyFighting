@@ -119,17 +119,17 @@ export class Layout_Menu extends Component {
         this.labelLandCost.string = "x" + land;
 
         const bEnoughCoin = DataMgr.coin > coin;
-        this.labelCoinCost.color = bEnoughCoin ? new Color().fromHEX("#f23160") : new Color().fromHEX("#FFFFFF");
+        this.labelCoinCost.color = bEnoughCoin ? new Color().fromHEX("#FFFFFF") : new Color().fromHEX("#f23160");
         // this.nodeCoinCost.active = bEnoughCoin;
         // this.nodeCoinAd.active = !bEnoughCoin;
 
         const bEnoughFighter = DataMgr.coin > fighter;
-        this.labelSoldierCost.color = bEnoughFighter ? new Color().fromHEX("#f23160") : new Color().fromHEX("#FFFFFF");
+        this.labelSoldierCost.color = bEnoughFighter ? new Color().fromHEX("#FFFFFF") : new Color().fromHEX("#f23160");
         // this.nodeSoldierCost.active = bEnoughFighter;
         // this.nodeSoldierAd.active = !bEnoughFighter;
 
         const bEnoughLand = DataMgr.coin > land;
-        this.labelLandCost.color = bEnoughLand ? new Color().fromHEX("#f23160") : new Color().fromHEX("#FFFFFF");
+        this.labelLandCost.color = bEnoughLand ? new Color().fromHEX("#FFFFFF") : new Color().fromHEX("#f23160");
         // this.nodeLandCost.active = bEnoughLand;
         // this.nodeLandAd.active = !bEnoughLand;
 
