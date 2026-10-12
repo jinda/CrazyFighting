@@ -11,8 +11,6 @@ import {
     find,
     view,
     instantiate,
-    game,
-    Game,
 } from "cc";
 import { Follow } from "./Follow";
 import { EffectGroup } from "./EeffectGroup";
@@ -27,7 +25,6 @@ import { UI_Menu } from "../../ui_menu/UI_Menu";
 import { UI_Fighter } from "../../ui_fighter/UI_Fighter";
 import BackResPkg from "db://assets/scripts/BackResPkg";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
-import { ClientApi } from "db://assets/scripts/ClientApi";
 
 const { ccclass, property } = _decorator;
 //“管理所有士兵”的脚本
@@ -98,30 +95,6 @@ export class FighterLogic extends Component {
 
     protected onLoad(): void {
         egf.Logger.log("FighterLogic init");
-        // 监听进入后台
-        game.on(
-            Game.EVENT_HIDE,
-            () => {
-                console.log("游戏进入后台");
-                // 在这里暂停游戏逻辑、音乐音效等
-                egf.AudioMgr.pause();
-                ClientApi.inst.background();
-                LocalDataMgr.saveData();
-            },
-            this,
-        );
-
-        // 监听回到前台
-        game.on(
-            Game.EVENT_SHOW,
-            () => {
-                console.log("游戏回到前台");
-                // 在这里恢复游戏逻辑、音乐音效等
-                egf.AudioMgr.resume();
-                ClientApi.inst.foreground();
-            },
-            this,
-        );
         this._gameInit();
         GameCfg.loadConfig();
     }

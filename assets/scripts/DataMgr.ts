@@ -2,7 +2,8 @@
  * 网络数据管理器
  */
 
-import { EApiErrcode, EResourceType, type IUserInfo } from "./apiInterface";
+import { Game, game } from "cc";
+import { EApiErrcode, EResourceType, type ILoginData, type IUserInfo } from "./apiInterface";
 import { ClientApi } from "./ClientApi";
 import { Constants } from "./Constants";
 import { LocalDataMgr, type IPendingLedgerOp } from "./LocalDataMgr";
@@ -18,7 +19,7 @@ window.onerror = function (message, source, lineno, colno, error) {
             /** 非空，最多 2 KiB；发送前移除敏感信息 */
             message: message.toString(),
             /** 最多 16 KiB；发送前移除敏感信息 */
-            stack: source?.toString(),
+            stack: error?.stack || "",
             /** 最多 128 字节 */
             game_version: DataMgr.version,
             /** 最多 128 字节 */
@@ -42,6 +43,13 @@ export interface IMaintenance {
     whitelist?: number[];
 }
 
+type ServerLogin = (onSuccess: (data: ILoginData) => void, onFailure: () => void) => void;
+
+const COIN_SYNC_INTERVAL_MS = 15000;
+const COIN_REQUEST_TIMEOUT_MS = 30000;
+const MAX_LEDGER_RETRIES = 3;
+const MAX_PENDING_COIN_OPS = 50;
+
 class DataManager {
     private static _inst: DataManager | null = null;
     public static get inst(): DataManager {
@@ -52,6 +60,18 @@ class DataManager {
     }
 
     public maintenance: IMaintenance = {}; // 维护信息
+
+    private coinOnline = false;
+    private coinSyncing = false;
+    private coinEpoch = 0;
+    private ledgerInFlight = false;
+    private ledgerRetries = 0;
+    private ledgerRetryAt = 0;
+    private pendingCoinOps: IPendingLedgerOp[] = [];
+    private coinSyncTimer: ReturnType<typeof setInterval> | null = null;
+    private coinRequestTimer: ReturnType<typeof setTimeout> | null = null;
+    private serverLogin: ServerLogin | null = null;
+    private inBackground = false;
 
     // 内存加密存储，防止内存扫描篡改金币/关卡
     private _coin: egf.SecureValue = new egf.SecureValue(0);
@@ -64,11 +84,6 @@ class DataManager {
     }
     public set userData(v: IUserInfo) {
         this._userData = v;
-        // 登录拿到服务器账号信息后，同步进加密字段
-        // if (v) {
-        //     this._coin.set(v.coin ?? 0);
-        //     this._level.set(v.level ?? 0);
-        // }
     }
     public onlineGetTime: number = Date.now(); // 在线奖励获取时间
     public bBannerAd: boolean = false; // 是否显示banner
@@ -83,31 +98,44 @@ class DataManager {
         this._coin.set(value);
     }
 
-    /**
-     * 增加金币（本地立即生效，随后异步上报服务端账本）
-     * @param coin 增加数量
-     * @param scene 上报场景，见 Constants.LEDGER_SCENE
-     */
+    /** 增加金币：立即显示；在线时由服务器确认，离线时只保存本地。 */
     public addCoin(coin: number, scene: string = Constants.LEDGER_SCENE.UNKNOWN) {
-        this._coin.set(this._coin.get() + coin);
-        LocalDataMgr.GameInfo.coin = DataMgr.coin;
-        //先入待上报队列，再统一落盘，避免一次加币写两次存档
-        this.queueLedgerReport("gain", coin, scene);
-        LocalDataMgr.saveGameInfoData();
-        egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
+        const amount = this.normalizeCoinAmount(coin);
+        if (amount === null || amount === 0) {
+            return;
+        }
+        this.queueLedgerReport("gain", amount, scene);
+        this.updateCoinBalance(this.coin + amount);
+        this.flushLedgerOp();
     }
 
-    /**
-     * 扣除金币（本地立即生效，随后异步上报服务端账本）
-     * @param coin 期望扣除数量；余额不足时按实际余额扣除
-     * @param scene 上报场景，见 Constants.LEDGER_SCENE
-     */
+    /** 扣除金币：余额不足时只扣实际余额，保持现有同步调用方式。 */
     public subCoin(coin: number, scene: string = Constants.LEDGER_SCENE.UNKNOWN) {
-        const cur = this._coin.get();
-        const cost = cur > coin ? coin : cur;
-        this._coin.set(cur - cost);
-        LocalDataMgr.GameInfo.coin = DataMgr.coin;
+        const amount = this.normalizeCoinAmount(coin);
+        if (amount === null || amount === 0) {
+            return;
+        }
+        const cost = Math.min(this.coin, amount);
         this.queueLedgerReport("consume", cost, scene);
+        this.updateCoinBalance(this.coin - cost);
+        this.flushLedgerOp();
+    }
+
+    private normalizeCoinAmount(amount: number): number | null {
+        if (!Number.isFinite(amount) || amount < 0 || amount > 1000000000) {
+            egf.Logger.warn("[DataMgr] 金币变化数量非法:", amount);
+            return null;
+        }
+        return Math.floor(amount);
+    }
+
+    private isCoinBalance(value: unknown): value is number {
+        return typeof value === "number" && Number.isSafeInteger(value) && value >= 0;
+    }
+
+    private updateCoinBalance(value: number) {
+        this._coin.set(value);
+        LocalDataMgr.GameInfo.coin = value;
         LocalDataMgr.saveGameInfoData();
         egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
         egf.EventMgr.emit("coin_changed");
@@ -135,78 +163,204 @@ class DataManager {
         this._onlineCoin.set(value);
     }
 
-    // ---------- 服务端账本与通关进度上报（本地权威 + 幂等异步上报） ----------
+    // ---------- 在线金币校准与通关进度上报 ----------
 
-    /**
-     * 是否支持服务端上报
-     * Android 平台 ClientApi 不发送请求，直接跳过上报，避免待上报队列无限堆积
-     */
     private get canReportServer(): boolean {
         return PlatformMgr.platform !== EPlatform.Android;
     }
 
-    /**
-     * 记录一笔账本变化：本地数值已生效，异步上报服务端账本
-     * req_id 生成后随队列落盘，服务端按幂等键去重，重试不会重复发币
-     * @param op 加币(gain) / 扣币(consume)
-     * @param amount 数量
-     * @param scene 上报场景，见 Constants.LEDGER_SCENE
-     */
-    public queueLedgerReport(op: "gain" | "consume", amount: number, scene: string) {
-        const value = op === "gain" ? Math.floor(amount) : Math.round(amount);
-        if (value === 0) {
-            //没有实际数量变化，无需上报
-            return;
-        }
-        if (value < 0 || value > 1000000000) {
-            egf.Logger.warn("[DataMgr] 账本上报数量非法，跳过:", op, amount, scene);
-            return;
-        }
+    /** 同步由全局数据管理器持有，不依赖已经卸载的启动场景组件。 */
+    public startCoinSync(login: ServerLogin) {
+        this.stopCoinSync();
+        LocalDataMgr.clearPendingLedgerOps();
         if (!this.canReportServer) {
             return;
         }
-        const pendingOp: IPendingLedgerOp = {
-            req_id: ClientApi.createReqId(scene),
-            op: op,
-            amount: value,
-            scene: scene,
-        };
-        //此处不落盘，由调用方（addCoin/subCoin）随金币一起写入存档
-        LocalDataMgr.addPendingLedgerOp(pendingOp, false);
-        this.flushLedgerOp(pendingOp);
+        this.serverLogin = login;
+        this.inBackground = false;
+        game.on(Game.EVENT_SHOW, this.onGameShow, this);
+        game.on(Game.EVENT_HIDE, this.onGameHide, this);
+        this.coinSyncTimer = setInterval(() => this.retryCoinSync(), COIN_SYNC_INTERVAL_MS);
+        this.retryCoinSync();
     }
 
-    /**
-     * 发送一笔待上报的账本操作
-     * 成功后出队；服务端终态拒绝（余额不足/参数错误）也出队，其余保留等待补报
-     */
-    private flushLedgerOp(op: IPendingLedgerOp) {
-        const onDone = () => {
-            LocalDataMgr.removePendingLedgerOp(op.req_id);
-        };
-        const onFail = (errcode: number, errmsg: string) => {
-            if (errcode === EApiErrcode.NotEnoughResource || errcode === EApiErrcode.ParamError) {
-                LocalDataMgr.removePendingLedgerOp(op.req_id);
-                egf.Logger.warn("[DataMgr] 账本上报被服务端拒绝，放弃重试:", op, errmsg);
-                return;
-            }
-            egf.Logger.warn("[DataMgr] 账本上报失败，等待补报:", op, errcode, errmsg);
-        };
+    /** 重启同步或退出游戏时清理定时器、监听，并使旧回调失效。 */
+    public stopCoinSync() {
+        if (this.coinSyncTimer !== null) {
+            clearInterval(this.coinSyncTimer);
+            this.coinSyncTimer = null;
+        }
+        this.clearCoinRequestTimer();
+        game.off(Game.EVENT_SHOW, this.onGameShow, this);
+        game.off(Game.EVENT_HIDE, this.onGameHide, this);
+        this.serverLogin = null;
+        this.useLocalCoin();
+    }
 
-        if (op.op === "gain") {
-            ClientApi.inst.gainCoin(op.req_id, op.amount, op.scene, onDone, onFail);
+    private onGameShow() {
+        this.inBackground = false;
+        this.retryCoinSync();
+
+        egf.AudioMgr.resume();
+        ClientApi.inst.foreground();
+    }
+
+    private onGameHide() {
+        this.inBackground = true;
+        egf.AudioMgr.pause();
+        ClientApi.inst.background();
+    }
+
+    private retryCoinSync() {
+        if (this.inBackground || this.coinSyncing || this.ledgerInFlight || !this.serverLogin) {
             return;
         }
-        ClientApi.inst.consumeResource(
-            {
-                req_id: op.req_id,
-                type: EResourceType.Coin,
-                amount: op.amount,
-                scene: op.scene,
-            },
-            onDone,
-            onFail,
+        if (this.pendingCoinOps.length > 0) {
+            this.flushLedgerOp();
+            return;
+        }
+        if (ClientApi.inst.token) {
+            this.syncWithServer();
+            return;
+        }
+        this.coinSyncing = true;
+        const epoch = this.coinEpoch;
+        let settled = false;
+        const onFail = () => {
+            if (settled || epoch !== this.coinEpoch) {
+                return;
+            }
+            settled = true;
+            this.useLocalCoin();
+        };
+        this.coinRequestTimer = setTimeout(onFail, COIN_REQUEST_TIMEOUT_MS);
+        this.serverLogin((data) => {
+            if (settled || epoch !== this.coinEpoch) {
+                return;
+            }
+            settled = true;
+            this.clearCoinRequestTimer();
+            this.coinSyncing = false;
+            this.userData = data.user_info;
+            // 金币独立查询资源账本，云存档中的 coin 不作为余额来源。
+            this.level = data.user_info.level || 1;
+            ClientApi.inst.foreground();
+            LocalDataMgr.loadDataFromSever();
+            this.syncWithServer();
+        }, onFail);
+    }
+
+    private clearCoinRequestTimer() {
+        if (this.coinRequestTimer !== null) {
+            clearTimeout(this.coinRequestTimer);
+            this.coinRequestTimer = null;
+        }
+    }
+
+    private useLocalCoin() {
+        this.clearCoinRequestTimer();
+        this.coinEpoch++;
+        this.coinOnline = false;
+        this.coinSyncing = false;
+        this.ledgerInFlight = false;
+        this.ledgerRetries = 0;
+        this.ledgerRetryAt = 0;
+        // 离线变化不补报；请求已到服务器但响应丢失的结果，由重连查询确认。
+        this.pendingCoinOps = [];
+    }
+
+    private queueLedgerReport(op: "gain" | "consume", amount: number, scene: string) {
+        if (!this.coinOnline || amount === 0) {
+            return;
+        }
+        if (this.pendingCoinOps.length >= MAX_PENDING_COIN_OPS) {
+            egf.Logger.warn("[DataMgr] 在线金币请求积压，改用本地余额等待重新同步");
+            this.useLocalCoin();
+            return;
+        }
+        this.pendingCoinOps.push({ req_id: ClientApi.createReqId(scene), op, amount, scene });
+    }
+
+    /** 校准时保留尚未发送/确认的在线操作，避免连续操作时余额回退。 */
+    private applyServerCoin(balance: number) {
+        this.userData.coin = balance;
+        const displayCoin = this.pendingCoinOps.reduce(
+            (value, op) => (op.op === "gain" ? value + op.amount : Math.max(0, value - op.amount)),
+            balance,
         );
+        this.updateCoinBalance(displayCoin);
+    }
+
+    /** 账本串行发送，确保服务器返回余额与客户端操作顺序一致。 */
+    private flushLedgerOp() {
+        const op = this.pendingCoinOps[0];
+        if (
+            !op ||
+            !this.coinOnline ||
+            this.coinSyncing ||
+            this.ledgerInFlight ||
+            this.inBackground ||
+            Date.now() < this.ledgerRetryAt
+        ) {
+            return;
+        }
+        this.ledgerInFlight = true;
+        const epoch = this.coinEpoch;
+        let settled = false;
+        const isCurrent = () => !settled && epoch === this.coinEpoch;
+        const onFail = (errcode: number, errmsg: string) => {
+            if (!isCurrent()) {
+                return;
+            }
+            settled = true;
+            this.clearCoinRequestTimer();
+            this.ledgerInFlight = false;
+            egf.Logger.warn("[DataMgr] 在线金币操作失败:", errcode, errmsg);
+            if (errcode === EApiErrcode.SystemBusy || errcode === EApiErrcode.Processing) {
+                if (this.ledgerRetries < MAX_LEDGER_RETRIES) {
+                    this.ledgerRetries++;
+                    this.ledgerRetryAt = Date.now() + COIN_SYNC_INTERVAL_MS;
+                    return;
+                }
+            } else if (errcode === EApiErrcode.NotEnoughResource || errcode === EApiErrcode.ParamError) {
+                this.pendingCoinOps.shift();
+                this.ledgerRetries = 0;
+                this.ledgerRetryAt = 0;
+                this.syncWithServer();
+                return;
+            }
+            if (errcode === EApiErrcode.NotLogin) {
+                ClientApi.inst.setToken("");
+            }
+            this.useLocalCoin();
+        };
+        const onDone = (balance: unknown) => {
+            if (!isCurrent()) {
+                return;
+            }
+            if (!this.isCoinBalance(balance)) {
+                onFail(-1, "服务器返回金币余额非法");
+                return;
+            }
+            settled = true;
+            this.clearCoinRequestTimer();
+            this.ledgerInFlight = false;
+            this.ledgerRetries = 0;
+            this.ledgerRetryAt = 0;
+            this.pendingCoinOps.shift();
+            this.applyServerCoin(balance);
+            this.flushLedgerOp();
+        };
+        this.coinRequestTimer = setTimeout(() => onFail(-1, "金币请求超时"), COIN_REQUEST_TIMEOUT_MS);
+        if (op.op === "gain") {
+            ClientApi.inst.gainCoin(op.req_id, op.amount, op.scene, (data) => onDone(data?.coin), onFail);
+        } else {
+            ClientApi.inst.consumeResource(
+                { req_id: op.req_id, type: EResourceType.Coin, amount: op.amount, scene: op.scene },
+                (data) => onDone(data?.balance),
+                onFail,
+            );
+        }
     }
 
     /**
@@ -237,20 +391,44 @@ class DataManager {
         );
     }
 
-    /**
-     * 登录成功后同步服务端：先补报失败留存的操作，再拉取一次服务端资源做校准日志
-     * 方案约定（本地权威）：服务端数值只用于比对与审计，不覆盖本地金币
-     */
+    /** 登录、重连及前台恢复时查询账本；离线变化直接由服务器余额覆盖。 */
     public syncWithServer() {
-        if (!this.canReportServer) {
+        if (!this.canReportServer || !ClientApi.inst.token || this.coinSyncing || this.ledgerInFlight) {
             return;
         }
-        for (const op of LocalDataMgr.pendingLedgerOps.slice()) {
-            this.flushLedgerOp(op);
-        }
-        if (LocalDataMgr.pendingLevels.length > 0) {
-            this.reportLevelComplete(Math.max(...LocalDataMgr.pendingLevels), false);
-        }
+        this.coinSyncing = true;
+        const epoch = this.coinEpoch;
+        let settled = false;
+        const onFail = (errcode: number, errmsg: string) => {
+            if (settled || epoch !== this.coinEpoch) {
+                return;
+            }
+            settled = true;
+            egf.Logger.warn("[DataMgr] 金币同步失败，使用本地余额:", errcode, errmsg);
+            if (errcode === EApiErrcode.NotLogin) {
+                ClientApi.inst.setToken("");
+            }
+            this.useLocalCoin();
+        };
+        this.coinRequestTimer = setTimeout(() => onFail(-1, "金币同步超时"), COIN_REQUEST_TIMEOUT_MS);
+        ClientApi.inst.getResource((data) => {
+            if (settled || epoch !== this.coinEpoch) {
+                return;
+            }
+            if (!this.isCoinBalance(data?.coin)) {
+                onFail(-1, "服务器返回金币余额非法");
+                return;
+            }
+            settled = true;
+            this.clearCoinRequestTimer();
+            this.coinSyncing = false;
+            this.coinOnline = true;
+            this.applyServerCoin(data.coin);
+            this.flushLedgerOp();
+            if (LocalDataMgr.pendingLevels.length > 0) {
+                this.reportLevelComplete(Math.max(...LocalDataMgr.pendingLevels), false);
+            }
+        }, onFail);
     }
 }
 

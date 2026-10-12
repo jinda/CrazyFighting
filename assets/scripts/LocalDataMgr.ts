@@ -7,7 +7,7 @@ const { AES } = CryptoTS;
 
 /**
  * 待上报的账本操作
- * 本地数值已经生效，等待服务端确认；同一笔操作重试必须复用同一个 req_id（服务端幂等）
+ * 在线操作重试复用同一个 req_id；旧存档中的待补报队列只用于迁移清理。
  */
 export interface IPendingLedgerOp {
     req_id: string; // 幂等键，服务端按 (game_code, uid, source, req_id, resource) 去重
@@ -31,7 +31,7 @@ interface IGameInfo {
     signDay: number;
     lastSignTime: number;
     signTotalDay: number;
-    pendingLedgerOps?: IPendingLedgerOp[]; //待上报的账本操作（金币加减），旧存档无此字段
+    pendingLedgerOps?: IPendingLedgerOp[]; //旧版金币补报队列，新版加载时清除
     pendingLevels?: number[]; //待上报的通关关卡（服务端只增不减，重试安全），旧存档无此字段
 }
 
@@ -44,8 +44,8 @@ interface ISetting {
 
 const AES_KEY = "eeffaif19822sf11156ff734fsefa9f0bb";
 
-// 待上报队列上限：断网/服务端不可用时避免无限堆积（超出丢弃最旧一条）
-const MAX_PENDING_LEDGER_OPS = 50;
+// 通关进度待上报队列上限。
+const MAX_PENDING_LEVELS = 50;
 
 class LocalDataManager {
     private static _inst: LocalDataManager | null = null;
@@ -97,7 +97,12 @@ class LocalDataManager {
 
     public loadDataFromSever(): void {
         this.loadServerData(this.GameInfoStr, (data: string) => {
-            this._gameInfo = egf.SafeJSON.parse(data) as IGameInfo;
+            const serverInfo = egf.SafeJSON.parse(data) as IGameInfo;
+            // 金币始终来自当前余额，禁止旧云存档恢复金币或待补报操作。
+            serverInfo.coin = DataMgr.coin;
+            serverInfo.pendingLedgerOps = [];
+            serverInfo.pendingLevels = this._gameInfo.pendingLevels;
+            this._gameInfo = serverInfo;
             //再次存档一次
             this.saveGameInfoData();
         });
@@ -113,14 +118,23 @@ class LocalDataManager {
         if (encryptStr) {
             try {
                 const decryptStr = AES.decrypt(encryptStr, AES_KEY).toString(CryptoTS.enc.Utf8);
-                this._gameInfo = egf.SafeJSON.parse(decryptStr) as IGameInfo;
-                DataMgr.coin = this._gameInfo.coin ?? 0;
-                DataMgr.level = this._gameInfo.level ?? 0;
+                const gameInfo = JSON.parse(decryptStr) as IGameInfo | null;
+                if (!gameInfo || typeof gameInfo !== "object" || Array.isArray(gameInfo)) {
+                    throw new Error("Invalid local game info");
+                }
+                this._gameInfo = gameInfo;
                 egf.Logger.log("loadGameInfoData:", this._gameInfo);
             } catch (error) {
                 egf.Logger.error("Failed to load and parse gameinfo:", error);
             }
         }
+        // 无存档或存档损坏时也初始化默认余额，避免首次离线启动显示 0。
+        if (!Number.isSafeInteger(this._gameInfo.coin) || this._gameInfo.coin < 0) {
+            this._gameInfo.coin = 100;
+        }
+        DataMgr.coin = this._gameInfo.coin;
+        DataMgr.level = this._gameInfo.level ?? 0;
+        this.clearPendingLedgerOps();
     }
 
     private loadSettingData() {
@@ -327,50 +341,12 @@ class LocalDataManager {
         this.saveGameInfoData();
     }
 
-    // ---------- 账本上报队列（本地生效、失败补报、幂等重试） ----------
-
-    /**
-     * 待上报的账本操作
-     * 只读用途，写入请走 addPendingLedgerOp / removePendingLedgerOp
-     */
-    public get pendingLedgerOps(): IPendingLedgerOp[] {
-        return this._gameInfo.pendingLedgerOps ?? [];
-    }
-
-    /**
-     * 追加一笔待上报的账本操作
-     * @param op 待上报操作（req_id 由调用方生成，并在重试时复用同一个值）
-     * @param bSave 是否立即落盘；若调用方紧接着还会 saveGameInfoData，可传 false 避免重复写
-     */
-    public addPendingLedgerOp(op: IPendingLedgerOp, bSave: boolean = true) {
-        if (!this._gameInfo.pendingLedgerOps) {
+    /** 清理旧版金币补报队列；新版离线金币变化不会上传。 */
+    public clearPendingLedgerOps() {
+        if (this._gameInfo.pendingLedgerOps?.length) {
             this._gameInfo.pendingLedgerOps = [];
-        }
-        const list = this._gameInfo.pendingLedgerOps;
-        while (list.length >= MAX_PENDING_LEDGER_OPS) {
-            const dropped = list.shift();
-            egf.Logger.warn("[LocalDataMgr] 待上报账本超过上限，丢弃最旧记录:", dropped);
-        }
-        list.push(op);
-        if (bSave) {
             this.saveGameInfoData();
         }
-    }
-
-    /**
-     * 移除已确认（或服务端终态拒绝）的账本操作
-     */
-    public removePendingLedgerOp(reqId: string) {
-        const list = this._gameInfo.pendingLedgerOps;
-        if (!list) {
-            return;
-        }
-        const idx = list.findIndex((op) => op.req_id === reqId);
-        if (idx === -1) {
-            return;
-        }
-        list.splice(idx, 1);
-        this.saveGameInfoData();
     }
 
     /**
@@ -392,7 +368,7 @@ class LocalDataManager {
         const list = this._gameInfo.pendingLevels;
         if (list.indexOf(level) === -1) {
             list.push(level);
-            while (list.length > MAX_PENDING_LEDGER_OPS) {
+            while (list.length > MAX_PENDING_LEVELS) {
                 list.shift();
             }
         }

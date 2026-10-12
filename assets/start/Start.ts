@@ -75,54 +75,7 @@ export class Start extends Component {
     }
 
     login() {
-        const params = {
-            failCb: function () {
-                egf.Logger.log("login fail");
-            },
-            successCb: function (code: any) {
-                egf.Logger.log("login success");
-                // 微信平台使用 wx.login 的 code 进行 oauthlogin
-                // 其他平台使用 guest + device_id 游客登录
-                if (PlatformMgr.platform == EPlatform.WeChat) {
-                    ClientApi.inst.oauthLogin(
-                        "wechat",
-                        { code },
-                        undefined,
-                        undefined,
-                        (data) => {
-                            Start.onLoginSuccess(data);
-                        },
-                        (errcode, errmsg) => {
-                            const msg = egf.i18nMgr.getText(errmsg);
-                            egf.UI_Toast.show(msg);
-                        },
-                    );
-                } else {
-                    // 生成或复用设备 ID 作为游客身份
-                    let deviceId = sys.localStorage.getItem("device_id");
-                    if (!deviceId) {
-                        deviceId = "dev-" + Date.now().toString(36) + "-" + Math.random().toString(36).substr(2, 9);
-                        sys.localStorage.setItem("device_id", deviceId);
-                        LocalDataMgr.GameInfo.deviceID = deviceId;
-                    }
-                    ClientApi.inst.oauthLogin(
-                        "guest",
-                        { device_id: deviceId },
-                        undefined,
-                        undefined,
-                        (data) => {
-                            Start.onLoginSuccess(data);
-                        },
-                        (errcode, errmsg) => {
-                            const msg = egf.i18nMgr.getText(errmsg);
-                            egf.UI_Toast.show(msg);
-                        },
-                    );
-                }
-            },
-        };
-
-        PlatformMgr.login(params);
+        DataMgr.startCoinSync(Start.loginServer);
 
         let channel = "wechat";
         switch (PlatformMgr.platform) {
@@ -150,28 +103,27 @@ export class Start extends Component {
             },
         );
     }
-    /**
-     * 登录成功后处理
-     */
-    private static onLoginSuccess(data: ILoginData) {
-        // 保存到 DataMgr 兼容旧代码
-        DataMgr.userData = data.user_info;
-
-        ClientApi.inst.foreground();
-        if (DataMgr.userData.coin !== DataMgr.coin) {
-            egf.Logger.error(
-                "本地金币与服务端账本不一致（方案约定以服务器为准）:",
-                DataMgr.coin,
-                DataMgr.userData.coin,
-            );
-        }
-        DataMgr.coin = data.user_info.coin || 0;
-        DataMgr.level = data.user_info.level || 1;
-
-        // ClientApi 内部已设置 Authorization Header
-        LocalDataMgr.loadDataFromSever();
-        // 补报上次失败留存的账本/通关进度，并拉取一次服务端资源做校准
-        DataMgr.syncWithServer();
-        egf.Logger.log("login success, uid:", data.user_info?.uid);
+    /** 登录回调不捕获启动组件，切换场景后仍可用于自动重连。 */
+    private static loginServer(onSuccess: (data: ILoginData) => void, onFailure: () => void) {
+        const onError = (errcode: number, errmsg: string) => {
+            egf.Logger.warn("[Start] 登录失败，继续使用本地数据:", errcode, errmsg);
+            onFailure();
+        };
+        PlatformMgr.login({
+            failCb: () => onError(-1, "平台登录失败"),
+            successCb: (code: string) => {
+                if (PlatformMgr.platform === EPlatform.WeChat) {
+                    ClientApi.inst.oauthLogin("wechat", { code }, undefined, undefined, onSuccess, onError);
+                    return;
+                }
+                let deviceId = sys.localStorage.getItem("device_id");
+                if (!deviceId) {
+                    deviceId = "dev-" + Date.now().toString(36) + "-" + Math.random().toString(36).slice(2, 9);
+                    sys.localStorage.setItem("device_id", deviceId);
+                    LocalDataMgr.GameInfo.deviceID = deviceId;
+                }
+                ClientApi.inst.oauthLogin("guest", { device_id: deviceId }, undefined, undefined, onSuccess, onError);
+            },
+        });
     }
 }
