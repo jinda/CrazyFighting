@@ -3,7 +3,7 @@ module.exports = {
         width: '100%',
         height: '100%',
         borderRadius: 12,
-        backgroundColor: '#e7c798',
+        backgroundColor: '#e2ccb8a4',
     },
 
     header: {
@@ -11,7 +11,7 @@ module.exports = {
         height: '10%',
         flexDirection: 'column',
         alignItems: 'center',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#cfbaa6',
         borderBottomWidth: 0.5,
         borderColor: 'rgba(0, 0, 0, 0.3)',
     },
@@ -30,13 +30,13 @@ module.exports = {
     rankList: {
         width: '100%',
         height: '100%',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#cfbaa6',
     },
 
     list: {
         width: '100%',
         height: '80%',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#cfbaa6',
         marginTop: 0,
     },
 
@@ -47,28 +47,30 @@ module.exports = {
         textAlign: 'center',
         fontSize: 25,
         color: 'rgba(0,0,0,0.5)',
-        backgroundColor: '#ffffff',
+        backgroundColor: '#cfbaa6',
         borderRadius: 10,
         borderWidth: 1,
         borderColor: 'rgba(0, 0, 0, 1)',
     },
 
     listItem: {
-        backgroundColor: '#e7d7c0',
-        width: '96%',
+        backgroundColor: '#d1bcab',
+        width: '95%',
         height: '15%',
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         margin: 10,
+        borderRadius: 10
     },
     listSelfItem: {
-        backgroundColor: '#ECEEB3',
-        width: '96%',
+        backgroundColor: '#f4d4a8',
+        width: '95%',
         height: '12%',
         flexDirection: 'row',
         alignItems: 'center',
         margin: 10,
+        borderRadius: 10
     },
 
     listItemOld: {
@@ -91,7 +93,7 @@ module.exports = {
         marginRight: 10,
         lineHeight: 100,
         color:"#FFFFFF",
-        strokeColor: '#923A00',
+        strokeColor: '#101010',
         strokeWidth: 2,
         textAlign: 'center',
     },
@@ -102,7 +104,7 @@ module.exports = {
         fontSize: 30,
         fontWeight: 'bold',
         color: '#FFED18',
-        strokeColor: '#923A00',
+        strokeColor: '#101010',
         strokeWidth: 2,
         lineHeight: 100,
         textAlign: 'center',
