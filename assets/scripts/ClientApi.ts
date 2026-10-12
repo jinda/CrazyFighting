@@ -91,8 +91,10 @@ export class ClientApi {
         this._token = token || "";
         if (this._token) {
             egf.HttpMgr.addHeaders("Authorization", `Bearer ${this._token}`);
+        } else {
+            egf.HttpMgr.removeHeaders("Authorization");
         }
-        egf.Logger.log("[ClientApi] setToken:", this._token.slice(0, 30) + "...");
+        egf.Logger.log("[ClientApi] authentication state changed:", this._token.length > 0);
     }
 
     /**
@@ -111,6 +113,9 @@ export class ClientApi {
         isGet: boolean = false,
     ) {
         if (PlatformMgr.platform === EPlatform.Android) {
+            if (errCb) {
+                errCb(-1, "当前平台不支持网络请求");
+            }
             return;
         }
 
@@ -121,14 +126,14 @@ export class ClientApi {
                 }
                 return;
             }
-            egf.Logger.error(`[ClientApi] ${uri} error:`, resp?.errcode, resp?.errmsg);
+            egf.Logger.error(`[ClientApi] ${uri} error:`, resp?.errcode);
             if (errCb) {
                 errCb(resp?.errcode, resp?.errmsg);
             }
         };
 
-        const onError = (err: unknown) => {
-            egf.Logger.error(`[ClientApi] ${uri} request failed:`, err);
+        const onError = (_error: unknown) => {
+            egf.Logger.error(`[ClientApi] ${uri} request failed`);
             if (errCb) {
                 errCb(-1, "网络请求失败");
             }
@@ -214,12 +219,9 @@ export class ClientApi {
      */
     private handleLoginData(data: ILoginData) {
         if (data) {
-            this._token = data.token || "";
+            this.setToken(data.token || "");
             this._userInfo = data.user_info || null;
-            if (this._token) {
-                egf.HttpMgr.addHeaders("Authorization", `Bearer ${this._token}`);
-            }
-            egf.Logger.log("[ClientApi] login success is_new:", data.is_new, "uid:", data.user_info?.uid);
+            egf.Logger.log("[ClientApi] login success, is_new:", data.is_new);
         }
     }
 

@@ -344,7 +344,7 @@ export class IWeChat extends SDKBase {
         wx.login({
             success(res: any) {
                 if (res.code) {
-                    egf.Logger.log("登录成功！", res.code);
+                    egf.Logger.log("登录成功！");
                     successCb && successCb(res.code);
                 } else {
                     egf.Logger.log("登录失败！", res.errMsg);
@@ -456,7 +456,7 @@ export class IWeChat extends SDKBase {
                     // 已经授权，可以直接调用 getUserInfo 获取头像昵称
                     wx.getUserInfo({
                         success: (res: any) => {
-                            egf.Logger.log("获取用户信息:", res.userInfo);
+                            egf.Logger.log("获取用户信息成功");
                             successCb && successCb(res.userInfo);
                         },
                         fail: (err: any) => {
@@ -497,7 +497,7 @@ export class IWeChat extends SDKBase {
                             self._userInfoBtn = null;
                             wx.getUserInfo({
                                 success(res: any) {
-                                    egf.Logger.log("获取用户信息:", res.userInfo);
+                                    egf.Logger.log("获取用户信息成功");
                                     successCb && successCb(res.userInfo);
                                 },
                                 fail(err: any) {

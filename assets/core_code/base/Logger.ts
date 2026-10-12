@@ -1,3 +1,4 @@
+import { DEV } from "cc/env";
 import { Utils } from "./Utils";
 
 /**
@@ -11,7 +12,7 @@ export default class Logger {
     /** log 日志信息 */
     private static _logArr: Array<string> = [];
     /** log状态 */
-    private static _logStatus: boolean = true;
+    private static _logStatus: boolean = DEV;
 
     public static log(message?: any, ...optionalParams: any[]): void {
         if (!Logger._logStatus) {
@@ -52,9 +53,6 @@ export default class Logger {
     }
 
     public static warn(message?: any, ...optionalParams: any[]): void {
-        if (!Logger._logStatus) {
-            return;
-        }
         Logger.checkLogArrLong();
         Logger._logArr.push(
             "[warn][" +
@@ -71,9 +69,6 @@ export default class Logger {
     }
 
     public static error(message?: any, ...optionalParams: any[]): void {
-        if (!Logger._logStatus) {
-            return;
-        }
         Logger.checkLogArrLong();
         Logger._logArr.push(
             "[error][" +
@@ -124,7 +119,7 @@ export default class Logger {
         );
     }
 
-    /** 设置日志状态 */
+    /** 设置普通日志状态；警告和错误始终保留。 */
     public static setLogStatus(flag: boolean): void {
         Logger._logStatus = flag;
         if (flag) {
