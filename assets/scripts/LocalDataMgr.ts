@@ -551,7 +551,7 @@ class LocalDataManager {
             const position = Number(key);
             if (
                 !Number.isSafeInteger(position) ||
-                position <= 0 ||
+                position < 0 ||
                 typeof fighter !== "number" ||
                 !Number.isSafeInteger(fighter) ||
                 fighter < 0

@@ -218,7 +218,52 @@ async function testCloudRecoveryAndCoinIsolation() {
     equal(harness.LocalDataMgr.GameInfo.coin, 100, "cloud save coin must not replace the ledger balance");
     deepEqual({ ...harness.LocalDataMgr.GameInfo.formation }, { 2: 202 }, "cloud formation must be applied once");
     equal(harness.LocalDataMgr.Setting.language, "en", "valid cloud settings must be applied");
-    equal(decodeSave(harness.storage.getItem("CrazyFightGameInfoConfig")).coin, 100, "normalized cloud data must persist locally");
+    equal(
+        decodeSave(harness.storage.getItem("CrazyFightGameInfoConfig")).coin,
+        100,
+        "normalized cloud data must persist locally",
+    );
+}
+
+async function testFormationZeroRecovery() {
+    const gameInfo = { coin: 321, level: 999, unlock: [101, 202], formation: { 0: 202, 1: 101, 50: 0 } };
+    const local = createLocalDataHarness();
+    local.storage.setItem("CrazyFightGameInfoConfig", encodeSave(gameInfo));
+    const localResult = await local.LocalDataMgr.prepareInitialData(() => Promise.resolve(null));
+    equal(localResult.source, "local", "position zero must be accepted in a valid local save");
+    equal(local.LocalDataMgr.GameInfo.level, 999, "local position zero must retain final-level progress");
+    deepEqual([...local.LocalDataMgr.GameInfo.unlock], [101, 202], "local position zero must retain unlocks");
+    deepEqual(
+        { ...local.LocalDataMgr.GameInfo.formation },
+        gameInfo.formation,
+        "local formation must retain zero and extended cells",
+    );
+
+    const cloud = createLocalDataHarness({
+        getData(key, complete) {
+            complete({ key, value: encodeSave(key.includes("GameInfo") ? gameInfo : {}) });
+        },
+    });
+    const cloudResult = await cloud.LocalDataMgr.prepareInitialData(() => Promise.resolve({ token: "ok" }));
+    equal(cloudResult.source, "cloud", "position zero must be accepted in a valid cloud save");
+    equal(cloud.LocalDataMgr.GameInfo.level, 999, "cloud position zero must retain final-level progress");
+    deepEqual([...cloud.LocalDataMgr.GameInfo.unlock], [101, 202], "cloud position zero must retain unlocks");
+    deepEqual(
+        { ...cloud.LocalDataMgr.GameInfo.formation },
+        gameInfo.formation,
+        "cloud formation must retain zero and extended cells",
+    );
+    cloud.LocalDataMgr.saveGameInfoData();
+    deepEqual(
+        decodeSave(cloud.storage.getItem("CrazyFightGameInfoConfig")).formation,
+        gameInfo.formation,
+        "saving recovered progress must preserve position zero",
+    );
+
+    const invalid = createLocalDataHarness();
+    invalid.storage.setItem("CrazyFightGameInfoConfig", encodeSave({ ...gameInfo, formation: { [-1]: 101 } }));
+    const invalidResult = await invalid.LocalDataMgr.prepareInitialData(() => Promise.resolve(null));
+    equal(invalidResult.source, "default", "negative formation positions must remain invalid");
 }
 
 async function testTimeoutRejectsLateCloud() {
@@ -551,3 +596,4 @@ main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
 });
+    await testFormationZeroRecovery();
