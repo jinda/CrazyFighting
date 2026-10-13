@@ -944,4 +944,8 @@ function main() {
     console.log(`战斗生命周期回归检查通过：${assertionCount} 项断言`);
 }
 
-main();
+if (require.main === module) {
+    main();
+}
+
+module.exports = { Component, Node, createGameManager, loadTypeScript };

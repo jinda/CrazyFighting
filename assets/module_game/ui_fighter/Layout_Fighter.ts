@@ -1,6 +1,7 @@
 import { _decorator, Node, Button, Component, Label, Animation, Sprite, v3, UITransform } from "cc";
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
+import { GameMgr } from "../game/scripts/GameMgr";
 const { ccclass, property } = _decorator;
 
 @ccclass("Layout_Fighter")
@@ -33,6 +34,7 @@ export class Layout_Fighter extends Component {
     labelCoin: Label = null!;
 
     private _skillCD: number = 0; //技能冷却时间
+    private readonly _skillCountDownCallback = () => this.skillCountDown();
 
     showInfo() {
         this.labelCoin.string = "x0";
@@ -62,11 +64,12 @@ export class Layout_Fighter extends Component {
     }
 
     public showSkillStatus(use: boolean) {
+        this.unschedule(this._skillCountDownCallback);
         this._skillCD = use ? Constants.SkillCD : 0;
         this.skillCountDown();
         if (use) {
             this.btnSkill.interactable = false;
-            this.schedule(this.skillCountDown.bind(this), 1);
+            this.schedule(this._skillCountDownCallback, 1);
             if (this.skillTipsAnim.node.active) {
                 this.skillTipsAnim.node.active = false;
                 this.skillTipsAnim.stop();
@@ -80,16 +83,27 @@ export class Layout_Fighter extends Component {
     }
 
     protected skillCountDown() {
+        if (this._skillCD <= 0) {
+            this.btnSkill.interactable = true;
+            this.unschedule(this._skillCountDownCallback);
+            this.spriteSkillGray.node.active = false;
+            this.labelSkillCD.string = "";
+            return;
+        }
+
+        if (GameMgr.isGamePause) {
+            return;
+        }
+
         if (this._skillCD > 0) {
             this._skillCD -= 1;
             this.labelSkillCD.string = this._skillCD + "";
             this.spriteSkillGray.node.active = true;
             this.spriteSkillGray.fillRange = this._skillCD / Constants.SkillCD;
-        } else {
-            this.btnSkill.interactable = true;
-            this.unschedule(this.skillCountDown.bind(this));
-            this.spriteSkillGray.node.active = false;
-            this.labelSkillCD.string = "";
         }
+    }
+
+    protected onDisable() {
+        this.unschedule(this._skillCountDownCallback);
     }
 }
