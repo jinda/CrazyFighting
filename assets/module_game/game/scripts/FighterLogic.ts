@@ -11,6 +11,7 @@ import {
     find,
     view,
     instantiate,
+    isValid,
 } from "cc";
 import { Follow } from "./Follow";
 import { EffectGroup } from "./EeffectGroup";
@@ -27,6 +28,12 @@ import BackResPkg from "db://assets/scripts/BackResPkg";
 import { ModuleDef } from "db://assets/scripts/ModuleDef";
 
 const { ccclass, property } = _decorator;
+
+interface SeparationItem {
+    node: Node;
+    radius: number;
+}
+
 //“管理所有士兵”的脚本
 @ccclass("FighterLogic")
 export class FighterLogic extends Component {
@@ -63,8 +70,15 @@ export class FighterLogic extends Component {
     private _ballPos: Vec3 = new Vec3(); //火球位置
     private _outRay1: any = new geometry.Ray(); //射线
     private _curTouchPos: Vec2 = new Vec2(); //touchMove触摸移动的位置
+    private _lifecycleGeneration: number = 0;
+    private readonly _separationItems: SeparationItem[] = [];
+    private readonly _separationBuckets = new Map<string, number[]>();
+    private readonly _separationBucketPool: number[][] = [];
+    private readonly _separationCellX: number[] = [];
+    private readonly _separationCellZ: number[] = [];
 
     onEnable() {
+        this._lifecycleGeneration++;
         egf.EventMgr.on(Constants.EVENT_NAME.FIGHT_START, this._fightStart, this);
         egf.EventMgr.on(Constants.EVENT_NAME.FIGHT_RESET, this._fightReset, this);
         egf.EventMgr.on(Constants.EVENT_NAME.GAME_INIT, this._gameInit, this);
@@ -80,6 +94,7 @@ export class FighterLogic extends Component {
     }
 
     onDisable() {
+        this._lifecycleGeneration++;
         egf.EventMgr.off(Constants.EVENT_NAME.FIGHT_START, this._fightStart, this);
         egf.EventMgr.off(Constants.EVENT_NAME.FIGHT_RESET, this._fightReset, this);
         egf.EventMgr.off(Constants.EVENT_NAME.GAME_INIT, this._gameInit, this);
@@ -91,6 +106,10 @@ export class FighterLogic extends Component {
         egf.EventMgr.off(Constants.EVENT_NAME.HIDE_ALL_SIMILAR, this._hideAllSimilar, this);
         egf.EventMgr.off(Constants.EVENT_NAME.GAME_PAUSE, this._gamePause, this);
         egf.EventMgr.off(Constants.EVENT_NAME.GAME_RESUME, this._gameResume, this);
+    }
+
+    protected onDestroy() {
+        this._releaseSeparationCaches();
     }
 
     protected onLoad(): void {
@@ -152,6 +171,8 @@ export class FighterLogic extends Component {
      */
     private _fightReset() {
         GameMgr.reset();
+        const battleGeneration = GameMgr.battleGeneration;
+        const lifecycleGeneration = ++this._lifecycleGeneration;
         this._preTime = 0;
         this._curTime = 0;
         this._timeScale = 1;
@@ -178,7 +199,15 @@ export class FighterLogic extends Component {
         this._checkSimilar();
 
         const randMapId = egf.Utils.getRandomInt(1, 3);
-        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/map/Map0${randMapId}`, (prefab: Node) => {
+        egf.ResMgr.getAsset(ModuleDef.GAME, `game/prefabs/map/Map0${randMapId}`, (prefab: Prefab) => {
+            if (
+                battleGeneration !== GameMgr.battleGeneration ||
+                lifecycleGeneration !== this._lifecycleGeneration ||
+                !isValid(this.node) ||
+                !isValid(this.nodeMap)
+            ) {
+                return;
+            }
             egf.Logger.log("fight reset map:", randMapId);
             this.nodeMap.removeAllChildren();
             const nodeMap = instantiate(prefab);
@@ -816,6 +845,8 @@ export class FighterLogic extends Component {
      * 使用火球技能
      */
     private _useFireBall() {
+        const battleGeneration = GameMgr.battleGeneration;
+        const lifecycleGeneration = this._lifecycleGeneration;
         let sumClose = 0; //近战士兵数量
         let sumLong = 0; //远程士兵数量
         let closePosX = 0,
@@ -860,7 +891,12 @@ export class FighterLogic extends Component {
         let disSqr = Constants.FIRE_BALL_DISTANCE * Constants.FIRE_BALL_DISTANCE;
 
         this.effectGroup.playFireBallEffect(this._ballPos, () => {
-            if (GameMgr.isGameOver) {
+            if (
+                battleGeneration !== GameMgr.battleGeneration ||
+                lifecycleGeneration !== this._lifecycleGeneration ||
+                GameMgr.isGamePause ||
+                GameMgr.isGameOver
+            ) {
                 egf.Logger.log("游戏已结束，技能无效");
                 return;
             }
@@ -1033,8 +1069,11 @@ export class FighterLogic extends Component {
      * 在 XZ 平面用空间哈希加速，把互相重叠的士兵（双方队伍）沿连线推开，保持“人群不堆叠”。
      */
     private _separateFighters() {
+        this._resetSeparationGrid();
+
         //收集参与分离的士兵：双方队伍、未死亡、且 enableSync 开启（阵型调整期间跳过）
-        const items: { node: Node; r: number }[] = [];
+        const items = this._separationItems;
+        let itemCount = 0;
         for (const team in GameMgr.dictFighter) {
             const dictFighter = GameMgr.dictFighter[team];
             for (const identity in dictFighter) {
@@ -1046,39 +1085,44 @@ export class FighterLogic extends Component {
                 if (!fighter || fighter.isDead) {
                     continue;
                 }
-                items.push({ node: ndFighter, r: fighter.radius });
+                const item = items[itemCount];
+                if (item) {
+                    item.node = ndFighter;
+                    item.radius = fighter.radius;
+                } else {
+                    items.push({ node: ndFighter, radius: fighter.radius });
+                }
+                itemCount++;
             }
         }
-
-        if (items.length < 2) {
+        if (itemCount < 2) {
             return;
         }
 
         let maxR = 0;
-        for (const it of items) {
-            if (it.r > maxR) {
-                maxR = it.r;
+        for (let i = 0; i < itemCount; i++) {
+            const item = items[i];
+            if (item.radius > maxR) {
+                maxR = item.radius;
             }
         }
         //格子尺寸不小于最大直径，保证可能碰撞的两个圆必在同一格或相邻格
         const cellSize = Math.max(maxR * 2, 0.6);
 
         //空间哈希：把士兵落入 XZ 平面网格，之后只在相邻格内做两两检测
-        const buckets = new Map<string, number[]>();
-        const cellKey = (cx: number, cz: number) => `${cx},${cz}`;
-        const cellCX = new Array<number>(items.length);
-        const cellCZ = new Array<number>(items.length);
-        for (let i = 0; i < items.length; i++) {
+        const cellCX = this._separationCellX;
+        const cellCZ = this._separationCellZ;
+        for (let i = 0; i < itemCount; i++) {
             const it = items[i];
             const cx = Math.floor(it.node.position.x / cellSize);
             const cz = Math.floor(it.node.position.z / cellSize);
             cellCX[i] = cx;
             cellCZ[i] = cz;
-            const key = cellKey(cx, cz);
-            let bucket = buckets.get(key);
+            const key = `${cx},${cz}`;
+            let bucket = this._separationBuckets.get(key);
             if (!bucket) {
-                bucket = [];
-                buckets.set(key, bucket);
+                bucket = this._separationBucketPool.pop() ?? [];
+                this._separationBuckets.set(key, bucket);
             }
             bucket.push(i);
         }
@@ -1086,7 +1130,7 @@ export class FighterLogic extends Component {
         //多轮松弛，逼近原 box2d 的软推开效果
         const ITERATIONS = 2;
         for (let iter = 0; iter < ITERATIONS; iter++) {
-            for (let i = 0; i < items.length; i++) {
+            for (let i = 0; i < itemCount; i++) {
                 const itemA = items[i];
                 const nodeA = itemA.node;
                 const cx = cellCX[i];
@@ -1094,7 +1138,7 @@ export class FighterLogic extends Component {
 
                 for (let oi = -1; oi <= 1; oi++) {
                     for (let oj = -1; oj <= 1; oj++) {
-                        const bucket = buckets.get(cellKey(cx + oi, cz + oj));
+                        const bucket = this._separationBuckets.get(`${cx + oi},${cz + oj}`);
                         if (!bucket) {
                             continue;
                         }
@@ -1106,7 +1150,7 @@ export class FighterLogic extends Component {
                             const nodeB = itemB.node;
                             const dx = nodeB.position.x - nodeA.position.x;
                             const dz = nodeB.position.z - nodeA.position.z;
-                            const minDist = itemA.r + itemB.r;
+                            const minDist = itemA.radius + itemB.radius;
                             const distSq = dx * dx + dz * dz;
                             if (distSq >= minDist * minDist) {
                                 continue;
@@ -1135,5 +1179,21 @@ export class FighterLogic extends Component {
                 }
             }
         }
+    }
+
+    private _resetSeparationGrid() {
+        for (const bucket of this._separationBuckets.values()) {
+            bucket.length = 0;
+            this._separationBucketPool.push(bucket);
+        }
+        this._separationBuckets.clear();
+    }
+
+    private _releaseSeparationCaches() {
+        this._resetSeparationGrid();
+        this._separationItems.length = 0;
+        this._separationCellX.length = 0;
+        this._separationCellZ.length = 0;
+        this._separationBucketPool.length = 0;
     }
 }

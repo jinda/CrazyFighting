@@ -11,6 +11,7 @@ export class UI_Fighter extends egf.UIController {
     private _gold: number = 0; //金币数量
     private _factor: number = 1; //系数：每个士兵掉落金币乘以本关加成系数
     private _gameTime: number = 0; // 游戏开始时间
+    private _settlementTimer: ReturnType<typeof setTimeout> | null = null;
     constructor() {
         super("ui_fighter/UI_Fighter", egf.UILayers.GAME, Layout_Fighter);
     }
@@ -44,6 +45,10 @@ export class UI_Fighter extends egf.UIController {
     }
 
     protected onDispose(): void {
+        if (this._settlementTimer !== null) {
+            clearTimeout(this._settlementTimer);
+            this._settlementTimer = null;
+        }
         egf.EventMgr.off(Constants.EVENT_NAME.DROP_COIN, this.onDropCoin, this);
         egf.EventMgr.off(Constants.EVENT_NAME.GAME_OVER, this.onGameOver, this);
     }
@@ -102,7 +107,14 @@ export class UI_Fighter extends egf.UIController {
         //播放胜利音效
         const sound = isWin ? Constants.AUDIO_SOUND.WIN : Constants.AUDIO_SOUND.FAIL;
         egf.AudioMgr.playOneShot(sound);
-        setTimeout(() => {
+        if (this._settlementTimer !== null) {
+            clearTimeout(this._settlementTimer);
+        }
+        this._settlementTimer = setTimeout(() => {
+            this._settlementTimer = null;
+            if (!isValid(this.node) || !this.node.activeInHierarchy) {
+                return;
+            }
             this.close();
             egf.UIMgr.showUI(UI_Settlement, null, this, { coin: this._gold, bWin: isWin });
         }, 2000);
