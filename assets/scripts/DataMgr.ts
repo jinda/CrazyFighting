@@ -156,13 +156,25 @@ class DataManager {
     }
 
     public set level(value: number) {
-        this._level.set(value);
+        const maxLevelIndex = this.getMaxLevelIndex();
+        const normalizedLevel = Number.isSafeInteger(value) ? Math.min(Math.max(value, 0), maxLevelIndex) : 0;
+        if (normalizedLevel !== value) {
+            egf.Logger.warn("[DataMgr] 关卡索引越界，已归一化:", value, normalizedLevel);
+        }
+        this._level.set(normalizedLevel);
     }
 
     public nextLevel() {
-        this._level.set(Math.min(this._level.get() + 1, Constants.MAX_LEVEL));
+        const maxLevelIndex = this.getMaxLevelIndex();
+        this._level.set(Math.min(this._level.get() + 1, maxLevelIndex));
         LocalDataMgr.GameInfo.level = this._level.get();
         LocalDataMgr.saveGameInfoData();
+    }
+
+    private getMaxLevelIndex(): number {
+        return Number.isSafeInteger(Constants.MAX_LEVEL) && Constants.MAX_LEVEL > 0
+            ? Constants.MAX_LEVEL - 1
+            : Number.MAX_SAFE_INTEGER;
     }
 
     public get onlineCoin() {

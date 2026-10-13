@@ -22,31 +22,30 @@ export class UI_Settlement extends egf.UIController {
 
         let coin = params.coin;
         this._bWin = params.bWin;
+        const settledLevel = DataMgr.level;
 
         if (this._bWin) {
-            let levelInfo = GameCfg.queryByID("level", DataMgr.level.toString());
+            let levelInfo = GameCfg.queryByID("level", settledLevel.toString());
             let winCoin = 0;
             if (levelInfo && levelInfo.gold) {
                 winCoin += levelInfo.gold;
             }
             coin += winCoin;
-            const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
-            layout.showInfo(this._bWin, DataMgr.level, coin, addCoin);
             this.checkUnlock();
             //上报通关进度：必须在 nextLevel 之前取当前关卡号（不额外落盘，由 nextLevel 一并保存）
-            DataMgr.reportLevelComplete(DataMgr.level, false);
+            DataMgr.reportLevelComplete(settledLevel, false);
             const scoreData = {
                 key: Constants.LeaderboardMode,
-                score: DataMgr.level,
+                score: settledLevel,
             };
             PlatformMgr.setUserCloudStorage(scoreData);
             DataMgr.nextLevel();
-        } else {
-            const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
-            layout.showInfo(this._bWin, DataMgr.level, coin, addCoin);
         }
-        egf.EventMgr.emit("add_coin_fly", { coin: coin });
-        DataMgr.addCoin(coin, this._bWin ? Constants.LEDGER_SCENE.LEVEL_WIN : Constants.LEDGER_SCENE.LEVEL_LOSE);
+        const addCoin = Math.floor(coin * LocalDataMgr.getCoinRate());
+        const totalCoin = coin + addCoin;
+        layout.showInfo(this._bWin, settledLevel, coin, addCoin);
+        egf.EventMgr.emit("add_coin_fly", { coin: totalCoin });
+        DataMgr.addCoin(totalCoin, this._bWin ? Constants.LEDGER_SCENE.LEVEL_WIN : Constants.LEDGER_SCENE.LEVEL_LOSE);
     }
 
     private clickBack() {

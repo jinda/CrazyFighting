@@ -256,7 +256,10 @@ async function testInvalidCriticalDataFallsBack() {
             complete({ key, value: key.includes("GameInfo") ? encodeSave({ level: "broken" }) : encodeSave({}) });
         },
     });
-    harness.storage.setItem("CrazyFightGameInfoConfig", encodeSave({ level: -1, formation: { 1: 101 } }));
+    harness.storage.setItem(
+        "CrazyFightGameInfoConfig",
+        encodeSave({ level: "broken", formation: { 1: 101 } }),
+    );
     const result = await harness.LocalDataMgr.prepareInitialData(() =>
         Promise.resolve({ token: "ok", user_info: {}, is_new: false }),
     );

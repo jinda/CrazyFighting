@@ -115,26 +115,36 @@ class GameManager {
      * 获得当前敌方战力
      */
     public getCurLevelEnemyFight() {
-        return this._getFormationFight(this.getCurLevelEnemy());
+        const formation = this.getCurLevelEnemy();
+        return formation ? this._getFormationFight(formation) : 0;
     }
 
     /**
      * 获取当前等级的敌人阵型
      * @returns
      */
-    public getCurLevelEnemy() {
-        let levelInfo = GameCfg.queryByID("level", DataMgr.level.toString());
+    public getCurLevelEnemy(): { [key: number]: number } | null {
+        const level = DataMgr.level;
+        const levelInfo = GameCfg.queryByID("level", level.toString());
+        if (!levelInfo || typeof levelInfo.formation !== "string" || levelInfo.formation.length === 0) {
+            egf.Logger.error("[GameMgr] 关卡配置缺失或阵型无效:", level);
+            return null;
+        }
 
-        let arrEnemyInfo = levelInfo["formation"].split("_");
+        const arrEnemyInfo = levelInfo.formation.split("_");
 
-        let dictFormation: { [key: number]: number } = {};
-        arrEnemyInfo.forEach((enemy: any) => {
-            let enemyInfo = enemy.split("#");
-            let fighterId = enemyInfo[0];
-            let pos = enemyInfo[1];
+        const dictFormation: { [key: number]: number } = {};
+        for (const enemy of arrEnemyInfo) {
+            const enemyInfo = enemy.split("#");
+            const fighterId = Number(enemyInfo[0]);
+            const pos = Number(enemyInfo[1]);
+            if (!Number.isSafeInteger(fighterId) || fighterId <= 0 || !Number.isSafeInteger(pos) || pos < 0) {
+                egf.Logger.error("[GameMgr] 关卡阵型配置无效:", level, enemy);
+                return null;
+            }
 
             dictFormation[pos] = fighterId;
-        });
+        }
 
         return dictFormation;
     }
@@ -163,6 +173,10 @@ class GameManager {
     public getNextUnlock() {
         let level = DataMgr.level;
         let arrLevel = GameCfg.getTableArr("level");
+        if (!Array.isArray(arrLevel)) {
+            egf.Logger.error("[GameMgr] 关卡配置表缺失");
+            return null;
+        }
         for (let idx = level - 1; idx < arrLevel.length; idx++) {
             if (arrLevel[idx].unlock) {
                 return { level: idx + 1, unlock: arrLevel[idx].unlock };

@@ -390,7 +390,7 @@ class LocalDataManager {
         }
         const defaults = this.createDefaultGameInfo();
         const coin = this.normalizeInteger(value.coin, defaults.coin, 0);
-        const level = this.normalizeInteger(value.level, defaults.level, 0);
+        const level = this.normalizeLevel(value.level, defaults.level);
         const coinLv = this.normalizeInteger(value.coinLv, defaults.coinLv, 1);
         const fighterLv = this.normalizeInteger(value.fighterLv, defaults.fighterLv, 1);
         const landLv = this.normalizeInteger(value.landLv, defaults.landLv, 1);
@@ -419,6 +419,9 @@ class LocalDataManager {
         ) {
             egf.Logger.error(`[LocalDataMgr] ${source} game info contains invalid fields`);
             return null;
+        }
+        if (value.level !== undefined && level !== value.level) {
+            egf.Logger.warn(`[LocalDataMgr] ${source} level is out of range and was normalized:`, value.level, level);
         }
 
         return {
@@ -489,6 +492,18 @@ class LocalDataManager {
             return null;
         }
         return value;
+    }
+
+    private normalizeLevel(value: unknown, fallback: number): number | null {
+        const level = this.normalizeInteger(value, fallback, Number.MIN_SAFE_INTEGER);
+        if (level === null) {
+            return null;
+        }
+        const maxLevelIndex =
+            Number.isSafeInteger(Constants.MAX_LEVEL) && Constants.MAX_LEVEL > 0
+                ? Constants.MAX_LEVEL - 1
+                : Number.MAX_SAFE_INTEGER;
+        return clamp(level, 0, maxLevelIndex);
     }
 
     private normalizeVolume(value: unknown, fallback: number): number | null {
@@ -794,6 +809,14 @@ class LocalDataManager {
         return (this._gameInfo.signDay % 7) + 1;
     }
 
+    /** 获取今天已领取的档位；今天尚未领取时返回 0。 */
+    public getSignedRewardDayToday(): number {
+        if (!this.isSignToday() || this._gameInfo.signDay <= 0) {
+            return 0;
+        }
+        return ((this._gameInfo.signDay - 1) % 7) + 1;
+    }
+
     /**
      * 执行签到
      * @returns 返回本次签到领取的奖励档位（第几天）
@@ -804,6 +827,7 @@ class LocalDataManager {
             return 0;
         }
 
+        const rewardDay = this.getSignProgress();
         const today = this.getTodayZero();
         const lastSignTime = this._gameInfo.lastSignTime;
 
@@ -820,9 +844,8 @@ class LocalDataManager {
         this._gameInfo.lastSignTime = Date.now();
         this.saveGameInfoData();
 
-        const day = this.getSignProgress();
-        egf.Logger.log("doSign success:", day, this._gameInfo);
-        return day;
+        egf.Logger.log("doSign success:", rewardDay);
+        return rewardDay;
     }
 
     public getCoinRate() {

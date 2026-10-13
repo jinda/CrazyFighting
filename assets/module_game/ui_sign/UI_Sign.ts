@@ -34,19 +34,31 @@ export class UI_Sign extends egf.UIController {
 
     private updateSignState() {
         let layout = this.layout as Layout_Sign;
-        const currentDay = LocalDataMgr.getSignProgress() - 1;
-        for (let i = 0; i < 7; i++) {
+        const signedRewardDay = LocalDataMgr.getSignedRewardDayToday();
+        const currentDay = signedRewardDay || LocalDataMgr.getSignProgress();
+        for (let day = 1; day <= 7; day++) {
             let status = 0;
-            if (i < currentDay) {
+            if (day < currentDay || (signedRewardDay > 0 && day === currentDay)) {
                 status = 1;
-            } else if (i == currentDay && !LocalDataMgr.isSignToday()) {
+            } else if (day === currentDay && signedRewardDay === 0) {
                 status = 2;
             }
-            egf.Logger.log("updateItemState:", i + 1, status, currentDay);
-            layout.updateItemState(i + 1, status);
+            egf.Logger.log("updateItemState:", day, status, currentDay);
+            layout.updateItemState(day, status);
         }
         layout.btnGet.getComponent(Sprite)!.grayscale = LocalDataMgr.isSignToday();
         layout.btnDoubleGet.getComponent(Sprite)!.grayscale = LocalDataMgr.isSignToday();
+    }
+
+    private getReward(day: number): number {
+        if (day < 1 || day > 7) {
+            egf.Logger.warn("签到奖励档位非法:", day);
+            return 0;
+        }
+        if (day === 7) {
+            return egf.Utils.getRandomInt(this._currentAward[6], this._currentAward[7]);
+        }
+        return this._currentAward[day - 1];
     }
 
     clickBack() {
@@ -72,10 +84,7 @@ export class UI_Sign extends egf.UIController {
         if (day <= 0) {
             return;
         }
-        let coin = this._currentAward[day - 1];
-        if (day == 6) {
-            coin = egf.Utils.getRandomInt(this._currentAward[day - 1], this._currentAward[day]);
-        }
+        const coin = this.getReward(day);
         DataMgr.addCoin(coin, Constants.LEDGER_SCENE.SIGN);
         egf.EventMgr.emit("add_coin_fly", { coin });
         this.updateSignState();
@@ -95,10 +104,7 @@ export class UI_Sign extends egf.UIController {
             if (ret) {
                 const day = LocalDataMgr.doSign();
                 if (day > 0) {
-                    let coin = this._currentAward[day - 1];
-                    if (day == 6) {
-                        coin = egf.Utils.getRandomInt(this._currentAward[day - 1], this._currentAward[day]);
-                    }
+                    const coin = this.getReward(day);
                     DataMgr.addCoin(coin * 2, Constants.LEDGER_SCENE.SIGN_AD_DOUBLE);
                     egf.EventMgr.emit("add_coin_fly", { coin: coin * 2 });
                     this.updateSignState();

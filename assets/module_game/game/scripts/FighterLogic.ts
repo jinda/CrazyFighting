@@ -170,7 +170,10 @@ export class FighterLogic extends Component {
 
         this._dictCell = {};
 
-        this.initFighters();
+        if (!this.initFighters()) {
+            egf.Logger.error("[FighterLogic] 当前关卡配置无效，已停止战斗初始化:", DataMgr.level);
+            return;
+        }
 
         this._checkSimilar();
 
@@ -186,7 +189,7 @@ export class FighterLogic extends Component {
     /*
      * 初始化敌我双方的士兵
      */
-    public initFighters() {
+    public initFighters(): boolean {
         let fightData: any = {};
         if (!DataMgr.isDebugMode) {
             //获取我方士兵阵型
@@ -209,6 +212,10 @@ export class FighterLogic extends Component {
 
             //获取敌方士兵阵型
             let enemyFormation = GameMgr.getCurLevelEnemy();
+            if (!enemyFormation) {
+                GameMgr.dictFighter = {};
+                return false;
+            }
 
             for (let pos in enemyFormation) {
                 arrEnemy[pos] = enemyFormation[pos];
@@ -248,6 +255,7 @@ export class FighterLogic extends Component {
                 this._addCell(index, Number(team), fighterId);
             });
         }
+        return true;
     }
 
     /**
