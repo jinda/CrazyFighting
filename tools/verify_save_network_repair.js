@@ -104,12 +104,13 @@ function decodeSave(value) {
 }
 
 function createLocalDataHarness(options = {}) {
-    const clock = createClock();
+    const clock = options.clock ?? createClock();
     const storage = createStorage();
     const logs = { log: [], warn: [], error: [] };
     const saveCalls = [];
     const getCalls = [];
-    const client = {
+    const client = options.client ?? { token: options.token === undefined ? "token" : options.token };
+    Object.assign(client, {
         token: options.token === undefined ? "token" : options.token,
         getData(key, complete, error) {
             getCalls.push({ key, complete, error });
@@ -119,8 +120,8 @@ function createLocalDataHarness(options = {}) {
             saveCalls.push({ key, value, complete, error });
             options.saveData?.(key, value, complete, error);
         },
-    };
-    const dataMgr = { coin: 0, level: 0 };
+    });
+    const dataMgr = options.dataMgr ?? { coin: 0, level: 0 };
     const crypto = {
         enc: { Utf8: {} },
         AES: {
@@ -153,25 +154,20 @@ const ClientApi = __deps.ClientApi;
 const Constants = __deps.Constants;
 const DataMgr = __deps.DataMgr;
 `;
-    const loaded = loadTypeScript(
-        "assets/scripts/LocalDataMgr.ts",
-        prelude,
-        ["LocalDataMgr", "InitialDataState"],
-        {
-            __deps: {
-                clamp: (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum),
-                sys: { localStorage: storage },
-                CryptoTS: crypto,
-                ClientApi: { inst: client },
-                Constants: { BASE_FIGHTER: 101, UNLOCK_CELL_SEQ: [1, 2, 3], goldRate: { maxLv: 10, step: 0.1 } },
-                DataMgr: dataMgr,
-            },
-            egf,
-            setTimeout: clock.setTimeout,
-            clearTimeout: clock.clearTimeout,
-            Buffer,
+    const loaded = loadTypeScript("assets/scripts/LocalDataMgr.ts", prelude, ["LocalDataMgr", "InitialDataState"], {
+        __deps: {
+            clamp: (value, minimum, maximum) => Math.min(Math.max(value, minimum), maximum),
+            sys: { localStorage: storage },
+            CryptoTS: crypto,
+            ClientApi: { inst: client },
+            Constants: { BASE_FIGHTER: 101, UNLOCK_CELL_SEQ: [1, 2, 3], goldRate: { maxLv: 10, step: 0.1 } },
+            DataMgr: dataMgr,
         },
-    );
+        egf,
+        setTimeout: clock.setTimeout,
+        clearTimeout: clock.clearTimeout,
+        Buffer,
+    });
     return { ...loaded, clock, storage, logs, saveCalls, getCalls, client, dataMgr };
 }
 
@@ -301,10 +297,7 @@ async function testInvalidCriticalDataFallsBack() {
             complete({ key, value: key.includes("GameInfo") ? encodeSave({ level: "broken" }) : encodeSave({}) });
         },
     });
-    harness.storage.setItem(
-        "CrazyFightGameInfoConfig",
-        encodeSave({ level: "broken", formation: { 1: 101 } }),
-    );
+    harness.storage.setItem("CrazyFightGameInfoConfig", encodeSave({ level: "broken", formation: { 1: 101 } }));
     const result = await harness.LocalDataMgr.prepareInitialData(() =>
         Promise.resolve({ token: "ok", user_info: {}, is_new: false }),
     );
@@ -402,8 +395,18 @@ function testHttpCompletionAndDeduplication() {
     let firstSuccess = 0;
     let secondSuccess = 0;
     let errors = 0;
-    harness.HttpMgr.post("/same", { b: 2, a: 1 }, () => firstSuccess++, () => errors++);
-    harness.HttpMgr.post("/same", { a: 1, b: 2 }, () => secondSuccess++, () => errors++);
+    harness.HttpMgr.post(
+        "/same",
+        { b: 2, a: 1 },
+        () => firstSuccess++,
+        () => errors++,
+    );
+    harness.HttpMgr.post(
+        "/same",
+        { a: 1, b: 2 },
+        () => secondSuccess++,
+        () => errors++,
+    );
     equal(harness.requests.length, 1, "identical requests must share one XMLHttpRequest");
     harness.requests[0].complete(200, JSON.stringify({ ok: true }));
     equal(firstSuccess, 1, "first subscriber must complete once");
@@ -411,26 +414,51 @@ function testHttpCompletionAndDeduplication() {
     harness.requests[0].onerror?.();
     equal(errors, 0, "late XHR events must not complete subscribers twice");
 
-    harness.HttpMgr.post("/500", {}, () => firstSuccess++, () => errors++);
+    harness.HttpMgr.post(
+        "/500",
+        {},
+        () => firstSuccess++,
+        () => errors++,
+    );
     harness.requests[1].complete(500, "server error");
     harness.requests[1].onerror?.();
     equal(errors, 1, "HTTP errors must notify each caller once");
 
-    harness.HttpMgr.post("/timeout", {}, () => firstSuccess++, () => errors++);
+    harness.HttpMgr.post(
+        "/timeout",
+        {},
+        () => firstSuccess++,
+        () => errors++,
+    );
     harness.requests[2].ontimeout?.();
     harness.requests[2].complete(0, "");
     equal(errors, 2, "timeouts must notify once even if ready-state follows");
 
-    harness.HttpMgr.post("/network", {}, () => firstSuccess++, () => errors++);
+    harness.HttpMgr.post(
+        "/network",
+        {},
+        () => firstSuccess++,
+        () => errors++,
+    );
     harness.requests[3].onerror?.();
     harness.requests[3].ontimeout?.();
     equal(errors, 3, "network errors must notify once even if another terminal event follows");
 
-    harness.HttpMgr.post("/parse", {}, () => firstSuccess++, () => errors++);
+    harness.HttpMgr.post(
+        "/parse",
+        {},
+        () => firstSuccess++,
+        () => errors++,
+    );
     harness.requests[4].complete(200, "not-json");
     equal(errors, 4, "JSON parse failure must use the error completion path");
 
-    harness.HttpMgr.post("/cancel", {}, () => firstSuccess++, () => errors++);
+    harness.HttpMgr.post(
+        "/cancel",
+        {},
+        () => firstSuccess++,
+        () => errors++,
+    );
     harness.HttpMgr.abort("/cancel");
     harness.requests[5].onerror?.();
     equal(errors, 5, "cancelled requests must notify once");
@@ -463,10 +491,10 @@ function testLoggerLevels() {
     equal(calls.warn, 2, "setLogStatus(false) must not suppress warnings");
 }
 
-async function testReconnectKeepsSaveState() {
-    const clock = createClock();
+function createDataManagerHarness(options = {}) {
+    const clock = options.clock ?? createClock();
     const localCalls = { clear: 0, flush: [], cloudLoad: 0 };
-    const localData = {
+    const localData = options.localData ?? {
         GameInfo: { coin: 250, level: 5 },
         pendingLevels: [],
         clearPendingLedgerOps: () => localCalls.clear++,
@@ -475,6 +503,8 @@ async function testReconnectKeepsSaveState() {
         saveGameInfoData() {},
         addPendingLevel() {},
         removePendingLevelsUpTo() {},
+        waitForInitialData: () => Promise.resolve(),
+        isInitialDataPending: false,
     };
     const resourceRequests = [];
     const client = {
@@ -543,25 +573,128 @@ const PlatformMgr = __deps.PlatformMgr;
         setInterval: () => 1,
         clearInterval: () => {},
     });
-    loaded.DataMgr.coin = 250;
-    loaded.DataMgr.level = 5;
+    return { ...loaded, clock, localCalls, localData, resourceRequests, client };
+}
+
+async function testReconnectKeepsSaveState() {
+    const { DataMgr, client, localCalls, resourceRequests } = createDataManagerHarness();
+    DataMgr.coin = 250;
+    DataMgr.level = 5;
     let loginSuccess;
-    const firstLogin = loaded.DataMgr.startCoinSync((success) => {
+    const firstLogin = DataMgr.startCoinSync((success) => {
         loginSuccess = success;
     });
-    equal(localCalls.clear, 1, "coin sync must retain the existing pending-progress store while clearing legacy ledger ops");
+    equal(
+        localCalls.clear,
+        1,
+        "coin sync must retain the existing pending-progress store while clearing legacy ledger ops",
+    );
     client.token = "authenticated";
     loginSuccess({ token: "authenticated", user_info: { level: 77, coin: 999 }, is_new: false });
     const loginData = await firstLogin;
+    await flushPromises();
     equal(loginData.user_info.level, 77, "the initial login result must be awaitable by startup recovery");
-    equal(loaded.DataMgr.level, 6, "login and reconnect must not overwrite the applied save level");
+    equal(DataMgr.level, 6, "login and reconnect must not overwrite the applied save level");
     equal(localCalls.cloudLoad, 0, "login and reconnect must not reload cloud formation");
     equal(resourceRequests.length, 1, "successful login must continue ledger synchronization");
     resourceRequests[0].complete({ coin: 888 });
-    equal(loaded.DataMgr.coin, 888, "ledger synchronization must still update the current coin balance");
-    loaded.DataMgr.onGameHide();
+    equal(DataMgr.coin, 888, "ledger synchronization must still update the current coin balance");
+    DataMgr.onGameHide();
     equal(localCalls.flush.at(-1), true, "background transition must force a retained cloud-save attempt");
-    loaded.DataMgr.stopCoinSync();
+    DataMgr.stopCoinSync();
+}
+
+async function testInitialRecoveryLedgerOrdering(outcome) {
+    let local;
+    const localData = new Proxy(
+        {},
+        {
+            get(_target, key) {
+                const value = local.LocalDataMgr[key];
+                return typeof value === "function" ? value.bind(local.LocalDataMgr) : value;
+            },
+        },
+    );
+    const data = createDataManagerHarness({ localData });
+    local = createLocalDataHarness({ clock: data.clock, dataMgr: data.DataMgr, client: data.client, token: "" });
+    const cloudInfo = { coin: 9999, level: 999, unlock: [101, 202], formation: { 0: 202, 1: 101 } };
+    let completeLogin;
+    const ready = local.LocalDataMgr.prepareInitialData(() =>
+        data.DataMgr.startCoinSync((complete) => {
+            completeLogin = complete;
+        }),
+    );
+    data.client.token = "authenticated";
+    completeLogin({ token: "authenticated", user_info: { coin: 777, level: 1 }, is_new: false });
+    await flushPromises();
+    equal(local.getCalls.length, 2, `${outcome}: cloud requests must start after login`);
+    equal(data.resourceRequests.length, 0, `${outcome}: the first ledger request must wait for recovery`);
+
+    // Exercise ordinary save, interval retry, direct sync and background flush while getData is pending.
+    local.LocalDataMgr.saveGameInfoData();
+    equal(
+        decodeSave(local.storage.getItem("CrazyFightGameInfoConfig")).level,
+        0,
+        `${outcome}: local writes must remain immediate`,
+    );
+    data.DataMgr.retryCoinSync();
+    data.DataMgr.syncWithServer();
+    data.DataMgr.onGameHide();
+    data.DataMgr.onGameShow();
+    local.clock.advance(500);
+    equal(data.resourceRequests.length, 0, `${outcome}: retries and foreground must respect the recovery gate`);
+    equal(local.saveCalls.length, 0, `${outcome}: default game snapshots must not upload during recovery`);
+
+    const gameRequest = local.getCalls.find((request) => request.key.includes("GameInfo"));
+    const settingRequest = local.getCalls.find((request) => request.key.includes("Setting"));
+    settingRequest.complete({ key: settingRequest.key, value: encodeSave({}) });
+    if (outcome === "cloud") {
+        gameRequest.complete({ key: gameRequest.key, value: encodeSave(cloudInfo) });
+    } else if (outcome === "failure") {
+        gameRequest.error(500, "unavailable");
+    } else {
+        local.clock.advance(9500);
+    }
+    const result = await ready;
+    await flushPromises();
+    const expectedLevel = outcome === "cloud" ? 999 : 0;
+    equal(
+        result.source,
+        outcome === "cloud" ? "cloud" : "default",
+        `${outcome}: recovery must finish with the expected source`,
+    );
+    equal(data.resourceRequests.length, 1, `${outcome}: the ledger request must resume after recovery finishes`);
+    equal(
+        local.LocalDataMgr.GameInfo.level,
+        expectedLevel,
+        `${outcome}: recovery must initialize the expected progress`,
+    );
+    equal(local.saveCalls.length, 0, `${outcome}: a pending default snapshot must not escape when the gate opens`);
+
+    data.resourceRequests[0].complete({ coin: 777 });
+    local.clock.advance(500);
+    equal(local.saveCalls.length, 1, `${outcome}: ledger success must upload one current game snapshot`);
+    const uploaded = decodeSave(local.saveCalls[0].value);
+    equal(uploaded.level, expectedLevel, `${outcome}: ledger saves must use recovered progress`);
+    equal(uploaded.coin, 777, `${outcome}: ledger balance must be authoritative`);
+    if (outcome === "cloud") {
+        deepEqual(
+            uploaded.formation,
+            cloudInfo.formation,
+            "ledger upload must preserve the recovered formation including cell zero",
+        );
+        deepEqual(uploaded.unlock, cloudInfo.unlock, "ledger upload must preserve recovered unlocks");
+    } else if (outcome === "timeout") {
+        gameRequest.complete({ key: gameRequest.key, value: encodeSave(cloudInfo) });
+        await flushPromises();
+        equal(
+            local.LocalDataMgr.GameInfo.level,
+            0,
+            "late cloud completion must not replace progress after ledger sync",
+        );
+        equal(local.LocalDataMgr.GameInfo.coin, 777, "late cloud completion must not replace the ledger balance");
+    }
+    data.DataMgr.stopCoinSync();
 }
 
 function testSourceContracts() {
@@ -569,8 +702,14 @@ function testSourceContracts() {
     const dataMgr = fs.readFileSync(path.join(projectRoot, "assets/scripts/DataMgr.ts"), "utf8");
     const clientApi = fs.readFileSync(path.join(projectRoot, "assets/scripts/ClientApi.ts"), "utf8");
     const httpMgr = fs.readFileSync(path.join(projectRoot, "assets/core_code/network/HttpMgr.ts"), "utf8");
-    check(start.includes("!this.resourcesReady || !this.dataReady"), "scene transition must gate on resources and data");
-    check(start.includes("prepareInitialData(() => DataMgr.startCoinSync"), "startup must run awaitable data preparation");
+    check(
+        start.includes("!this.resourcesReady || !this.dataReady"),
+        "scene transition must gate on resources and data",
+    );
+    check(
+        start.includes("prepareInitialData(() => DataMgr.startCoinSync"),
+        "startup must run awaitable data preparation",
+    );
     check(!dataMgr.includes("loadDataFromSever"), "reconnect must not restore cloud formation");
     check(!dataMgr.includes("this.level = data.user_info.level"), "login callback must not overwrite runtime level");
     check(!clientApi.includes("this._token.slice"), "token content must not be logged");
@@ -581,6 +720,7 @@ function testSourceContracts() {
 async function main() {
     await testLocalPriorityAndMigration();
     await testCloudRecoveryAndCoinIsolation();
+    await testFormationZeroRecovery();
     await testTimeoutRejectsLateCloud();
     await testInvalidCriticalDataFallsBack();
     await testCloudSaveQueue();
@@ -588,6 +728,9 @@ async function main() {
     testHttpCompletionAndDeduplication();
     testLoggerLevels();
     await testReconnectKeepsSaveState();
+    for (const outcome of ["cloud", "failure", "timeout"]) {
+        await testInitialRecoveryLedgerOrdering(outcome);
+    }
     testSourceContracts();
     console.log(`save/network regression checks passed: ${assertionCount} assertions`);
 }
@@ -596,4 +739,3 @@ main().catch((error) => {
     console.error(error);
     process.exitCode = 1;
 });
-    await testFormationZeroRecovery();

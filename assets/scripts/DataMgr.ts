@@ -201,6 +201,22 @@ class DataManager {
         const initialLogin = new Promise<ILoginData | null>((resolve) => {
             this.initialLoginResolver = resolve;
         });
+        const epoch = this.coinEpoch;
+        void initialLogin
+            .then(async (data) => {
+                if (!data) {
+                    return;
+                }
+                await LocalDataMgr.waitForInitialData();
+                if (epoch !== this.coinEpoch) {
+                    return;
+                }
+                LocalDataMgr.flushCloudSaves();
+                this.retryCoinSync();
+            })
+            .catch((error: unknown) => {
+                egf.Logger.error("[DataMgr] 首次存档准备后金币同步失败:", error);
+            });
         this.serverLogin = login;
         this.inBackground = false;
         game.on(Game.EVENT_SHOW, this.onGameShow, this);
@@ -248,7 +264,9 @@ class DataManager {
             return;
         }
         if (ClientApi.inst.token) {
-            this.syncWithServer();
+            if (!LocalDataMgr.isInitialDataPending) {
+                this.syncWithServer();
+            }
             return;
         }
         this.coinSyncing = true;
@@ -271,10 +289,13 @@ class DataManager {
             this.clearCoinRequestTimer();
             this.coinSyncing = false;
             this.userData = data.user_info;
+            const isInitialLogin = this.initialLoginResolver !== null;
             this.resolveInitialLogin(data);
             ClientApi.inst.foreground();
-            LocalDataMgr.flushCloudSaves();
-            this.syncWithServer();
+            if (!isInitialLogin) {
+                LocalDataMgr.flushCloudSaves();
+                this.retryCoinSync();
+            }
         }, onFail);
     }
 
@@ -430,7 +451,13 @@ class DataManager {
 
     /** 登录、重连及前台恢复时查询账本；离线变化直接由服务器余额覆盖。 */
     public syncWithServer() {
-        if (!this.canReportServer || !ClientApi.inst.token || this.coinSyncing || this.ledgerInFlight) {
+        if (
+            !this.canReportServer ||
+            !ClientApi.inst.token ||
+            this.coinSyncing ||
+            this.ledgerInFlight ||
+            LocalDataMgr.isInitialDataPending
+        ) {
             return;
         }
         this.coinSyncing = true;

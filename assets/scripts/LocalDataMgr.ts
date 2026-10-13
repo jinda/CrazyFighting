@@ -105,6 +105,18 @@ class LocalDataManager {
         return this._initialDataState;
     }
 
+    public get isInitialDataPending(): boolean {
+        return (
+            this._initialDataState === InitialDataState.LOADING_LOCAL ||
+            this._initialDataState === InitialDataState.WAITING_CLOUD
+        );
+    }
+
+    /** 首次登录的后续账本操作须等待存档恢复完成。 */
+    public async waitForInitialData(): Promise<void> {
+        await this.initialDataPromise;
+    }
+
     /** 兼容旧调用：同步读取本地数据，不执行云恢复。 */
     public loadData(): void {
         this._initialDataState = InitialDataState.LOADING_LOCAL;
@@ -131,6 +143,9 @@ class LocalDataManager {
         const hasValidGameInfo = this.loadGameInfoData();
         this.loadSettingData();
 
+        // 登录可能同步回调；先建立恢复状态，防止默认档提前进入上传队列。
+        this._initialDataState = hasValidGameInfo ? InitialDataState.READY_LOCAL : InitialDataState.WAITING_CLOUD;
+
         let loginPromise: Promise<ILoginData | null>;
         try {
             loginPromise = startLogin();
@@ -140,17 +155,14 @@ class LocalDataManager {
         }
 
         if (hasValidGameInfo) {
-            this._initialDataState = InitialDataState.READY_LOCAL;
             void loginPromise.catch((error: unknown) => {
                 egf.Logger.error("[LocalDataMgr] background login failed:", error);
             });
             return { state: this._initialDataState, source: "local" };
         }
 
-        this._initialDataState = InitialDataState.WAITING_CLOUD;
         return new Promise<IInitialDataResult>((resolve) => {
             let settled = false;
-            let timer: ReturnType<typeof setTimeout>;
             const complete = (
                 source: IInitialDataResult["source"],
                 reason?: string,
@@ -175,7 +187,7 @@ class LocalDataManager {
                 }
                 resolve({ state: this._initialDataState, source, reason });
             };
-            timer = setTimeout(() => complete("default", "cloud_timeout"), INITIAL_CLOUD_TIMEOUT_MS);
+            const timer = setTimeout(() => complete("default", "cloud_timeout"), INITIAL_CLOUD_TIMEOUT_MS);
 
             void loginPromise
                 .then(async (loginData) => {
@@ -227,7 +239,7 @@ class LocalDataManager {
 
     public saveGameInfoData() {
         const encryptStr = this.writeGameInfoLocal();
-        if (encryptStr) {
+        if (encryptStr && !this.isInitialDataPending) {
             this.queueCloudSave(this.GameInfoStr, encryptStr);
         }
     }
@@ -320,7 +332,12 @@ class LocalDataManager {
     }
 
     private sendCloudSave(key: string, state: ICloudSaveState) {
-        if (state.inFlight || state.latest === null || !ClientApi.inst.token) {
+        if (
+            state.inFlight ||
+            state.latest === null ||
+            !ClientApi.inst.token ||
+            (key === this.GameInfoStr && this.isInitialDataPending)
+        ) {
             return;
         }
         const snapshot = state.latest;
