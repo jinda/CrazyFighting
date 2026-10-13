@@ -128,8 +128,9 @@ export class Weapon extends Component {
                 this.ndTrail = null;
             }
 
-            this.ndTrail = egf.PoolMgr.getNode(this.pfTrail, this.node);
-            const particle = this.ndTrail.getComponent(ParticleSystemComponent);
+            const trail = egf.PoolMgr.getNode(this.pfTrail, this.node);
+            this.ndTrail = trail;
+            const particle = trail.getComponent(ParticleSystemComponent);
             particle?.clear();
             particle?.stop();
             particle?.play();
