@@ -9,8 +9,9 @@ import {
     SkinnedMeshRenderer,
     MeshRenderer,
     CCBoolean,
+    type Vec3,
 } from "cc";
-import { Fighter } from "./Fighter";
+import type { Fighter } from "./Fighter";
 import { Constants } from "db://assets/scripts/Constants";
 import { Weapon } from "./Weapon";
 import { GameMgr } from "./GameMgr";
@@ -43,10 +44,13 @@ export class FighterModel extends Component {
     @property(CCBoolean)
     public bThrowWeapon: boolean = false; //可以丢弃的武器本体
 
-    private _cb: Function = null!; //攻击后的回调函数
-    private _target: any = null!; //士兵对应的fighter脚本
+    private _cb: (() => void) | null = null; //攻击后的回调函数
+    private _target: Fighter | null = null; //士兵对应的fighter脚本
+    private _animationFinishedCallback: (() => void) | null = null;
+    private _animationFinishedTarget: object | null = null;
     private _currentAni: string = ""; //当前动画名称
     private _crownGeneration: number = 0; //皇冠异步加载代次：每次 show()/reset() 递增，防止模型复用后旧皇冠挂到新角色
+    private _isBattlePaused: boolean = false;
 
     start() {
         // Your initialization goes here.
@@ -58,6 +62,15 @@ export class FighterModel extends Component {
      */
     public reset() {
         this._crownGeneration++;
+        this._clearAnimationFinishedListener();
+        this._cb = null;
+        this._target = null;
+        this._currentAni = "";
+        this._isBattlePaused = false;
+        this.ani.stop();
+        if (this.bThrowWeapon && this.nodeWeapon) {
+            this.nodeWeapon.active = true;
+        }
     }
 
     /**
@@ -93,7 +106,7 @@ export class FighterModel extends Component {
      * @param cb 回调函数
      * @param target 目标
      */
-    public setEffectListener(cb: Function, target: any) {
+    public setEffectListener(cb: () => void, target: Fighter) {
         this._cb = cb;
         this._target = target;
     }
@@ -102,7 +115,10 @@ export class FighterModel extends Component {
      * attack动画帧事件
      */
     public triggerEffect() {
-        this._cb && this._cb.apply(this._target);
+        if (this._isBattlePaused || !this._cb || !this._target) {
+            return;
+        }
+        this._cb.apply(this._target);
     }
 
     /**
@@ -112,14 +128,39 @@ export class FighterModel extends Component {
      * @param {Object} targe
      * @memberof FighterModel
      */
-    public onceAniFinished(callback: Function, target: Object) {
-        this.ani.once(
-            AnimationComponent.EventType.FINISHED,
-            () => {
-                callback();
-            },
-            target,
-        );
+    public onceAniFinished(callback: () => void, target: object) {
+        this._clearAnimationFinishedListener();
+        this._animationFinishedCallback = () => {
+            this._animationFinishedCallback = null;
+            this._animationFinishedTarget = null;
+            callback();
+        };
+        this._animationFinishedTarget = target;
+        this.ani.once(AnimationComponent.EventType.FINISHED, this._animationFinishedCallback, target);
+    }
+
+    private _clearAnimationFinishedListener() {
+        if (this._animationFinishedCallback && this._animationFinishedTarget) {
+            this.ani.off(
+                AnimationComponent.EventType.FINISHED,
+                this._animationFinishedCallback,
+                this._animationFinishedTarget,
+            );
+        }
+        this._animationFinishedCallback = null;
+        this._animationFinishedTarget = null;
+    }
+
+    public setBattlePaused(paused: boolean) {
+        if (this._isBattlePaused === paused) {
+            return;
+        }
+        this._isBattlePaused = paused;
+        if (paused) {
+            this.ani.pause();
+        } else {
+            this.ani.resume();
+        }
     }
 
     /**
@@ -173,7 +214,12 @@ export class FighterModel extends Component {
      * 在士兵手上生成武器，并向敌人扔该武器
      * @param callback
      */
-    public throwWeapon(parent: Node, target: Fighter, callback: Function) {
+    public throwWeapon(
+        parent: Node,
+        attacker: Fighter,
+        target: Fighter,
+        callback: (target: Fighter, hitPosition: Vec3) => void,
+    ) {
         if (!this.pfThrowWeapon) {
             egf.Logger.error("throwWeapon error no prefab!");
             return;
@@ -181,14 +227,20 @@ export class FighterModel extends Component {
         const ndThrow = egf.PoolMgr.getNode(this.pfThrowWeapon, parent!);
         ndThrow.setWorldPosition(this.nodeWeapon.worldPosition);
         ndThrow.setWorldRotation(this.nodeWeapon.worldRotation);
-        const posTarget = target.node.worldPosition;
+        const posTarget = target.node.worldPosition.clone();
         const weapon = ndThrow.getComponent(Weapon);
-        weapon?.throwMissile(posTarget, 10 * GameMgr.timeScale, target, callback);
+
+        if (!weapon) {
+            egf.Logger.error("throwWeapon error no Weapon component!");
+            egf.PoolMgr.putNode(ndThrow);
+            return;
+        }
 
         //隐藏手中的武器
         if (this.bThrowWeapon) {
             this.nodeWeapon.active = false;
         }
+        weapon.throwMissile(posTarget, 10 * GameMgr.timeScale, attacker, target, callback);
     }
 
     /**

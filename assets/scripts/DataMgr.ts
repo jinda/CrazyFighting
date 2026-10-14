@@ -9,27 +9,36 @@ import { Constants } from "./Constants";
 import { LocalDataMgr, type IPendingLedgerOp } from "./LocalDataMgr";
 import { EPlatform, PlatformMgr } from "./SDK/PlatformMgr";
 
-window.onerror = function (message, source, lineno, colno, error) {
-    egf.Logger.error("捕获到全局错误: ", message, source, lineno, colno, error);
+const sanitizeDiagnostic = (value: unknown): string => {
+    return String(value ?? "")
+        .replace(/Bearer\s+[A-Za-z0-9._~+/=-]+/gi, "Bearer [REDACTED]")
+        .replace(/([?&](?:token|code|password)=)[^&\s]+/gi, "$1[REDACTED]")
+        .replace(/("(?:token|password|identity_token|id_token)"\s*:\s*")[^"]+/gi, "$1[REDACTED]");
+};
+
+window.onerror = function (message, _source, lineno, colno, error) {
+    const safeMessage = sanitizeDiagnostic(message);
+    const safeStack = sanitizeDiagnostic(error?.stack || "");
+    egf.Logger.error("捕获到全局错误: ", safeMessage, lineno, colno);
     ClientApi.inst.reportError(
         {
             /** 一次异常的稳定 ID，非空，最多 128 字节；重试必须复用 */
             event_id: ClientApi.createReqId("global_error"),
             error_type: "runtime",
             /** 非空，最多 2 KiB；发送前移除敏感信息 */
-            message: message.toString(),
+            message: safeMessage,
             /** 最多 16 KiB；发送前移除敏感信息 */
-            stack: error?.stack || "",
+            stack: safeStack,
             /** 最多 128 字节 */
             game_version: DataMgr.version,
             /** 最多 128 字节 */
             platform: PlatformMgr.platform.toString(),
         },
-        (data) => {
-            egf.Logger.log("reportError success:", data);
+        () => {
+            egf.Logger.log("reportError success");
         },
-        (errcode, errmsg) => {
-            egf.Logger.warn("reportError fail:", errcode, errmsg);
+        (errcode) => {
+            egf.Logger.warn("reportError fail:", errcode);
         },
     );
     return true; // 返回true可以阻止错误冒泡
@@ -71,6 +80,7 @@ class DataManager {
     private coinSyncTimer: ReturnType<typeof setInterval> | null = null;
     private coinRequestTimer: ReturnType<typeof setTimeout> | null = null;
     private serverLogin: ServerLogin | null = null;
+    private initialLoginResolver: ((data: ILoginData | null) => void) | null = null;
     private inBackground = false;
 
     // 内存加密存储，防止内存扫描篡改金币/关卡
@@ -146,13 +156,25 @@ class DataManager {
     }
 
     public set level(value: number) {
-        this._level.set(value);
+        const maxLevelIndex = this.getMaxLevelIndex();
+        const normalizedLevel = Number.isSafeInteger(value) ? Math.min(Math.max(value, 0), maxLevelIndex) : 0;
+        if (normalizedLevel !== value) {
+            egf.Logger.warn("[DataMgr] 关卡索引越界，已归一化:", value, normalizedLevel);
+        }
+        this._level.set(normalizedLevel);
     }
 
     public nextLevel() {
-        this._level.set(Math.min(this._level.get() + 1, Constants.MAX_LEVEL));
+        const maxLevelIndex = this.getMaxLevelIndex();
+        this._level.set(Math.min(this._level.get() + 1, maxLevelIndex));
         LocalDataMgr.GameInfo.level = this._level.get();
         LocalDataMgr.saveGameInfoData();
+    }
+
+    private getMaxLevelIndex(): number {
+        return Number.isSafeInteger(Constants.MAX_LEVEL) && Constants.MAX_LEVEL > 0
+            ? Constants.MAX_LEVEL - 1
+            : Number.MAX_SAFE_INTEGER;
     }
 
     public get onlineCoin() {
@@ -170,18 +192,38 @@ class DataManager {
     }
 
     /** 同步由全局数据管理器持有，不依赖已经卸载的启动场景组件。 */
-    public startCoinSync(login: ServerLogin) {
+    public startCoinSync(login: ServerLogin): Promise<ILoginData | null> {
         this.stopCoinSync();
         LocalDataMgr.clearPendingLedgerOps();
         if (!this.canReportServer) {
-            return;
+            return Promise.resolve(null);
         }
+        const initialLogin = new Promise<ILoginData | null>((resolve) => {
+            this.initialLoginResolver = resolve;
+        });
+        const epoch = this.coinEpoch;
+        void initialLogin
+            .then(async (data) => {
+                if (!data) {
+                    return;
+                }
+                await LocalDataMgr.waitForInitialData();
+                if (epoch !== this.coinEpoch) {
+                    return;
+                }
+                LocalDataMgr.flushCloudSaves();
+                this.retryCoinSync();
+            })
+            .catch((error: unknown) => {
+                egf.Logger.error("[DataMgr] 首次存档准备后金币同步失败:", error);
+            });
         this.serverLogin = login;
         this.inBackground = false;
         game.on(Game.EVENT_SHOW, this.onGameShow, this);
         game.on(Game.EVENT_HIDE, this.onGameHide, this);
         this.coinSyncTimer = setInterval(() => this.retryCoinSync(), COIN_SYNC_INTERVAL_MS);
         this.retryCoinSync();
+        return initialLogin;
     }
 
     /** 重启同步或退出游戏时清理定时器、监听，并使旧回调失效。 */
@@ -194,6 +236,7 @@ class DataManager {
         game.off(Game.EVENT_SHOW, this.onGameShow, this);
         game.off(Game.EVENT_HIDE, this.onGameHide, this);
         this.serverLogin = null;
+        this.resolveInitialLogin(null);
         this.useLocalCoin();
     }
 
@@ -207,6 +250,7 @@ class DataManager {
 
     private onGameHide() {
         this.inBackground = true;
+        LocalDataMgr.flushCloudSaves(true);
         egf.AudioMgr.pause();
         ClientApi.inst.background();
     }
@@ -220,7 +264,9 @@ class DataManager {
             return;
         }
         if (ClientApi.inst.token) {
-            this.syncWithServer();
+            if (!LocalDataMgr.isInitialDataPending) {
+                this.syncWithServer();
+            }
             return;
         }
         this.coinSyncing = true;
@@ -231,6 +277,7 @@ class DataManager {
                 return;
             }
             settled = true;
+            this.resolveInitialLogin(null);
             this.useLocalCoin();
         };
         this.coinRequestTimer = setTimeout(onFail, COIN_REQUEST_TIMEOUT_MS);
@@ -242,12 +289,23 @@ class DataManager {
             this.clearCoinRequestTimer();
             this.coinSyncing = false;
             this.userData = data.user_info;
-            // 金币独立查询资源账本，云存档中的 coin 不作为余额来源。
-            this.level = data.user_info.level || 1;
+            const isInitialLogin = this.initialLoginResolver !== null;
+            this.resolveInitialLogin(data);
             ClientApi.inst.foreground();
-            LocalDataMgr.loadDataFromSever();
-            this.syncWithServer();
+            if (!isInitialLogin) {
+                LocalDataMgr.flushCloudSaves();
+                this.retryCoinSync();
+            }
         }, onFail);
+    }
+
+    private resolveInitialLogin(data: ILoginData | null) {
+        if (!this.initialLoginResolver) {
+            return;
+        }
+        const resolve = this.initialLoginResolver;
+        this.initialLoginResolver = null;
+        resolve(data);
     }
 
     private clearCoinRequestTimer() {
@@ -393,7 +451,13 @@ class DataManager {
 
     /** 登录、重连及前台恢复时查询账本；离线变化直接由服务器余额覆盖。 */
     public syncWithServer() {
-        if (!this.canReportServer || !ClientApi.inst.token || this.coinSyncing || this.ledgerInFlight) {
+        if (
+            !this.canReportServer ||
+            !ClientApi.inst.token ||
+            this.coinSyncing ||
+            this.ledgerInFlight ||
+            LocalDataMgr.isInitialDataPending
+        ) {
             return;
         }
         this.coinSyncing = true;

@@ -40,9 +40,12 @@ export class Fighter extends Component {
     private _moveTime: number = 0; //每次移动的时间
     private _moveSpeed: number = 0; //移动速度
     private _isWaitingDamage: boolean = false; //等待伤害计算
-    private _tweenDead: any = null!; //士兵阵亡缓动效果
+    private _tweenDead: Tween<Node> | null = null; //士兵阵亡缓动效果
     private _isAttacking: boolean = false; //是否正在攻击
     private _loadGeneration: number = 0; //异步模型加载代次：每次 init() 递增，回收时失效，防止旧回调挂载到复用后的角色
+    private _lifecycleGeneration: number = 0; //对象池复用代次，异步攻击只能命中创建时的角色生命周期
+    private _battleGeneration: number = 0;
+    private _findEnemyDelay: number = 0;
     private _fightStartTargetPos: Vec3 = new Vec3(); //开始游戏后士兵到达的第一个位置
     private _nodeModel: Node = null!; //士兵模型
     private _fighterModel: FighterModel = null!; //士兵模型的脚本
@@ -63,6 +66,8 @@ export class Fighter extends Component {
     }
 
     onDisable() {
+        GameMgr.unregisterBattleLifecycle(this);
+        this.unscheduleAllCallbacks();
         if (this._tweenDead) {
             this._tweenDead.stop();
             this._tweenDead = null;
@@ -80,6 +85,15 @@ export class Fighter extends Component {
      * @param cellPos 对应的格子
      */
     public init(identity: number, team: number, fighterInfo: any, posWorld: Vec3, cellPos: number) {
+        this.unscheduleAllCallbacks();
+        if (this._tweenDead) {
+            this._tweenDead.stop();
+            this._tweenDead = null;
+        }
+        this._lifecycleGeneration++;
+        this._battleGeneration = GameMgr.battleGeneration;
+        this._findEnemyDelay = 0;
+        GameMgr.registerBattleLifecycle(this);
         this.node.worldPosition = posWorld;
 
         this.isDead = false;
@@ -147,6 +161,7 @@ export class Fighter extends Component {
             this._fighterModel = this._nodeModel.getComponent(FighterModel) as FighterModel;
             this._fighterModel.show(this.team, this.fighterInfo.color, this.fighterInfo.crown);
             this._fighterModel.setEffectListener(this._triggerEffect, this);
+            this._fighterModel.setBattlePaused(GameMgr.isGamePause);
         });
 
         let scale = this.fighterInfo.scale;
@@ -178,6 +193,33 @@ export class Fighter extends Component {
         }
 
         this.recycle();
+    }
+
+    public get lifecycleGeneration(): number {
+        return this._lifecycleGeneration;
+    }
+
+    public isLifecycleActive(lifecycleGeneration: number, battleGeneration: number): boolean {
+        return (
+            lifecycleGeneration === this._lifecycleGeneration &&
+            battleGeneration === this._battleGeneration &&
+            battleGeneration === GameMgr.battleGeneration &&
+            !this.isDead &&
+            isValid(this.node) &&
+            !!this.node.parent
+        );
+    }
+
+    public setBattlePaused(paused: boolean) {
+        this._fighterModel?.setBattlePaused(paused);
+        if (!this._tweenDead) {
+            return;
+        }
+        if (paused) {
+            this._tweenDead.pause();
+        } else {
+            this._tweenDead.resume();
+        }
     }
 
     /**
@@ -235,7 +277,7 @@ export class Fighter extends Component {
             GameMgr.checkWin(this.team);
             if (!GameMgr.isGameOver) {
                 //待机3s在搜寻下？？
-                this.scheduleOnce(this._findEnemy, 3);
+                this._findEnemyDelay = 3;
             }
         } else {
             //如果找到敌人则向敌人移动
@@ -250,7 +292,11 @@ export class Fighter extends Component {
     private _playAttackEffect() {
         const effect = this._skillInfo.release;
         if (effect) {
-            GameMgr.effectGroup.playEffect(effect, this.node, Vec3.ZERO);
+            const lifecycleGeneration = this._lifecycleGeneration;
+            const battleGeneration = this._battleGeneration;
+            GameMgr.effectGroup.playEffect(effect, this.node, Vec3.ZERO, undefined, undefined, () =>
+                this.isLifecycleActive(lifecycleGeneration, battleGeneration),
+            );
         }
         const sound = this._skillInfo.release_sound;
         if (sound) {
@@ -305,7 +351,7 @@ export class Fighter extends Component {
     public onDamage(damageValue: number, attacker?: number) {
         //同一帧可能被多个伤害源命中（近战 + 范围伤害 + 飞行武器），必须幂等：
         //否则会重复触发 onSomeoneDead → 重复掉落金币、重复播放阵亡缓动
-        if (this.isDead) {
+        if (this.isDead || GameMgr.isGamePause) {
             return;
         }
         // egf.Logger.log("onDamage:", this.identity, damageValue, attacker, this._hp);
@@ -383,35 +429,74 @@ export class Fighter extends Component {
      * 士兵attack动画帧动画事件触发的回调函数
      */
     private _triggerEffect() {
-        if (!this._isWaitingDamage) {
+        if (!this._isWaitingDamage || GameMgr.isGamePause || this.isDead) {
             return;
         }
 
         this._isWaitingDamage = false;
-        if (this.target && !this.target.isDead) {
+        const target = this.target;
+        if (target && !target.isDead) {
+            const attackerGeneration = this._lifecycleGeneration;
+            const targetGeneration = target.lifecycleGeneration;
+            const battleGeneration = this._battleGeneration;
             //是否远程兵/是否扔武器
             const flyEffect = this._skillInfo.fly;
             if (flyEffect) {
                 //扔武器
-                this._fighterModel.throwWeapon(this.node.parent!, this.target, (target: Fighter) => {
-                    //触发特效
-                    this.hitEffect(target);
-
-                    //扔完后展示手中的武器
-                    this._fighterModel.showHandWeapon();
-                });
+                this._fighterModel.throwWeapon(
+                    this.node.parent!,
+                    this,
+                    target,
+                    (hitTarget: Fighter, hitPosition: Vec3) => {
+                        if (
+                            !this._isHitContextActive(hitTarget, attackerGeneration, targetGeneration, battleGeneration)
+                        ) {
+                            return;
+                        }
+                        this.hitEffect(hitTarget, hitPosition, attackerGeneration, targetGeneration, battleGeneration);
+                        this._fighterModel?.showHandWeapon();
+                    },
+                );
             } else {
                 //触发特效
-                this.hitEffect(this.target);
+                this.hitEffect(
+                    target,
+                    target.node.worldPosition.clone(),
+                    attackerGeneration,
+                    targetGeneration,
+                    battleGeneration,
+                );
             }
         }
     }
 
-    private hitEffect(target: Fighter) {
+    private _isHitContextActive(
+        target: Fighter,
+        attackerGeneration: number,
+        targetGeneration: number,
+        battleGeneration: number,
+    ) {
+        return (
+            !GameMgr.isGamePause &&
+            this.isLifecycleActive(attackerGeneration, battleGeneration) &&
+            target.isLifecycleActive(targetGeneration, battleGeneration)
+        );
+    }
+
+    private hitEffect(
+        target: Fighter,
+        hitPosition: Vec3,
+        attackerGeneration: number,
+        targetGeneration: number,
+        battleGeneration: number,
+    ) {
+        if (!this._isHitContextActive(target, attackerGeneration, targetGeneration, battleGeneration)) {
+            return;
+        }
+
         const hitEffect = this._skillInfo.hit;
         if (hitEffect) {
-            const posTarget = this.target.node.worldPosition;
-            GameMgr.effectGroup.playChairEffect(hitEffect, posTarget);
+            GameMgr.effectGroup.playChairEffect(hitEffect, hitPosition);
         }
         const sound = this._skillInfo.hit_sound;
         if (sound) {
@@ -481,15 +566,29 @@ export class Fighter extends Component {
             return;
         }
 
+        GameMgr.unregisterBattleLifecycle(this);
+        this.unscheduleAllCallbacks();
+        this._findEnemyDelay = 0;
+        this._lifecycleGeneration++;
         //使当前代次的异步加载全部失效：本节点即将回池复用，旧回调不得再挂载模型/皇冠
         this._loadGeneration++;
+
+        if (this._tweenDead) {
+            this._tweenDead.stop();
+            this._tweenDead = null;
+        }
+        this.target = null!;
+        this._isWaitingDamage = false;
+        this._isAttacking = false;
 
         //通知模型组件取消未完成的异步加载（如皇冠）
         if (this._fighterModel) {
             this._fighterModel.reset();
         }
 
-        egf.PoolMgr.putNode(this._nodeModel);
+        if (this._nodeModel) {
+            egf.PoolMgr.putNode(this._nodeModel);
+        }
         this._nodeModel = null!;
         this._fighterModel = null!;
 
@@ -504,6 +603,15 @@ export class Fighter extends Component {
 
         //deltaTime 加入时间缩放，用于加快攻击及移动速度
         deltaTime *= GameMgr.timeScale;
+
+        if (this._findEnemyDelay > 0) {
+            this._findEnemyDelay -= deltaTime;
+            if (this._findEnemyDelay <= 0) {
+                this._findEnemyDelay = 0;
+                this._findEnemy();
+            }
+            return;
+        }
 
         if (this.target) {
             if (this.target.isDead) {

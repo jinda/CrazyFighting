@@ -1,4 +1,5 @@
 import { _decorator, Component, AnimationComponent, ParticleSystemComponent, Enum } from "cc";
+import { GameMgr } from "./GameMgr";
 const { ccclass, property } = _decorator;
 //特效、动画播放脚本: 该脚本挂在节点上
 
@@ -32,9 +33,12 @@ export class Effect extends Component {
     })
     public playOnStart = true;
 
-    private _endListenerCb: Function = null!; //特效播放完后的回调函数
+    private _endListenerCb: (() => void) | null = null; //特效播放完后的回调函数
     private _arrParticle: ParticleSystemComponent[] | null = null; //粒子组件缓存（节点回池后子树不变，避免每次 getComponentsInChildren 分配）
     private _arrAni: AnimationComponent[] | null = null; //动画组件缓存
+    private _remainingTime: number = -1;
+    private _isBattlePaused: boolean = false;
+    private _pendingEffectOver: boolean = false;
 
     start() {
         if (this.playOnStart) {
@@ -55,6 +59,8 @@ export class Effect extends Component {
         //（注意：这里不能清 _endListenerCb，win01/hitBoom01 的 playOnStart 为 true，
         //  start() 会在调用方 setEndListener 之后再调一次 play()，清掉会丢回调）
         this.unscheduleAllCallbacks();
+        this._remainingTime = this.keepTime;
+        this._pendingEffectOver = false;
 
         if (!this._arrParticle) {
             this._arrParticle = this.node.getComponentsInChildren(ParticleSystemComponent);
@@ -73,10 +79,21 @@ export class Effect extends Component {
         });
 
         if (this.keepTime > 0) {
-            //表示要持续一个时间后删除该特效
-            this.scheduleOnce(() => {
-                this.effectOver();
-            }, this.keepTime);
+            this._remainingTime = this.keepTime;
+        }
+
+        this._isBattlePaused = false;
+        GameMgr.registerBattleLifecycle(this);
+    }
+
+    protected update(deltaTime: number) {
+        if (this._isBattlePaused || this._remainingTime <= 0) {
+            return;
+        }
+        this._remainingTime -= deltaTime;
+        if (this._remainingTime <= 0) {
+            this._remainingTime = -1;
+            this.effectOver();
         }
     }
 
@@ -84,21 +101,81 @@ export class Effect extends Component {
      * 特效播放完后调用
      */
     public effectOver() {
+        if (this._isBattlePaused || GameMgr.isGamePause) {
+            this._pendingEffectOver = true;
+            return;
+        }
+        this._completeEffect();
+    }
+
+    private _completeEffect() {
+        GameMgr.unregisterBattleLifecycle(this);
+        this.unscheduleAllCallbacks();
+        this._remainingTime = -1;
+        this._pendingEffectOver = false;
         if (this.autoDestroy) {
             this.node.destroy();
         }
 
         //取出后置空：保证“播放结束回调”最多只触发一次，
         //否则同一个节点会被重复 putNode（对象池里出现同一个节点的多份引用）
-        let endCb = this._endListenerCb;
-        this._endListenerCb = null!;
-        endCb && endCb();
+        const endCb = this._endListenerCb;
+        this._endListenerCb = null;
+        if (endCb) {
+            endCb();
+        }
     }
 
     /**
      * 设置特效播放完后的回调函数
      */
-    public setEndListener(cb: Function) {
+    public setEndListener(cb: () => void) {
         this._endListenerCb = cb;
+    }
+
+    public setBattlePaused(paused: boolean) {
+        if (this._isBattlePaused === paused) {
+            return;
+        }
+        this._isBattlePaused = paused;
+
+        if (!this._arrParticle) {
+            this._arrParticle = this.node.getComponentsInChildren(ParticleSystemComponent);
+        }
+        if (!this._arrAni) {
+            this._arrAni = this.node.getComponentsInChildren(AnimationComponent);
+        }
+
+        for (const particle of this._arrParticle) {
+            if (paused) {
+                particle.pause();
+            } else if (particle.isPaused) {
+                particle.play();
+            }
+        }
+        for (const ani of this._arrAni) {
+            if (paused) {
+                ani.pause();
+            } else {
+                ani.resume();
+            }
+        }
+
+        if (!paused && this._pendingEffectOver) {
+            this._completeEffect();
+        }
+    }
+
+    public cancelBattle() {
+        this._isBattlePaused = false;
+        this._completeEffect();
+    }
+
+    protected onDisable() {
+        GameMgr.unregisterBattleLifecycle(this);
+        this.unscheduleAllCallbacks();
+        this._remainingTime = -1;
+        this._pendingEffectOver = false;
+        this._isBattlePaused = false;
     }
 }

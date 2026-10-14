@@ -8,7 +8,12 @@ import { GameCfg } from "./GameConfig";
 import { DataMgr } from "db://assets/scripts/DataMgr";
 import { LocalDataMgr } from "db://assets/scripts/LocalDataMgr";
 import { Fighter } from "./Fighter";
-import { EffectGroup } from "./EeffectGroup";
+import type { EffectGroup } from "./EeffectGroup";
+
+export interface BattleLifecycleParticipant {
+    setBattlePaused(paused: boolean): void;
+    cancelBattle?(): void;
+}
 
 class GameManager {
     private static _inst: GameManager | null = null;
@@ -27,6 +32,8 @@ class GameManager {
 
     //暂停请求计数：设置界面、奖励界面、激励视频等多个来源可能同时请求暂停，计数归零才真正恢复
     private _pauseCount: number = 0;
+    private _battleGeneration: number = 0; //每次战斗重置递增，隔离上一局遗留的异步回调
+    private readonly _lifecycleParticipants = new Set<BattleLifecycleParticipant>();
     private _identity: number = 1; //士兵唯一标识
 
     /**
@@ -35,6 +42,37 @@ class GameManager {
      */
     public get isGamePause(): boolean {
         return this._pauseCount > 0;
+    }
+
+    /** 当前战斗代次，用于拒绝上一局迟到的异步回调。 */
+    public get battleGeneration(): number {
+        return this._battleGeneration;
+    }
+
+    /**
+     * 注册仅属于战斗世界的可暂停对象。弹窗和广告 UI 不注册，因此仍可交互。
+     */
+    public registerBattleLifecycle(participant: BattleLifecycleParticipant) {
+        this._lifecycleParticipants.add(participant);
+        if (this.isGamePause) {
+            participant.setBattlePaused(true);
+        }
+    }
+
+    public unregisterBattleLifecycle(participant: BattleLifecycleParticipant) {
+        this._lifecycleParticipants.delete(participant);
+    }
+
+    private _setBattlePaused(paused: boolean) {
+        for (const participant of [...this._lifecycleParticipants]) {
+            participant.setBattlePaused(paused);
+        }
+    }
+
+    private _cancelPreviousBattle() {
+        for (const participant of [...this._lifecycleParticipants]) {
+            participant.cancelBattle?.();
+        }
     }
 
     /**
@@ -115,26 +153,36 @@ class GameManager {
      * 获得当前敌方战力
      */
     public getCurLevelEnemyFight() {
-        return this._getFormationFight(this.getCurLevelEnemy());
+        const formation = this.getCurLevelEnemy();
+        return formation ? this._getFormationFight(formation) : 0;
     }
 
     /**
      * 获取当前等级的敌人阵型
      * @returns
      */
-    public getCurLevelEnemy() {
-        let levelInfo = GameCfg.queryByID("level", DataMgr.level.toString());
+    public getCurLevelEnemy(): { [key: number]: number } | null {
+        const level = DataMgr.level;
+        const levelInfo = GameCfg.queryByID("level", level.toString());
+        if (!levelInfo || typeof levelInfo.formation !== "string" || levelInfo.formation.length === 0) {
+            egf.Logger.error("[GameMgr] 关卡配置缺失或阵型无效:", level);
+            return null;
+        }
 
-        let arrEnemyInfo = levelInfo["formation"].split("_");
+        const arrEnemyInfo = levelInfo.formation.split("_");
 
-        let dictFormation: { [key: number]: number } = {};
-        arrEnemyInfo.forEach((enemy: any) => {
-            let enemyInfo = enemy.split("#");
-            let fighterId = enemyInfo[0];
-            let pos = enemyInfo[1];
+        const dictFormation: { [key: number]: number } = {};
+        for (const enemy of arrEnemyInfo) {
+            const enemyInfo = enemy.split("#");
+            const fighterId = Number(enemyInfo[0]);
+            const pos = Number(enemyInfo[1]);
+            if (!Number.isSafeInteger(fighterId) || fighterId <= 0 || !Number.isSafeInteger(pos) || pos < 0) {
+                egf.Logger.error("[GameMgr] 关卡阵型配置无效:", level, enemy);
+                return null;
+            }
 
             dictFormation[pos] = fighterId;
-        });
+        }
 
         return dictFormation;
     }
@@ -163,6 +211,10 @@ class GameManager {
     public getNextUnlock() {
         let level = DataMgr.level;
         let arrLevel = GameCfg.getTableArr("level");
+        if (!Array.isArray(arrLevel)) {
+            egf.Logger.error("[GameMgr] 关卡配置表缺失");
+            return null;
+        }
         for (let idx = level - 1; idx < arrLevel.length; idx++) {
             if (arrLevel[idx].unlock) {
                 return { level: idx + 1, unlock: arrLevel[idx].unlock };
@@ -216,11 +268,16 @@ class GameManager {
 
     reset() {
         egf.Logger.log("GameMgr reset");
+        const wasPaused = this.isGamePause;
+        this._pauseCount = 0;
+        this._battleGeneration++;
+        this._cancelPreviousBattle();
+        if (wasPaused) {
+            this._setBattlePaused(false);
+        }
         this.isGameStart = false;
         this.isGameOver = false;
         this.timeScale = 1;
-        //暂停计数清零，避免上一局的暂停状态残留到下一局
-        this._pauseCount = 0;
         this._identity = 1;
 
         //重置敌我双方士兵状态
@@ -338,7 +395,11 @@ class GameManager {
      * 多个来源（设置界面、奖励界面、激励视频等）可叠加暂停
      */
     public pauseGame() {
+        const shouldFreeze = this._pauseCount === 0;
         this._pauseCount++;
+        if (shouldFreeze) {
+            this._setBattlePaused(true);
+        }
         egf.Logger.log("GameMgr pauseGame, pauseCount:", this._pauseCount);
     }
 
@@ -347,7 +408,14 @@ class GameManager {
      * 暂停计数减到0才算真正恢复，避免多来源暂停被提前解除
      */
     public resumeGame() {
+        if (this._pauseCount === 0) {
+            egf.Logger.warn("GameMgr resumeGame ignored because pauseCount is already 0");
+            return;
+        }
         this._pauseCount = Math.max(0, this._pauseCount - 1);
+        if (this._pauseCount === 0) {
+            this._setBattlePaused(false);
+        }
         egf.Logger.log("GameMgr resumeGame, pauseCount:", this._pauseCount);
     }
 

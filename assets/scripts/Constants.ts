@@ -4,7 +4,7 @@ export class Constants {
         REMOTE: 2, //远程
     };
 
-    //先设置最多50关
+    // 显示关卡上限；运行时存档使用 0-based 索引，因此最大内部索引为 MAX_LEVEL - 1
     static MAX_LEVEL = 1000;
 
     //士兵移动速度换算基数：166.6 = 10000/60帧
