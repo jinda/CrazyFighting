@@ -103,12 +103,13 @@ export class Constants {
 
     //引导步奏
     public static GUIDE_STEP = {
-        START: 100, //开始
-        BUY: 200, //购买
-        COMBINE_ONE: 300, //合成一个
-        COMBINE_TWO: 400, //合成两个
-        BUY_CELL: 500, //购买土地
-        LAST_GUIDE: 700, //最后引导
+        COMBINE_ONE: 1, //合成一个
+        BUY_CELL: 2, //购买土地
+        SHOW_FIGHTER: 3, //展示士兵
+        BUY_FIGHTER: 4, //购买士兵
+        START: 5, //开始
+        USE_SKILL: 6, //使用技能
+        LAST_GUIDE: 7, //最后引导
     };
 
     //新手引导类型
@@ -164,6 +165,11 @@ export class Constants {
 
         SHOW_SPRINT: "showSprint", //格子上展示冲刺暴走特效
         SHOW_LEVEL_TIPS: "showLevelTips", //展示士兵等级提示
+
+        CLICK_BUY_CELL: "clickBuyCell", //点击购买土地按钮
+        CLICK_BUY_FIGHTER: "clickBuyFighter", //点击购买士兵按钮
+        CLICK_START: "clickStart", //点击开始按钮
+        CLICK_USE_SKILL: "clickUseSkill", //点击使用技能按钮
     };
 
     //动画类型

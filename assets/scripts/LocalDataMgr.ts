@@ -33,6 +33,7 @@ interface IGameInfo {
     signTotalDay: number;
     pendingLedgerOps?: IPendingLedgerOp[]; //旧版金币补报队列，新版加载时清除
     pendingLevels?: number[]; //待上报的通关关卡（服务端只增不减，重试安全），旧存档无此字段
+    guideStep: number; // 引导步骤
 }
 
 interface ISetting {
@@ -80,6 +81,7 @@ class LocalDataManager {
         signDay: 0,
         lastSignTime: 0,
         signTotalDay: 0,
+        guideStep: 0,
     };
 
     public get Setting(): ISetting {

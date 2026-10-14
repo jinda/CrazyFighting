@@ -418,6 +418,18 @@ class GameManager {
 
         delete teamFighters[identity];
     }
+
+    public getFighterUIPos(uiNode: Node, posCell: number): Vec3 {
+        const teamFighters = this.dictFighter[Constants.PLAYER_TEAM];
+        const ndFighter = Object.values(teamFighters)[posCell] as Node;
+        if (ndFighter) {
+            const worldPos = ndFighter.worldPosition.clone();
+            const uiLocalPos = new Vec3();
+            this.mainCamera.convertToUINode(worldPos, uiNode, uiLocalPos);
+            return uiLocalPos;
+        }
+        return new Vec3(0, 0, 0);
+    }
 }
 
 export const GameMgr = GameManager.inst;

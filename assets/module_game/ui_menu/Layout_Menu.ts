@@ -61,6 +61,8 @@ export class Layout_Menu extends Component {
     nodeLandAd: Node = null!;
     @property(Node)
     nodePowerTips: Node = null!;
+    @property(Node)
+    nodeHand: Node = null!;
     @property(Label)
     labelPowerAdd: Label = null!;
     @property(LevelTips)

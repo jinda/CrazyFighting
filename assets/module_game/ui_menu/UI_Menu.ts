@@ -7,14 +7,13 @@ import { GameCfg } from "../game/scripts/GameConfig";
 import { GameMgr } from "../game/scripts/GameMgr";
 import { UI_BuyFighter } from "../ui_buyFighter/UI_BuyFighter";
 import { UI_Fighter } from "../ui_fighter/UI_Fighter";
+import { UI_Guide } from "../ui_guide/UI_Guide";
 import { UI_Rank } from "../ui_rank/UI_Rank";
 import { UI_Sign } from "../ui_sign/UI_Sign";
 import { Layout_Menu } from "./Layout_Menu";
 import { EventTouch, Node, Vec2 } from "cc";
 
 export class UI_Menu extends egf.UIController {
-    private _game_count: number = 0;
-
     constructor() {
         super("ui_menu/UI_Menu", egf.UILayers.GAME, Layout_Menu);
     }
@@ -35,6 +34,9 @@ export class UI_Menu extends egf.UIController {
         egf.EventMgr.on(Constants.EVENT_NAME.SHOW_LEVEL_TIPS, this.showFighterLvTips, this);
         egf.EventMgr.on(Constants.EVENT_NAME.REC_ONLINE_REWARD, this.onUpdateFormation, this);
         egf.EventMgr.on(Constants.EVENT_NAME.BUY_FIGHTER, this.onFighterPowerTips, this);
+        egf.EventMgr.on(Constants.EVENT_NAME.COMBINE_SUCCEED, this.onCombineSucceed, this);
+        egf.EventMgr.on(Constants.EVENT_NAME.CLICK_BUY_CELL, this.clickLand, this);
+        egf.EventMgr.on(Constants.EVENT_NAME.CLICK_START, this.clickStart, this);
 
         this.node.on(Node.EventType.TOUCH_START, this.onTouchEvent, this);
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchEvent, this);
@@ -71,6 +73,13 @@ export class UI_Menu extends egf.UIController {
                 egf.UIMgr.showUI(UI_Sign);
             }
         }
+
+        // LocalDataMgr.GameInfo.guideStep = Constants.GUIDE_STEP.START - 1;
+        // UI_Guide.showGuideStep(Constants.GUIDE_STEP.START, {
+        //     content: egf.i18nMgr.getText("你的战力已经提升，点击开始游戏吧！"),
+        //     worldPos: layout.btnStart.node.worldPosition,
+        //     nodeBtn: layout.btnStart.node,
+        // });
     }
 
     protected onDispose(): void {
@@ -79,6 +88,9 @@ export class UI_Menu extends egf.UIController {
         egf.EventMgr.off(Constants.EVENT_NAME.SHOW_LEVEL_TIPS, this.showFighterLvTips, this);
         egf.EventMgr.off(Constants.EVENT_NAME.REC_ONLINE_REWARD, this.onUpdateFormation, this);
         egf.EventMgr.off(Constants.EVENT_NAME.BUY_FIGHTER, this.onFighterPowerTips, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.COMBINE_SUCCEED, this.onCombineSucceed, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.CLICK_BUY_CELL, this.clickLand, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.CLICK_START, this.clickStart, this);
 
         this.node.off(Node.EventType.TOUCH_START, this.onTouchEvent, this);
         this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchEvent, this);
@@ -107,6 +119,11 @@ export class UI_Menu extends egf.UIController {
         this.showStart(angleZ);
         PlatformMgr.reportEvent("game_start", {
             mode: 0,
+        });
+
+        UI_Guide.showGuideStep(Constants.GUIDE_STEP.LAST_GUIDE, {
+            content: egf.i18nMgr.getText("你已经学会了如何战斗，尽情游戏吧！"),
+            worldPos: layout.btnStart.node.worldPosition,
         });
     }
     private clickCoin() {
@@ -187,6 +204,22 @@ export class UI_Menu extends egf.UIController {
         let fighterInfo = GameCfg.queryByID("fighter", fighterId.toString());
         const layout = this.layout as Layout_Menu;
         layout.showPowerTips(fighterInfo.fight);
+
+        UI_Guide.showGuideStep(Constants.GUIDE_STEP.START, {
+            content: egf.i18nMgr.getText("你的战力已经提升，点击开始游戏吧！"),
+            worldPos: layout.btnStart.node.worldPosition,
+            nodeBtn: layout.btnStart.node,
+        });
+    }
+
+    private onCombineSucceed(targetPos: number, selectPos: number) {
+        const layout = this.layout as Layout_Menu;
+        egf.UIMgr.closeUI(UI_Guide);
+        UI_Guide.showGuideStep(Constants.GUIDE_STEP.BUY_CELL, {
+            content: egf.i18nMgr.getText("购买格子后，容纳更多士兵！"),
+            worldPos: layout.btnLand.node.worldPosition,
+            nodeBtn: layout.btnLand.node,
+        });
     }
 
     /**
@@ -251,5 +284,11 @@ export class UI_Menu extends egf.UIController {
         const layout = this.layout as Layout_Menu;
 
         layout.updateCoinCost();
+
+        UI_Guide.showGuideStep(Constants.GUIDE_STEP.SHOW_FIGHTER, {
+            content: egf.i18nMgr.getText("购买士兵，增加战力！"),
+            worldPos: layout.btnSoldier.node.worldPosition,
+            nodeBtn: layout.btnSoldier.node,
+        });
     }
 }

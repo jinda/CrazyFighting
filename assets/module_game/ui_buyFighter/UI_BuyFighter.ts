@@ -3,6 +3,7 @@ import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 import { Constants } from "../../scripts/Constants";
+import { UI_Guide } from "../ui_guide/UI_Guide";
 
 export class UI_BuyFighter extends egf.UIController {
     private _fighterId: number = 0;
@@ -22,9 +23,23 @@ export class UI_BuyFighter extends egf.UIController {
         this._fighterId = this.getRandomBuyFighter();
         this._price = LocalDataMgr.getBuyFighterPrice();
         layout.showInfo(this._fighterId, this._price);
+
+        UI_Guide.showGuideStep(
+            Constants.GUIDE_STEP.BUY_FIGHTER,
+            {
+                worldPos: layout.btnGet.node.worldPosition,
+                nodeBtn: layout.btnGet.node,
+            },
+            0,
+            true,
+        );
+
+        egf.EventMgr.on(Constants.EVENT_NAME.CLICK_BUY_FIGHTER, this.clickGet, this);
     }
 
-    protected onDispose(): void {}
+    protected onDispose(): void {
+        egf.EventMgr.off(Constants.EVENT_NAME.CLICK_BUY_FIGHTER, this.clickGet, this);
+    }
 
     clickBack() {
         egf.AudioMgr.playOneShot("tap");

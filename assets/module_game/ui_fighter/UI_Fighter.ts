@@ -6,6 +6,7 @@ import { GameMgr } from "../game/scripts/GameMgr";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { UI_Settlement } from "../ui_settlement/UI_Settlement";
 import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
+import { UI_Guide } from "../ui_guide/UI_Guide";
 
 export class UI_Fighter extends egf.UIController {
     private _gold: number = 0; //金币数量
@@ -21,6 +22,7 @@ export class UI_Fighter extends egf.UIController {
 
         egf.EventMgr.on(Constants.EVENT_NAME.DROP_COIN, this.onDropCoin, this);
         egf.EventMgr.on(Constants.EVENT_NAME.GAME_OVER, this.onGameOver, this);
+        egf.EventMgr.on(Constants.EVENT_NAME.CLICK_USE_SKILL, this.clickSkill, this);
 
         //本局的金币加成系数
         this._updateFactor();
@@ -30,6 +32,14 @@ export class UI_Fighter extends egf.UIController {
         let enemyCount = GameMgr.getFighterFight(false);
         layout.updateFighterNum(myCount, enemyCount);
         this._gameTime = Date.now();
+
+        layout.scheduleOnce(() => {
+            UI_Guide.showGuideStep(Constants.GUIDE_STEP.USE_SKILL, {
+                content: egf.i18nMgr.getText("点击使用技能，消灭敌方士兵！"),
+                worldPos: layout.btnSkill.node.worldPosition,
+                nodeBtn: layout.btnSkill.node,
+            });
+        }, 1.5);
     }
 
     /**
@@ -46,6 +56,7 @@ export class UI_Fighter extends egf.UIController {
     protected onDispose(): void {
         egf.EventMgr.off(Constants.EVENT_NAME.DROP_COIN, this.onDropCoin, this);
         egf.EventMgr.off(Constants.EVENT_NAME.GAME_OVER, this.onGameOver, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.CLICK_USE_SKILL, this.clickSkill, this);
     }
 
     private clickSkill() {

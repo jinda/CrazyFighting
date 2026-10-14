@@ -1,11 +1,13 @@
 import { Layout_Sign } from "./Layout_Sign";
 import { ModuleDef } from "../../scripts/ModuleDef";
-import { Sprite, sys } from "cc";
+import { Sprite, sys, v3 } from "cc";
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { UI_CommonTips } from "../../scripts/UIDef";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
+import { UI_Guide } from "../ui_guide/UI_Guide";
+import { GameMgr } from "../game/scripts/GameMgr";
 
 const AWARD_LIST = [100, 200, 300, 400, 500, 600, 700, 1000];
 
@@ -30,6 +32,14 @@ export class UI_Sign extends egf.UIController {
         });
         layout.showInfo(this._currentAward);
         this.updateSignState();
+    }
+
+    protected onDispose() {
+        UI_Guide.showGuideStep(Constants.GUIDE_STEP.COMBINE_ONE, {
+            content: egf.i18nMgr.getText("拖动士兵合成更高级的士兵，提升战力！"),
+            worldPos: GameMgr.getFighterUIPos(this.node, 0),
+            bShowBlackBg: false,
+        });
     }
 
     private updateSignState() {

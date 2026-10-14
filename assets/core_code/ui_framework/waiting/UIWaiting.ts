@@ -35,7 +35,7 @@ export class UIWaiting extends UIController {
             egf.Logger.error("Layout_UIWaiting not loaded:", contentStr);
             UIWaiting.hide();
         }
-        if (layout.loadingTxt) {
+        if (layout && layout.loadingTxt) {
             layout.schedule(() => {
                 let str = layout.loadingTxt!.string;
                 if (str.includes("...")) {

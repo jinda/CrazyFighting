@@ -864,7 +864,7 @@ export class FighterLogic extends Component {
 
             //如果关卡小于20关则伤害百分比为100%
             if (DataMgr.level < 20) {
-                percent = 1;
+                percent = 0.9;
             }
 
             for (let team in GameMgr.dictFighter) {
