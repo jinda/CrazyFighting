@@ -19,6 +19,7 @@ export interface IPendingLedgerOp {
 
 interface IGameInfo {
     deviceID: string;
+    loginDate: number;
     hasLoggedIn?: boolean; // 是否已经登录过
     coin: number; //金币数量
     level: number; //默认初始关卡
@@ -374,6 +375,7 @@ class LocalDataManager {
     private createDefaultGameInfo(): IGameInfo {
         return {
             deviceID: "",
+            loginDate: Date.now(),
             coin: 100,
             level: 0,
             coinLv: 1,
@@ -426,6 +428,7 @@ class LocalDataManager {
         const pendingLevels = this.normalizeIntegerArray(value.pendingLevels, [], 1, true) ?? [];
         const formation = this.normalizeFormation(value.formation, defaults.formation);
         const deviceID = typeof value.deviceID === "string" ? value.deviceID : defaults.deviceID;
+        const loginDate = this.normalizeInteger(value.loginDate, defaults.loginDate, Date.now());
         const hasLoggedIn = typeof value.hasLoggedIn === "boolean" ? value.hasLoggedIn : undefined;
         if (
             coin === null ||
@@ -445,6 +448,7 @@ class LocalDataManager {
 
         return {
             deviceID,
+            loginDate,
             hasLoggedIn,
             coin,
             level,
