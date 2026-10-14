@@ -6,25 +6,29 @@ import { JsonAsset, Label, SpriteFrame, assetManager, isValid, sys } from "cc";
 import { ResMgr } from "./ResMgr";
 
 export enum ELanguage {
+    en = "en", // 英语
     "zh-cn" = "zh_cn", // 简体中文
     "zh-tw" = "zh_tw", // 繁体中文
-    en = "en_us", // 英文
-    hi = "hi_in", // 印地语
-    pt = "pt_br", // 葡萄牙语
-    es = "es_es", // 西班牙语
-    ar = "ar_sa", // 阿拉伯语
-    ja = "ja_jp", // 日语
+    ru = "ru", // 俄语
+    fr = "fr", // 法语
+    de = "de", // 德语
+    ja = "ja", // 日语
+    ko = "ko", // 韩语
+    es = "es", // 西班牙语
+    pt = "pt", // 葡萄牙语
 }
 
 export enum ELanguageKey {
-    zh_cn = "简体中文", // 简体中文 (Simplified Chinese)
-    zh_tw = "繁體中文", // 繁体中文 (Traditional Chinese)
-    en_us = "English", // 英文 (English)
-    hi_in = "हिन्दी", // 印地语 (Hindi)
-    pt_br = "Português", // 葡萄牙语 (Portuguese)
-    es_es = "Español", // 西班牙语 (Spanish)
-    ar_sa = "العربية", // 阿拉伯语 (Arabic)
-    ja_jp = "日本語", // 日语 (Japanese)
+    en = "English", // 英语
+    zh_cn = "简体中文", // 简体中文
+    zh_tw = "繁体中文", // 繁体中文
+    ru = "Русский", // 俄语
+    fr = "Français", // 法语
+    de = "Deutsch", // 德语
+    ja = "日本語", // 日语
+    ko = "한국어", // 韩语
+    es = "Español", // 西班牙语
+    pt = "Português", // 葡萄牙语
 }
 
 class i18nManager {
@@ -77,16 +81,20 @@ class i18nManager {
                     : ELanguage["zh-cn"];
             case "en":
                 return ELanguage.en;
-            case "hi":
-                return ELanguage.hi;
-            case "pt":
-                return ELanguage.pt;
-            case "es":
-                return ELanguage.es;
-            case "ar":
-                return ELanguage.ar;
+            case "ru":
+                return ELanguage.ru;
+            case "fr":
+                return ELanguage.fr;
+            case "de":
+                return ELanguage.de;
             case "ja":
                 return ELanguage.ja;
+            case "ko":
+                return ELanguage.ko;
+            case "es":
+                return ELanguage.es;
+            case "pt":
+                return ELanguage.pt;
             default:
                 return null;
         }

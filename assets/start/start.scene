@@ -974,8 +974,8 @@
     "__prefab": null,
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 332,
-      "height": 298
+      "width": 340,
+      "height": 327
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1042,7 +1042,7 @@
       "__id__": 2
     },
     "_children": [],
-    "_active": true,
+    "_active": false,
     "_components": [
       {
         "__id__": 28
@@ -1427,6 +1427,9 @@
     },
     "loadingBar": {
       "__id__": 22
+    },
+    "nodeGameHeath": {
+      "__id__": 27
     },
     "_id": "ccwYlVBqtP3qOrWWpSPSZW"
   },

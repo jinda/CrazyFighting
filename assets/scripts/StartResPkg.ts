@@ -29,11 +29,11 @@ var resPkg = {
     module_i18n: [
         {
             assetType: JsonAsset,
-            urls: ["label/en_us", "label/zh_cn"],
+            urls: ["label/en", "label/zh_cn"],
         },
         {
             assetType: SpriteFrame,
-            urls: ["sprite/en_us/logo/spriteFrame", "sprite/en_us/logo/spriteFrame"],
+            urls: ["sprite/en/logo/spriteFrame", "sprite/en/logo/spriteFrame"],
         },
     ],
     module_extra: {
