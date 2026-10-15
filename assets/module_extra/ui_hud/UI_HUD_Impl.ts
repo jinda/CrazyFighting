@@ -62,7 +62,7 @@ export class UI_HUD_Impl extends egf.UIController {
 
     clickCoin() {
         egf.AudioMgr.playOneShot("tap");
-        egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
+        egf.UIMgr.showUI(UI_Award, null, this, { type: 0, coin: Constants.awardCoin });
     }
 
     clickStamina() {

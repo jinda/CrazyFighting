@@ -28,6 +28,7 @@ export class UI_Menu extends egf.UIController {
         this.onButtonEvent(layout.btnLand, this.clickLand, this);
         this.onButtonEvent(layout.btnRank, this.clickRank, this);
         this.onButtonEvent(layout.btnGameCircle, this.clickGameCircle, this);
+        this.onButtonEvent(layout.btnShare, this.clickShare, this);
 
         egf.EventMgr.on(Constants.EVENT_NAME.UPDATE_FORMATION, this.onUpdateFormation, this);
         egf.EventMgr.on(Constants.EVENT_NAME.UPDATE_LEVEL, this.onUpdateLevel, this);
@@ -104,7 +105,7 @@ export class UI_Menu extends egf.UIController {
 
     private clickOnline() {
         egf.AudioMgr.playOneShot("tap");
-        egf.UIMgr.showUI(UI_Award, null, this, { bOnline: true, coin: DataMgr.onlineCoin });
+        egf.UIMgr.showUI(UI_Award, null, this, { type: 1, coin: DataMgr.onlineCoin, bDouble: true });
     }
     private clickSign() {
         egf.AudioMgr.playOneShot("tap");
@@ -134,7 +135,7 @@ export class UI_Menu extends egf.UIController {
             const layout = this.layout as Layout_Menu;
             layout.updateCoinCost();
         } else {
-            egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
+            egf.UIMgr.showUI(UI_Award, null, this, { type: 0, coin: Constants.awardCoin });
         }
         PlatformMgr.reportEvent("lvup_prop", {
             prop_type: 1,
@@ -161,7 +162,7 @@ export class UI_Menu extends egf.UIController {
                 level: LocalDataMgr.GameInfo.landLv,
             });
         } else {
-            egf.UIMgr.showUI(UI_Award, null, this, { bOnline: false, coin: Constants.awardCoin });
+            egf.UIMgr.showUI(UI_Award, null, this, { type: 0, coin: Constants.awardCoin });
         }
     }
 
@@ -173,6 +174,11 @@ export class UI_Menu extends egf.UIController {
     private clickGameCircle() {
         egf.AudioMgr.playOneShot("tap");
         PlatformMgr.showGameCircle();
+    }
+
+    private clickShare() {
+        egf.AudioMgr.playOneShot("tap");
+        egf.UIMgr.showUI(UI_Award, null, this, { type: 2, coin: Constants.shareCoin });
     }
 
     private onUpdateFormation() {

@@ -222,12 +222,15 @@ export class Constants {
         UPGRADE_COIN: "upgrade_coin", //金币加成升级
         UPGRADE_LAND: "upgrade_land", //购买土地
         BUY_FIGHTER: "buy_fighter", //购买士兵
+        SHARE_GAME: "share_game", //分享游戏
     };
 
     // 技能CD时间
     public static SkillCD = 10;
     // 观看视频可领取金币数量
     public static awardCoin = 500;
+    // 分享获得金币
+    public static shareCoin = 200;
     // 金币加成配置
     public static goldRate = { default: 1, step: 0.1, maxLv: 50 };
     public static maxOnlineCoin = 300;

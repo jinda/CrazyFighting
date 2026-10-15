@@ -64,8 +64,13 @@ class LocalDataManager {
         if (!encryptStr) {
             return false;
         }
-        const gameInfoData = this.decryptValue(encryptStr, "local");
+        let gameInfoData = this.decryptValue(encryptStr, "local");
+        if (!gameInfoData) {
+            gameInfoData = this.createDefaultGameInfo();
+        }
         this._gameInfo = gameInfoData as IGameInfo;
+        DataMgr.coin = this._gameInfo.coin;
+        DataMgr.level = this._gameInfo.level;
         egf.Logger.log("load game info local:", this._gameInfo);
         return true;
     }
@@ -75,7 +80,10 @@ class LocalDataManager {
         if (!encryptStr) {
             return false;
         }
-        const settingData = this.decryptValue(encryptStr, "local");
+        let settingData = this.decryptValue(encryptStr, "local");
+        if (!settingData) {
+            settingData = this.createDefaultSetting();
+        }
         this._setting = settingData as ISetting;
         return true;
     }

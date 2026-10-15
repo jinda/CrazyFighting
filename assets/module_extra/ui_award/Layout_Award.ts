@@ -18,12 +18,12 @@ export class Layout_Award extends Component {
     @property(Node)
     nodeAd: Node = null!;
 
-    public showInfo(bOnline: boolean, coin: number, addCoin: number, bDailyGift: boolean) {
-        if (bOnline) {
+    public showInfo(type: number, coin: number, addCoin: number, bDouble: boolean) {
+        if (type == 1) {
             this.labelContent.string = egf.i18nMgr.getText("获得在线时长金币奖励");
             this.btnDoubleGet.node.active = true;
-        } else if (bDailyGift) {
-            this.labelContent.string = egf.i18nMgr.getText("获得每日金币奖励");
+        } else if (type == 2) {
+            this.labelContent.string = egf.i18nMgr.getText("分享获得每日金币奖励");
             this.btnDoubleGet.node.active = false;
         } else {
             this.labelContent.string = egf.i18nMgr.getText("观看广告获得金币奖励");
@@ -31,6 +31,6 @@ export class Layout_Award extends Component {
         }
         this.labelCoin.string = "x" + coin;
         this.labelCoinAdd.string = "+" + addCoin;
-        this.nodeAd.active = !bOnline;
+        this.nodeAd.active = bDouble;
     }
 }
