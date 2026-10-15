@@ -135,11 +135,19 @@ export class Start extends Component {
             egf.Logger.warn("[Start] 登录失败，继续使用本地数据:", errcode, errmsg);
             onFailure();
         };
+        const handleLoginSuccess = async (data: ILoginData) => {
+            try {
+                await LocalDataMgr.reconcileAfterLogin();
+            } catch (error) {
+                egf.Logger.error("[Start] 登录后存档仲裁异常，使用本地数据:", error);
+            }
+            onSuccess(data);
+        };
         PlatformMgr.login({
             failCb: () => onError(-1, "平台登录失败"),
             successCb: (code: string) => {
                 if (PlatformMgr.platform === EPlatform.WeChat) {
-                    ClientApi.inst.oauthLogin("wechat", { code }, undefined, undefined, onSuccess, onError);
+                    ClientApi.inst.oauthLogin("wechat", { code }, undefined, undefined, handleLoginSuccess, onError);
                     return;
                 }
                 let deviceId = sys.localStorage.getItem("device_id");
@@ -148,7 +156,14 @@ export class Start extends Component {
                     sys.localStorage.setItem("device_id", deviceId);
                     LocalDataMgr.GameInfo.deviceID = deviceId;
                 }
-                ClientApi.inst.oauthLogin("guest", { device_id: deviceId }, undefined, undefined, onSuccess, onError);
+                ClientApi.inst.oauthLogin(
+                    "guest",
+                    { device_id: deviceId },
+                    undefined,
+                    undefined,
+                    handleLoginSuccess,
+                    onError,
+                );
             },
         });
     }

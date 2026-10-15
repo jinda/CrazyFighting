@@ -19,6 +19,7 @@ export interface IPendingLedgerOp {
 
 interface IGameInfo {
     deviceID: string;
+    /** 最近一次存档时间（每次保存都会刷新），登录后据此判定本地/服务器谁更新 */
     loginDate: number;
     hasLoggedIn?: boolean; // 是否已经登录过
     coin: number; //金币数量
@@ -72,6 +73,7 @@ const AES_KEY = "eeffaif19822sf11156ff734fsefa9f0bb";
 // 通关进度待上报队列上限。
 const MAX_PENDING_LEVELS = 50;
 const INITIAL_CLOUD_TIMEOUT_MS = 10000;
+const RECONCILE_TIMEOUT_MS = 8000;
 const CLOUD_SAVE_DEBOUNCE_MS = 500;
 const CLOUD_SAVE_RETRY_BASE_MS = 1000;
 const CLOUD_SAVE_MAX_BACKOFF_MS = 30000;
@@ -240,6 +242,8 @@ class LocalDataManager {
     }
 
     public saveGameInfoData() {
+        // 每次落盘都刷新存档时间，保证 loginDate 代表“最新存档”，而非仅登录时间
+        this._gameInfo.loginDate = Date.now();
         const encryptStr = this.writeGameInfoLocal();
         if (encryptStr && !this.isInitialDataPending) {
             this.queueCloudSave(this.GameInfoStr, encryptStr);
@@ -305,6 +309,56 @@ class LocalDataManager {
                 },
             );
         });
+    }
+
+    /**
+     * 登录成功后，按“最新存档”决定使用服务器还是本地数据。
+     * - 新装（无有效本地存档）由 prepareInitialData 负责云恢复，此处跳过避免重复拉取。
+     * - 服务器存档 loginDate 更新时，用服务器存档覆盖本地（金币除外，由账本同步校准）。
+     * - 否则保持本地。
+     * 结束时标记已登录并落盘（saveGameInfoData 会刷新 loginDate，进入云端上传队列）。
+     */
+    public async reconcileAfterLogin(): Promise<"server" | "local" | "none" | "skip"> {
+        if (this.isInitialDataPending) {
+            return "skip";
+        }
+
+        let cloudData: {
+            gameInfo: IGameInfo | null;
+            setting: ISetting | null;
+            reason?: string;
+        } | null = null;
+        try {
+            cloudData = await Promise.race([
+                this.loadInitialCloudData(),
+                new Promise<null>((resolve) => setTimeout(() => resolve(null), RECONCILE_TIMEOUT_MS)),
+            ]);
+        } catch (error) {
+            egf.Logger.error("[LocalDataMgr] 登录后存档仲裁失败，使用本地数据:", error);
+            cloudData = null;
+        }
+
+        let decision: "server" | "local" | "none" = "none";
+        if (cloudData && cloudData.gameInfo) {
+            const cloud = cloudData.gameInfo;
+            if (cloud.loginDate > this._gameInfo.loginDate) {
+                this.applyGameInfo(cloud, true);
+                if (cloudData.setting) {
+                    this.applySetting(cloudData.setting);
+                }
+                this.writeGameInfoLocal();
+                this.writeSettingLocal();
+                egf.Logger.log("[LocalDataMgr] 登录成功，服务器存档较新，使用服务器数据");
+                decision = "server";
+            } else {
+                egf.Logger.log("[LocalDataMgr] 登录成功，本地存档较新，使用本地数据");
+                decision = "local";
+            }
+        }
+
+        this._gameInfo.hasLoggedIn = true;
+        this.saveGameInfoData();
+        return decision;
     }
 
     private queueCloudSave(key: string, value: string) {
@@ -428,7 +482,7 @@ class LocalDataManager {
         const pendingLevels = this.normalizeIntegerArray(value.pendingLevels, [], 1, true) ?? [];
         const formation = this.normalizeFormation(value.formation, defaults.formation);
         const deviceID = typeof value.deviceID === "string" ? value.deviceID : defaults.deviceID;
-        const loginDate = this.normalizeInteger(value.loginDate, defaults.loginDate, Date.now());
+        const loginDate = this.normalizeInteger(value.loginDate, defaults.loginDate, 0) ?? defaults.loginDate;
         const hasLoggedIn = typeof value.hasLoggedIn === "boolean" ? value.hasLoggedIn : undefined;
         if (
             coin === null ||
