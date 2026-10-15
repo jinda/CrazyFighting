@@ -11,7 +11,7 @@ import { UI_Guide } from "../ui_guide/UI_Guide";
 import { UI_Rank } from "../ui_rank/UI_Rank";
 import { UI_Sign } from "../ui_sign/UI_Sign";
 import { Layout_Menu } from "./Layout_Menu";
-import { EventTouch, Node, Vec2 } from "cc";
+import { EventTouch, Layout, Node, Vec2 } from "cc";
 
 export class UI_Menu extends egf.UIController {
     constructor() {
@@ -38,12 +38,14 @@ export class UI_Menu extends egf.UIController {
         egf.EventMgr.on(Constants.EVENT_NAME.COMBINE_SUCCEED, this.onCombineSucceed, this);
         egf.EventMgr.on(Constants.EVENT_NAME.CLICK_BUY_CELL, this.clickLand, this);
         egf.EventMgr.on(Constants.EVENT_NAME.CLICK_START, this.clickStart, this);
+        egf.EventMgr.on(Constants.EVENT_NAME.SHARE_SUCCESS, this.onShareSuccess, this);
 
         this.node.on(Node.EventType.TOUCH_START, this.onTouchEvent, this);
         this.node.on(Node.EventType.TOUCH_MOVE, this.onTouchEvent, this);
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEvent, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEvent, this);
 
+        layout.btnShare.node.active = !LocalDataMgr.GameInfo.bShare;
         layout.showInfo(GameMgr.getCurLevelEnemyFight());
         layout.updateMyPower(GameMgr.getFormationFight());
         layout.updateCoinCost();
@@ -96,6 +98,7 @@ export class UI_Menu extends egf.UIController {
         egf.EventMgr.off(Constants.EVENT_NAME.COMBINE_SUCCEED, this.onCombineSucceed, this);
         egf.EventMgr.off(Constants.EVENT_NAME.CLICK_BUY_CELL, this.clickLand, this);
         egf.EventMgr.off(Constants.EVENT_NAME.CLICK_START, this.clickStart, this);
+        egf.EventMgr.off(Constants.EVENT_NAME.SHARE_SUCCESS, this.onShareSuccess, this);
 
         this.node.off(Node.EventType.TOUCH_START, this.onTouchEvent, this);
         this.node.off(Node.EventType.TOUCH_MOVE, this.onTouchEvent, this);
@@ -225,6 +228,11 @@ export class UI_Menu extends egf.UIController {
             worldPos: layout.btnLand.node.worldPosition,
             nodeBtn: layout.btnLand.node,
         });
+    }
+
+    private onShareSuccess() {
+        const layout = this.layout as Layout_Menu;
+        layout.btnShare.node.active = false;
     }
 
     /**

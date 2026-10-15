@@ -60,9 +60,11 @@ export class UI_Award_Impl extends egf.UIController {
         } else if (this._params.type == 2) {
             PlatformMgr.share({ content: "我发现个好玩的游戏，快来玩吧！" });
             setTimeout(() => {
+                LocalDataMgr.GameInfo.bShare = true;
                 DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.SHARE_GAME);
                 egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
                 this.close();
+                egf.EventMgr.emit(Constants.EVENT_NAME.SHARE_SUCCESS);
             }, 500);
         } else {
             PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {

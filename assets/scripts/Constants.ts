@@ -170,6 +170,7 @@ export class Constants {
         CLICK_BUY_FIGHTER: "clickBuyFighter", //点击购买士兵按钮
         CLICK_START: "clickStart", //点击开始按钮
         CLICK_USE_SKILL: "clickUseSkill", //点击使用技能按钮
+        SHARE_SUCCESS: "share_success", //分享成功
     };
 
     //动画类型

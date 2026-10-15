@@ -19,6 +19,7 @@ interface IGameInfo {
     lastSignTime: number;
     signTotalDay: number;
     guideStep: number; // 引导步骤
+    bShare: boolean;
 }
 
 interface ISetting {
@@ -71,6 +72,9 @@ class LocalDataManager {
         this._gameInfo = gameInfoData as IGameInfo;
         DataMgr.coin = this._gameInfo.coin;
         DataMgr.level = this._gameInfo.level;
+        if (this.isSignToday()) {
+            this._gameInfo.bShare = true;
+        }
         egf.Logger.log("load game info local:", this._gameInfo);
         return true;
     }
@@ -191,6 +195,7 @@ class LocalDataManager {
             lastSignTime: 0,
             signTotalDay: 0,
             guideStep: 0,
+            bShare: false,
         };
     }
 
