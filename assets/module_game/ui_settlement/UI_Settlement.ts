@@ -32,8 +32,6 @@ export class UI_Settlement extends egf.UIController {
             }
             coin += winCoin;
             this.checkUnlock();
-            //上报通关进度：必须在 nextLevel 之前取当前关卡号（不额外落盘，由 nextLevel 一并保存）
-            DataMgr.reportLevelComplete(settledLevel, false);
             const scoreData = {
                 key: Constants.LeaderboardMode,
                 score: settledLevel,

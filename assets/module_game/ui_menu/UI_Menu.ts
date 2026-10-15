@@ -80,6 +80,10 @@ export class UI_Menu extends egf.UIController {
         //     worldPos: layout.btnStart.node.worldPosition,
         //     nodeBtn: layout.btnStart.node,
         // });
+        UI_Guide.showGuideStep(Constants.GUIDE_STEP.LAST_GUIDE, {
+            content: egf.i18nMgr.getText("你已经学会了如何战斗，尽情游戏吧！"),
+            worldPos: layout.btnStart.node.worldPosition,
+        });
     }
 
     protected onDispose(): void {
@@ -119,11 +123,6 @@ export class UI_Menu extends egf.UIController {
         this.showStart(angleZ);
         PlatformMgr.reportEvent("game_start", {
             mode: 0,
-        });
-
-        UI_Guide.showGuideStep(Constants.GUIDE_STEP.LAST_GUIDE, {
-            content: egf.i18nMgr.getText("你已经学会了如何战斗，尽情游戏吧！"),
-            worldPos: layout.btnStart.node.worldPosition,
         });
     }
     private clickCoin() {
