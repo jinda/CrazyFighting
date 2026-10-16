@@ -6,7 +6,7 @@
 - **通用 Header**:
   - `X-Game-Code: {game_code}` — 必填，标识游戏（默认值 `default`）
   - `Content-Type: application/json` — POST 请求必填
-- **认证**: 登录后获取 token，后续请求通过 Header 或 Query 传递
+- **认证**: 登录后获取 token，受保护请求必须通过 `Authorization: Bearer {token}` Header 传递
 - **响应格式**: `{ "errcode": 0, "errmsg": "操作成功!", "data": {...} }`
 
 | errcode | 含义 |
@@ -21,9 +21,20 @@
 | 10060 | 邮件不存在或不可用 |
 | 10062 | 邮件附件尚未领取 |
 | 10063 | 邮件无可领取附件 |
+| 10066 | 每日任务不存在或尚未生效 |
+| 10067 | 每日任务日期已过期 |
+| 10068 | 每日任务配置已更新，请刷新后重试（后台接口） |
+| 10069 | 每日任务奖励配置无效 |
+| 10070 | 奖励数值溢出 |
+| 10071 | 账号已在其他设备登录，请重新登录 |
+| 10072 | 每日任务尚未完成 |
 | 2 | 未登录/token 无效 |
 
 > **变更(2026-08-15)**: 排行榜接口由自由 board_id 改为玩法 mode + 周期 type,见第 3-5 节。
+
+> **变更(2026-10-14)**: 新增每日任务列表和完成接口；任务按北京时间自然日生效，完成奖励由服务端事务提交。
+
+> **变更(2026-10-15)**: 客户端登录改为同一游戏、同一玩家仅一个有效会话。每次 UID 或 OAuth 登录都会替换此前 token；旧 token 请求受保护接口时返回 HTTP 401、`errcode=10071`。上线前签发且没有会话标识的 token 返回 HTTP 401、`errcode=2`，客户端必须重新登录。
 
 ---
 
@@ -105,11 +116,13 @@ POST /client/login
 
 | 字段 | 说明 |
 |------|------|
-| token | JWT，后续请求放 Authorization header 或 ?token= 参数 |
+| token | JWT，后续受保护请求放入 `Authorization: Bearer {token}` Header |
 | user_info | 玩家信息 |
 | is_new | `true` = 本次自动注册，`false` = 已存在 |
 
 多渠道登录(游客/微信/Google/Apple)见 [第 10 节](#10-多渠道登录游客微信googleapple)。
+
+每次登录成功都会建立新的 24 小时服务端会话，并替换同一游戏、同一玩家此前的会话。同一设备重复登录也会替换旧 token。只有 Redis 会话写入成功后才返回 token；登录后访问业务接口不会延长会话有效期。不同游戏或不同玩家的会话互不影响。
 
 ---
 
@@ -162,14 +175,12 @@ Content-Type: application/json
 ## 2. 获取玩家信息
 
 ```
-GET /client/userinfo?uid={uid}
+GET /client/userinfo
 POST /client/userinfo
 ```
 
-**认证方式**（三选一）:
-- `Authorization: Bearer {token}` — Header 传 JWT
-- `?token={token}&uid={uid}` — Query 参数
-- `?uid={uid}` — 仅传 uid（开发环境，生产建议用 token）
+**认证方式**:
+- `Authorization: Bearer {token}` — 必须通过 Header 传有效的当前会话 JWT。Query、请求 body 中的 `uid`、`token` 或 `game_code` 不能替代 JWT 身份。
 
 **响应**:
 ```json
@@ -195,7 +206,7 @@ POST /client/userinfo
 POST /client/updateprofile
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 **请求参数** (JSON Body, 至少传一项):
 
@@ -255,7 +266,7 @@ POST /client/leaderboards
 POST /client/pushscore
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 **请求参数**:
 
@@ -434,7 +445,7 @@ POST /client/event/report
 POST /client/leaderboard
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 **请求参数**:
 
@@ -489,7 +500,7 @@ POST /client/leaderboard
 GET /client/resource
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 查询时服务端会先结算体力自然恢复（上限 30，每 5 分钟恢复 1 点）。
 
@@ -525,7 +536,7 @@ GET /client/resource
 POST /client/resource/consume
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 **请求参数**:
 
@@ -583,7 +594,7 @@ POST /client/resource/gain
 POST /client/code/redeem
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 **请求参数**: `{ "code": "VipCode2026" }`
 
@@ -655,7 +666,7 @@ POST /client/adconfig
 POST /client/savedata
 ```
 
-**认证**: 需要 token 或 uid
+**认证**: 需要 `Authorization: Bearer {token}`
 
 **请求参数**:
 
@@ -779,8 +790,9 @@ curl -s -X POST $BASE/client/adconfig \
   -H "Content-Type: application/json" | jq .
 
 # 6. 获取玩家信息
-curl -s "$BASE/client/userinfo?uid=10001" \
-  -H "X-Game-Code: $GAME" | jq .
+curl -s "$BASE/client/userinfo" \
+  -H "X-Game-Code: $GAME" \
+  -H "Authorization: Bearer $TOKEN" | jq .
 
 # 7. 保存存档
 curl -s -X POST $BASE/client/savedata \
@@ -973,6 +985,158 @@ mail_ids 必须包含 1–100 个互不重复的合法 ID。服务端先校验�
 状态写入不使用事务；存储中断时接口返回 `10000`，已完成的子集保持删除，使用相同 ID 列表
 重试可补齐剩余项。
 
+## 12. 每日任务
+
+每日任务按 `Asia/Shanghai` 的自然日生效和重置。客户端 UID 与游戏代码只取登录 token 和
+`X-Game-Code`，请求体不能覆盖。客户端声明任务目标已经达成；服务端负责校验当天发布规则、
+一次完成、奖励原子性和租户隔离，不校验具体玩法目标。
+
+### 12.1 获取当天任务
+
+```http
+POST /client/task/list
+Authorization: Bearer {token}
+X-Game-Code: {game_code}
+Content-Type: application/json
+
+{}
+```
+
+成功响应：
+
+```json
+{
+  "errcode": 0,
+  "errmsg": "操作成功!",
+  "data": {
+    "task_date": "2026-10-14",
+    "server_time": "2026-10-14T04:00:00Z",
+    "next_reset_time": "2026-10-14T16:00:00Z",
+    "version": 7,
+    "tasks": [
+      {
+        "task_id": "login_once",
+        "title": "登录游戏",
+        "description": "当天登录一次",
+        "sort": 1,
+        "enabled": true,
+        "rewards": [
+          { "resource": "coin", "amount": 100 },
+          { "resource": "item", "item_id": "shield", "amount": 1 }
+        ],
+        "completed": false,
+        "claimable": false,
+        "claimed": false
+      }
+    ]
+  }
+}
+```
+
+- `server_time` 与 `next_reset_time` 是 RFC3339 UTC 时间；`task_date` 是北京时间业务日。
+- 只返回当天生效版本中启用的任务，并按 `sort, task_id` 排序；没有生效版本或启用任务时
+  `tasks` 必为 `[]`，`version` 为 `0`。
+- 奖励资源为 `coin`、`stamina` 或 `item`；道具奖励同时包含 `item_id`。数量均为正 int64。
+
+### 12.2 标记任务完成（不发奖）
+
+```http
+POST /client/task/complete
+Authorization: Bearer {token}
+X-Game-Code: {game_code}
+Content-Type: application/json
+
+{ "task_id": "login_once", "task_date": "2026-10-14" }
+```
+
+首次成功响应：
+
+```json
+{
+  "errcode": 0,
+  "errmsg": "操作成功!",
+  "data": {
+    "completion": {
+      "completion_id": "2112345678901234567",
+      "task_date": "2026-10-14",
+      "task_id": "login_once",
+      "title": "登录游戏",
+      "version": 7,
+      "rewards": [
+        { "resource": "coin", "amount": 100 },
+        { "resource": "item", "item_id": "shield", "amount": 1 }
+      ],
+      "claimed": false,
+      "claimed_at": null,
+      "reward_result": { "coin": 0, "stamina": 0, "items": {} },
+      "reward_request_id": "daily_task:2026-10-14:login_once",
+      "completed_at": "2026-10-14T04:01:00Z"
+    },
+    "replay": false
+  }
+}
+```
+
+- 新完成只接受服务端请求开始时的当天日期、当天已生效且启用的任务。未完成的旧日期请求返回
+  `10067`；不存在、未生效或停用任务返回 `10066`。
+- 完成唯一键为游戏、业务日、任务、玩家。此接口只保存完成记录和奖励快照，不修改金币、体力、
+  道具余额，不生成奖励流水。完成不依赖道具当前是否启用或玩家余额能否容纳奖励，相关校验在领取时进行。
+- 相同四元组再次完成返回已有记录和 `replay=true`，支持跨日重试；不会重置已领取状态。
+- 列表中未完成任务为 `completed=false, claimable=false, claimed=false`；完成后未领取为
+  `completed=true, claimable=true, claimed=false`；领取后为 `completed=true, claimable=false, claimed=true`。
+- 未领取完成响应中的 `reward_result` 是空结果，不代表玩家当前余额；`claimed_at=null`。
+
+### 12.3 领取已完成任务奖励
+
+```http
+POST /client/task/claim
+Authorization: Bearer {token}
+X-Game-Code: {game_code}
+Content-Type: application/json
+
+{ "task_id": "login_once", "task_date": "2026-10-14" }
+```
+
+首次成功响应：
+
+```json
+{
+  "errcode": 0,
+  "errmsg": "操作成功!",
+  "data": {
+    "completion": {
+      "completion_id": "2112345678901234567",
+      "task_date": "2026-10-14",
+      "task_id": "login_once",
+      "title": "登录游戏",
+      "version": 7,
+      "rewards": [
+        { "resource": "coin", "amount": 100 },
+        { "resource": "item", "item_id": "shield", "amount": 1 }
+      ],
+      "claimed": true,
+      "claimed_at": "2026-10-14T04:02:00Z",
+      "reward_result": { "coin": 350, "stamina": 0, "items": { "shield": 4 } },
+      "reward_request_id": "daily_task:2026-10-14:login_once",
+      "completed_at": "2026-10-14T04:01:00Z"
+    },
+    "replay": false
+  }
+}
+```
+
+- 领取只接受当前认证游戏与玩家的已完成记录；尚未完成（含其他游戏或玩家的记录）返回 `10072`。
+- 请求必须指定完成记录原始的 `task_date`。已完成未领取任务可以跨日领取，奖励以完成时保存的快照
+  为准；任务后来停用或版本改变不取消领取资格。当天任务列表只列当天任务，客户端需保留旧日期以重试旧任务。
+- 全部金币/体力/道具余额变化、`source=daily_task` 的完成态资源流水、领取标记、领取时间及余额
+  响应在一个 MongoDB 事务中提交；任一步失败全部回滚，完成记录仍保持未领取，可再次领取。
+- 成功后相同四元组重试返回首次保存的奖励快照、领取时间及余额结果，`replay=true`，不会重复发奖。
+  并发请求暂时无法取得已提交结果时返回 `10044`，客户端应以相同请求重试。
+- 体力和道具沿用服务端封顶规则；无效/停用道具返回 `10069`，余额计算溢出返回 `10070`。
+- 旧版自动发奖完成记录视为已领取，`claimed=true`，`claimed_at` 使用原完成时间；再次领取只重放，
+  不补发。无需回填即可兼容，即使原奖励因封顶没有实际余额增量也不重复发奖。
+- 每个任务每天最多完成一次、领取一次；同一任务在不同业务日分别计数和奖励。
+
 ---
 
 ## 管理后台配置
@@ -983,6 +1147,7 @@ mail_ids 必须包含 1–100 个互不重复的合法 ID。服务端先校验�
 - **广告**: `游戏管理 > 广告管理` → 微信/AdMob 为默认渠道；可动态新增渠道代码和名称，再分别填写激励视频/插屏/Banner 的广告单元 ID 并启用
 - **游戏**: `游戏管理 > 游戏列表` → 新增游戏（`X-Game-Code` header 对应游戏代码）
 - **登录配置**: `游戏管理 > 登录配置` → 按游戏填写微信 appid/secret、Google client_id、Apple bundle_id、SUD Game ID/Secret,并启用。未配置的渠道客户端登录返回 10007；SUD Game Secret 仅供服务端调用 SUD OpenPaaS。
+- **每日任务**: `游戏管理 > 每日任务` → 编辑并保存草稿，再发布次日版本；启停同样生成次日版本。查看、编辑、发布和统计分别使用权限 `44`、`45`、`46`、`47`。
 
 ### 前台新会话频率与保留期限
 

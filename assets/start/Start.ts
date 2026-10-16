@@ -88,7 +88,7 @@ export class Start extends Component {
         }
         this.sceneLoadStarted = true;
         egf.i18nMgr.setLanguage(LocalDataMgr.Setting.language);
-        director.loadScene(SceneDef.GAME.name);
+        egf.SceneUtil.loadScene(SceneDef.GAME);
         PlatformMgr.reportEvent("loading_time", { time: game.totalTime });
     }
 
@@ -138,7 +138,7 @@ export class Start extends Component {
         }
         ClientApi.inst.getAdConfig(
             channel,
-            (data: IAdConfigData) => {
+            (data: IAdConfigData | undefined) => {
                 PlatformMgr.initAd(data);
             },
             () => {
@@ -157,6 +157,7 @@ export class Start extends Component {
             this.dataReady = true;
             this.tryEnterGame();
         });
+        ClientApi.inst.foreground();
     }
 
     private onLoginFail(errcode: number, errmsg: string) {

@@ -15,7 +15,7 @@ export interface IApiResponse<T = unknown> {
     /**
      * 数据
      */
-    data: T;
+    data?: T;
 }
 
 /**
@@ -66,6 +66,18 @@ export interface ILoginData {
     is_new: boolean;
 }
 
+/** OAuth 登录渠道；SUD 和微信均提交一次性 code，由服务端校验身份。 */
+export type TOAuthLoginType = "guest" | "wechat" | "google" | "apple" | "sud";
+
+/** 各 OAuth 渠道的凭据，不包含服务端密钥。 */
+export interface IOAuthLoginCredentials {
+    guest: { device_id: string };
+    wechat: { code: string };
+    google: { id_token: string };
+    apple: { identity_token: string };
+    sud: { code: string };
+}
+
 /**
  * 前台/后台会话状态
  */
@@ -99,7 +111,7 @@ export interface ISessionData {
     /**
      * 会话状态，见 ESessionStatus
      */
-    status: string;
+    status: "active" | "completed" | "discarded" | "ignored";
 }
 
 /**
@@ -119,7 +131,7 @@ export interface ILeaderboardMode {
      */
     periods: number[];
     /**
-     * 计分类型: 0=自定义分数 1=最高关（客户端按此决定 pushScore 的 score 传什么）
+     * 计分类型: 0=自定义分数 1=最高关 2=通过的关卡数（仅由通关接口更新）
      */
     score_type: number;
 }
@@ -234,6 +246,10 @@ export enum EScoreType {
      * 最高关榜
      */
     MaxLevel = 1,
+    /**
+     * 通过的关卡数榜，仅通过 completeProgress 上报实际完成的关卡
+     */
+    CompletedLevels = 2,
 }
 
 /**
@@ -279,10 +295,10 @@ export interface IProgressCompleteData {
      */
     level: number;
     /**
-     * 各最高关玩法(score_type=1)及其已配置周期的当前排名
+     * 各最高关玩法(score_type=1)、通过关卡数玩法(score_type=2)及其已配置周期的当前排名
      * key 为 mode, 值为 { daily/weekly/monthly/alltime: 排名 }
      */
-    ranks?: { [mode: string]: { [period: string]: number } };
+    ranks: { [mode: string]: { [period: string]: number } };
 }
 
 /**
@@ -575,6 +591,71 @@ export interface IMailDeleteData {
     deleted_count: number;
 }
 
+/** 每日任务奖励；道具奖励必须包含 item_id，数量为正整数。 */
+export type TTaskReward =
+    { resource: "coin" | "stamina"; amount: number } | { resource: "item"; item_id: string; amount: number };
+
+/** 当天启用的任务，服务端按 sort、task_id 排序。 */
+export interface ITask {
+    task_id: string;
+    title: string;
+    description: string;
+    sort: number;
+    enabled: boolean;
+    rewards: TTaskReward[];
+    completed: boolean;
+    /** 已完成且尚未领取时为 true。 */
+    claimable: boolean;
+    claimed: boolean;
+}
+
+/** 每日任务列表；没有启用任务时 tasks 为 []、version 为 0。 */
+export interface ITaskListData {
+    /** Asia/Shanghai 业务日期，格式 YYYY-MM-DD。 */
+    task_date: string;
+    /** RFC3339 UTC 时间，由服务端提供，不能用设备日期替代。 */
+    server_time: string;
+    next_reset_time: string;
+    version: number;
+    tasks: ITask[];
+}
+
+/** 任务奖励发放后的余额快照，重放返回首次领取时的结果；未领取时为零值和空道具表。 */
+export interface ITaskRewardResult {
+    coin: number;
+    stamina: number;
+    items: { [itemId: string]: number };
+}
+
+/** 已提交的任务完成记录；ID 按字符串处理，避免大整数精度丢失。 */
+export interface ITaskCompletion {
+    completion_id: string;
+    task_date: string;
+    task_id: string;
+    title: string;
+    version: number;
+    rewards: TTaskReward[];
+    claimed: boolean;
+    /** RFC3339 UTC 领取时间；未领取时为 null，旧版自动发奖记录使用原完成时间。 */
+    claimed_at: string | null;
+    reward_result: ITaskRewardResult;
+    reward_request_id: string;
+    /** RFC3339 UTC 完成时间。 */
+    completed_at: string;
+}
+
+/** 标记任务完成的响应，不发奖；replay 为 true 时返回已有记录，保留领取状态。 */
+export interface ITaskCompleteData {
+    completion: ITaskCompletion;
+    replay: boolean;
+}
+
+/** 领取任务奖励的响应；replay 为 true 时返回首次领取结果，不重复发奖。 */
+export interface ITaskClaimData {
+    completion: ITaskCompletion;
+    replay: boolean;
+}
+
 /**
  * 服务端错误码（对应 client-api.md 的错误码表）
  */
@@ -651,4 +732,20 @@ export enum EApiErrcode {
      * 前台会话创建过于频繁，请稍后重试
      */
     SessionTooFrequent = 10064,
+    /** 客户端异常上报超过限额，不立即重试。 */
+    ErrorReportRateLimited = 10065,
+    /** 每日任务不存在、未生效或已停用。 */
+    TaskNotAvailable = 10066,
+    /** 尚未完成的每日任务日期已过期。 */
+    TaskDateExpired = 10067,
+    /** 每日任务配置已更新（后台接口）。 */
+    TaskConfigChanged = 10068,
+    /** 每日任务奖励配置无效，包含无效或停用道具。 */
+    TaskRewardInvalid = 10069,
+    /** 奖励余额计算溢出。 */
+    RewardOverflow = 10070,
+    /** 同一游戏的账号已再次登录，当前 token 已被替换。 */
+    SessionReplaced = 10071,
+    /** 每日任务尚未完成，不能领取奖励。 */
+    TaskNotCompleted = 10072,
 }

@@ -49,16 +49,19 @@ export class UI_CommonTips_impl extends UI_CommonTips {
             layout.btnClose!.node.active = true;
             layout.setCancelText(this._params.cancelTxt);
         }
-        if (this._params.bOk != undefined) {
+        if (this._params.bOk !== undefined) {
             layout.btnOK!.node.active = this._params.bOk;
         }
-        if (this._params.bCancel != undefined) {
-            layout.btnCancel!.node.active = this._params.bCancel;
-        }
+        layout.btnCancel!.node.active = !!this._params.bCancel;
+        layout.btnClose!.node.active = !!this._params.bCancel;
+
         layout.labelCost!.node.parent!.active = this._params.costTxt != null;
         if (this._params.costTxt) {
             layout.labelCost!.string = this._params.costTxt;
         }
+    }
+    protected onDispose(): void {
+        egf.Logger.log("close UI_CommonTips");
     }
 
     clickOk(button: any, ok: boolean) {

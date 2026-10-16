@@ -84,5 +84,5 @@ export interface INetworkTips {
     requestTips(isShow: boolean): void;
     showErrorTips(code: number): void;
     showServerErrorTips(errorMsg: any): void;
-    showHttpErrorTips(data: { event: HttpEvent; code: number; msg: string }): void;
+    showHttpErrorTips(data: { event: HttpEvent; code: number; msg: string }, response: string): void;
 }

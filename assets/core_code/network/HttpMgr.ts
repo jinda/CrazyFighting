@@ -35,7 +35,7 @@ export enum HttpEvent {
 /** HTTP请求 */
 class HttpManager {
     /** 服务器地址 */
-    public server: string = "http://127.0.0.1/";
+    private server: string = "http://127.0.0.1/";
     /** 请求超时时间 */
     private timeout: number = 10000;
     /** 请求头Headers协议 */
@@ -51,6 +51,11 @@ class HttpManager {
             this._inst = new HttpManager();
         }
         return this._inst;
+    }
+
+    public init(server: string, networkTips: INetworkTips) {
+        this.server = server;
+        this.networkTips = networkTips;
     }
 
     public addHeaders(key: string, value: string) {
@@ -99,6 +104,8 @@ class HttpManager {
             }
         }
     }
+
+    public isReady() {}
 
     private resolveUrl(uri: string): string {
         if (uri.toLocaleLowerCase().indexOf("http") === 0) {
@@ -181,10 +188,10 @@ class HttpManager {
         };
         this.requests.set(requestKey, record);
 
-        const fail = (event: HttpEvent, status: number = xhr.status) => {
+        const fail = (event: HttpEvent, response: string = "", status: number = xhr.status) => {
             const error = { event, status, uri: logUri, code: status, msg: "" };
             Logger.error("[HttpMgr] request failed:", isPost ? "POST" : "GET", logUri, status, event);
-            this.networkTips?.showHttpErrorTips(error);
+            this.networkTips?.showHttpErrorTips(error, response);
             this.settle(record, false, error);
         };
 
@@ -215,7 +222,7 @@ class HttpManager {
                     return;
                 }
                 if (xhr.status < 200 || xhr.status >= 300) {
-                    fail(xhr.status >= 500 ? HttpEvent.NO_NETWORK : HttpEvent.UNKNOWN_ERROR);
+                    fail(xhr.status >= 500 ? HttpEvent.NO_NETWORK : HttpEvent.UNKNOWN_ERROR, xhr.response);
                     return;
                 }
                 if (responseType === "arraybuffer") {

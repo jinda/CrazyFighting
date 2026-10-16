@@ -119,9 +119,13 @@ export class FighterLogic extends Component {
     }
 
     protected start(): void {
-        this.planeCollider.setGroup(Constants.COLLIDER_GROUP.PLANE);
-        this._fightReset();
         egf.Logger.log("FighterLogic start:", DataMgr.level);
+        this.planeCollider.setGroup(Constants.COLLIDER_GROUP.PLANE);
+        try {
+            this._fightReset();
+        } catch (error) {
+            console.error("start error:", error);
+        }
 
         //首次进来的话检查下是否处于新手引导第一关，直接开始
         if (DataMgr.level === 1) {

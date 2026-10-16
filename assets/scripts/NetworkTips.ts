@@ -1,7 +1,10 @@
-import { assetManager } from "cc";
+import { assetManager, director, sys } from "cc";
 import { GetEnvConfig } from "./config/EnvConfig";
 import { LocalDataMgr } from "./LocalDataMgr";
 import { UI_CommonTips } from "./UIDef";
+import { EApiErrcode } from "./apiInterface";
+import { SceneDef } from "./SceneDef";
+import { ClientApi } from "./ClientApi";
 
 export class NetworkTips implements egf.INetworkTips {
     connectTips(isShow: boolean): void {
@@ -41,7 +44,6 @@ export class NetworkTips implements egf.INetworkTips {
                     callback: (ok: boolean) => {
                         if (ok && egf.NetMgr.isWorking()) {
                             egf.UIMgr.closeUI(UI_CommonTips);
-                            egf.EventMgr.emit("EVT_FETCH_AND_UPDATE_USER_INFO");
                         }
                     },
                 });
@@ -108,31 +110,38 @@ export class NetworkTips implements egf.INetworkTips {
         });
     }
 
-    showHttpErrorTips(data: { event: egf.HttpEvent; code: number; msg: string }): void {
+    showHttpErrorTips(data: { event: egf.HttpEvent; code: number; msg: string }, response: string): void {
         let tipsStr = "";
         switch (data.event) {
             case egf.HttpEvent.NO_NETWORK:
-                tipsStr = "SYS_NETWORK_UNAVAILABLE";
+                tipsStr = "网络连接不可用";
                 break;
             case egf.HttpEvent.UNKNOWN_ERROR:
-                tipsStr = "SYS_LOST_CONNECTION";
+                tipsStr = "网络失去连接";
                 break;
             case egf.HttpEvent.TIMEOUT:
-                tipsStr = "SYS_NETWORK_UNAVAILABLE";
+                tipsStr = "网络连接不好";
                 break;
             default:
                 tipsStr = data.msg || `unknown error code:(${data.code})`;
                 break;
         }
-
-        egf.UIMgr.showUI(UI_CommonTips, null, this, {
-            content: egf.i18nMgr.getText(tipsStr),
-            callback: (ok: boolean) => {
-                if (ok && egf.NetMgr.isWorking()) {
-                    egf.UIMgr.closeUI(UI_CommonTips);
-                    egf.EventMgr.emit("EVT_FETCH_AND_UPDATE_USER_INFO");
-                }
-            },
-        });
+        egf.Logger.error("showHttpErrorTips:", data, response);
+        const res = egf.SafeJSON.parse(response);
+        if (res.errcode == EApiErrcode.SessionReplaced) {
+            egf.UIMgr.showUI(UI_CommonTips, null, this, {
+                content: egf.i18nMgr.getText(res.errmsg),
+                callback: (ok: boolean) => {
+                    if (ok) {
+                        egf.UIMgr.closeAll();
+                        ClientApi.inst.setToken("");
+                        LocalDataMgr.removeLocalGameInfo();
+                        setTimeout(() => {
+                            director.loadScene(SceneDef.START.name);
+                        }, 500);
+                    }
+                },
+            });
+        }
     }
 }

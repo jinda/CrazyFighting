@@ -2,7 +2,7 @@
  * 网络数据管理器
  */
 
-import { Camera, Vec3, Node, geometry, screen, PhysicsSystem } from "cc";
+import { Camera, Vec3, Node, geometry, screen, PhysicsSystem, isValid } from "cc";
 import { Constants } from "db://assets/scripts/Constants";
 import { GameCfg } from "./GameConfig";
 import { DataMgr } from "db://assets/scripts/DataMgr";
@@ -286,8 +286,10 @@ class GameManager {
 
             for (const pos in dictFighter) {
                 const ndFighter = dictFighter[pos] as Node;
-                const scriptFighter = ndFighter.getComponent(Fighter)!;
-                scriptFighter.resetFighterState();
+                if (isValid(ndFighter)) {
+                    const scriptFighter = ndFighter.getComponent(Fighter)!;
+                    scriptFighter.resetFighterState();
+                }
             }
         }
         this.dictFighter = {};

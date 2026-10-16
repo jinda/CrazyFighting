@@ -62,10 +62,8 @@ class LocalDataManager {
 
     private loadGameInfoData(): boolean {
         const encryptStr = sys.localStorage.getItem(this.GameInfoStr);
-        if (!encryptStr) {
-            return false;
-        }
         let gameInfoData = this.decryptValue(encryptStr, "local");
+        egf.Logger.log("local game info:", gameInfoData);
         if (!gameInfoData) {
             gameInfoData = this.createDefaultGameInfo();
         }
@@ -81,15 +79,16 @@ class LocalDataManager {
 
     private loadSettingData(): boolean {
         const encryptStr = sys.localStorage.getItem(this.SettingStr);
-        if (!encryptStr) {
-            return false;
-        }
         let settingData = this.decryptValue(encryptStr, "local");
         if (!settingData) {
             settingData = this.createDefaultSetting();
         }
         this._setting = settingData as ISetting;
         return true;
+    }
+
+    public removeLocalGameInfo() {
+        sys.localStorage.removeItem(this.GameInfoStr);
     }
 
     public saveGameInfoData() {
@@ -145,9 +144,9 @@ class LocalDataManager {
         ClientApi.inst.getData(
             this.GameInfoStr,
             (data) => {
-                egf.Logger.log("loadCloud GameInfo success:", data);
                 if (data?.value) {
                     const gameInfoData = this.decryptValue(data?.value, "cloud");
+                    egf.Logger.log("loadCloud GameInfo success:", gameInfoData);
                     this.setGameInfo(gameInfoData as IGameInfo);
                 } else {
                     egf.Logger.log("loadCloud GameInfo is null");
@@ -183,7 +182,7 @@ class LocalDataManager {
     private createDefaultGameInfo(): IGameInfo {
         return {
             deviceID: "",
-            saveTime: Date.now(),
+            saveTime: 0,
             coin: 0,
             level: 0,
             coinLv: 1,

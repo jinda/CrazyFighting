@@ -1,5 +1,5 @@
 import { GetEnvConfig } from "./config/EnvConfig";
-import {
+import type {
     IAdConfigData,
     IAllData,
     IApiResponse,
@@ -13,6 +13,7 @@ import {
     IMailDeleteData,
     IMailDetail,
     IMailListData,
+    IOAuthLoginCredentials,
     IProgressCompleteData,
     IPushScoreResp,
     IRedeemCodeData,
@@ -22,12 +23,17 @@ import {
     IResourceData,
     ISaveDataItem,
     ISessionData,
+    ITaskClaimData,
+    ITaskCompleteData,
+    ITaskListData,
     IUserInfo,
     TApiErrCallback,
     TQueryParams,
     TRequestParams,
+    TOAuthLoginType,
 } from "./apiInterface";
 import { EPlatform, PlatformMgr } from "./SDK/PlatformMgr";
+import { NetworkTips } from "./NetworkTips";
 
 /**
  * 客户端 API 客户端（对应 client-api.md）
@@ -67,8 +73,8 @@ export class ClientApi {
         return this._userInfo!;
     }
 
-    public get adConfig(): IAdConfigData {
-        return this._adConfig!;
+    public get adConfig(): IAdConfigData | null {
+        return this._adConfig;
     }
 
     /**
@@ -79,7 +85,7 @@ export class ClientApi {
         if (game_code) {
             this._gameCode = game_code;
         }
-        egf.HttpMgr.server = url;
+        egf.HttpMgr.init(url, new NetworkTips());
         egf.HttpMgr.addHeaders("X-Game-Code", this._gameCode);
         egf.Logger.log("[ClientApi] init, game_code:", this._gameCode);
     }
@@ -112,9 +118,9 @@ export class ClientApi {
         errCb?: TApiErrCallback,
         isGet: boolean = false,
     ) {
-        if (PlatformMgr.platform === EPlatform.Android) {
+        if (this._token == "" && uri != "/client/login" && uri != "/client/oauthlogin") {
             if (errCb) {
-                errCb(-1, "当前平台不支持网络请求");
+                errCb(-1, "没有登陆不支持网络请求");
             }
             return;
         }
@@ -150,6 +156,7 @@ export class ClientApi {
 
     /**
      * uid 登录（自动注册）
+     * 每次登录创建 24 小时有效会话并替换旧 token；业务请求不会续期。
      * @param uid 玩家唯一 ID（snowflake 超过 JS 2^53，必须按字符串传，否则丢精度）
      * @param nickname 昵称（新用户必填，缺省 player_{uid}）
      * @param avatar 头像 URL
@@ -182,10 +189,28 @@ export class ClientApi {
     }
 
     /**
-     * 多渠道登录（游客/微信/Google/Apple）
-     * @param loginType guest / wechat / google / apple
-     * @param extra 各渠道必填参数：guest=device_id；wechat=code；google=id_token；apple=identity_token
+     * 多渠道登录（游客/微信/Google/Apple/SUD），每次登录成功都会替换该玩家旧会话。
+     * SUD 仅提交 sud.login 的原始 code，不提交 openid 或 Game Secret。
+     * @param loginType guest / wechat / google / apple / sud
+     * @param extra 各渠道必填参数：guest=device_id；wechat/sud=code；google=id_token；apple=identity_token
      */
+    public oauthLogin<T extends TOAuthLoginType>(
+        loginType: T,
+        extra: IOAuthLoginCredentials[T],
+        nickname?: string,
+        avatar?: string,
+        cb?: (data: ILoginData) => void,
+        errCb?: TApiErrCallback,
+    ): void;
+    /** 兼容已有字符串渠道调用；新增调用优先使用上方带渠道凭据类型的签名。 */
+    public oauthLogin(
+        loginType: string,
+        extra?: TRequestParams,
+        nickname?: string,
+        avatar?: string,
+        cb?: (data: ILoginData) => void,
+        errCb?: TApiErrCallback,
+    ): void;
     public oauthLogin(
         loginType: string,
         extra: TRequestParams = {},
@@ -194,7 +219,7 @@ export class ClientApi {
         cb?: (data: ILoginData) => void,
         errCb?: TApiErrCallback,
     ) {
-        const params: TRequestParams = { login_type: loginType, ...extra };
+        const params: TRequestParams = { ...extra, login_type: loginType };
         if (nickname) {
             params.nickname = nickname;
         }
@@ -242,10 +267,10 @@ export class ClientApi {
     /**
      * 上报游戏进入前台（需要登录 token）
      * 登录成功后，每次应用进入前台生成新的 UUID 调用；收到成功响应后，进入后台时复用同一 session_id
-     * @param sessionId 会话 UUID（可用 ClientApi.createSessionId 生成）
+     * @param sessionId 新前台会话的 UUID；省略时自动生成，重试须显式传入同一 UUID
      */
-    public foreground(cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
-        this._sessionId = ClientApi.createSessionId();
+    public foreground(cb?: (data: ISessionData) => void, errCb?: TApiErrCallback, sessionId?: string) {
+        this._sessionId = sessionId ?? ClientApi.createSessionId();
         this.request<ISessionData>("/client/foreground", { session_id: this._sessionId }, cb, errCb);
     }
 
@@ -254,24 +279,33 @@ export class ClientApi {
      * 前台上报成功收到响应后，进入后台时用同一个 session_id 调用；请求失败重试沿用原 UUID
      * @param sessionId 与前台上报一致的会话 UUID
      */
-    public background(cb?: (data: ISessionData) => void, errCb?: TApiErrCallback) {
-        this.request<ISessionData>("/client/background", { session_id: this._sessionId }, cb, errCb);
+    public background(cb?: (data: ISessionData) => void, errCb?: TApiErrCallback, sessionId?: string) {
+        this.request<ISessionData>("/client/background", { session_id: sessionId ?? this._sessionId }, cb, errCb);
     }
 
     // ---------- 2. 获取玩家信息 ----------
 
     /**
-     * 获取玩家信息（POST 方式）
-     * @param uid 玩家 UID；不传时服务端从 Authorization token 派生
+     * 获取当前登录玩家信息（POST 方式），身份仅由 Authorization token 确定。
      */
-    public getUserInfo(uid?: string, cb?: (data: IUserInfo) => void, errCb?: TApiErrCallback) {
-        const params: TRequestParams = {};
-        if (uid) {
-            params.uid = uid;
-        }
+    public getUserInfo(cb: (data: IUserInfo) => void, errCb?: TApiErrCallback): void;
+    /** @deprecated uid 不再参与认证，兼容旧调用但不会发送该字段。 */
+    public getUserInfo(uid?: string, cb?: (data: IUserInfo) => void, errCb?: TApiErrCallback): void;
+    public getUserInfo(
+        uidOrCallback?: string | ((data: IUserInfo) => void),
+        callbackOrError?: ((data: IUserInfo) => void) | TApiErrCallback,
+        legacyErrorCallback?: TApiErrCallback,
+    ) {
+        // 保留 getUserInfo(undefined, cb, errCb) 的旧式占位调用；新调用直接传成功回调。
+        const isLegacyCall = typeof uidOrCallback !== "function";
+        const cb =
+            typeof uidOrCallback === "function"
+                ? uidOrCallback
+                : (callbackOrError as ((data: IUserInfo) => void) | undefined);
+        const errCb = isLegacyCall ? legacyErrorCallback : (callbackOrError as TApiErrCallback | undefined);
         this.request<IUserInfo>(
             "/client/userinfo",
-            params,
+            {},
             (data) => {
                 this._userInfo = data;
                 if (cb) {
@@ -322,7 +356,7 @@ export class ClientApi {
 
     /**
      * 获取当前游戏所有启用中的玩法及开启的周期（无需登录）
-     * score_type 决定 pushScore 传什么：0=自定义分数、1=最高关
+     * score_type：0=自定义分数、1=最高关、2=通过的关卡数（仅通过 completeProgress 更新）
      */
     public getLeaderboards(cb?: (data: ILeaderboardsData) => void, errCb?: TApiErrCallback) {
         this.request<ILeaderboardsData>("/client/leaderboards", {}, cb, errCb);
@@ -333,6 +367,7 @@ export class ClientApi {
     /**
      * 上传分数（写入该玩法所有开启周期的榜单）
      * 服务器只保留历史最高分；低分上报被忽略但仍返回当前排名
+     * 最高关分数同步全部启用的最高关玩法；通过关卡数榜禁止调用本接口。
      * @param mode 玩法标识
      * @param score score_type=0 传自定义分数；score_type=1 传当前最高关（整数，如 52）
      */
@@ -343,8 +378,9 @@ export class ClientApi {
     // ---------- 4.1 上报通关进度 ----------
 
     /**
-     * 上报通关进度：更新历史最高关，并同步当前游戏全部启用的最高关榜（score_type=1）
-     * 较低/重复/跳关上报按只增不减处理；失败时用相同或更低的 level 重试可补齐榜单
+     * 上报实际完成的关卡，同步最高关榜（score_type=1）和通过关卡数榜（score_type=2）。
+     * 最高关只增不减，通过关卡数按各周期对关卡编号去重，不推断遗漏关卡已完成。
+     * 临时失败须用相同 level 在同周期重试，避免遗漏通过关卡数或误计入其他业务日。
      * @param level 已通关关卡，范围 1..9006，必须是整数（不接受浮点数或字符串）
      */
     public completeProgress(level: number, cb?: (data: IProgressCompleteData) => void, errCb?: TApiErrCallback) {
@@ -385,7 +421,7 @@ export class ClientApi {
      * 上报客户端异常（登录后使用），请求体最多 32 KiB，不接受 uid/game_code 或自定义上下文。
      * 调用方须先移除消息、堆栈中的 token、密码和请求凭据；不能再次上报本接口自身的失败。
      * 临时依赖失败（10000/网络失败）由调用方采用有上限的退避重试，沿用相同 event_id；
-     * 参数错误（10001）、认证错误（2）、限流（10065）不立即重试。
+     * 参数错误（10001）、认证错误（2/10071）、限流（10065）不立即重试。
      * @param params 异常信息；event_id 可用 ClientApi.createReqId 生成，同一次异常重试不得重新生成
      */
     public reportError(params: IReportErrorParams, cb?: (data: IReportErrorData) => void, errCb?: TApiErrCallback) {
@@ -498,23 +534,23 @@ export class ClientApi {
      * 渠道未配置或已禁用时 data 为空，客户端需降级处理
      * @param channel 广告渠道代码，缺省 wechat（AdMob 为 admob，其他渠道用后台创建的代码）
      */
-    public getAdConfig(channel?: string, cb?: (data: IAdConfigData) => void, errCb?: TApiErrCallback) {
+    public getAdConfig(channel?: string, cb?: (data: IAdConfigData | undefined) => void, errCb?: TApiErrCallback) {
         const params: TRequestParams = {};
         if (channel) {
             params.channel = channel;
         }
-        this.request<IAdConfigData>(
+        this.request<IAdConfigData | null | undefined>(
             "/client/adconfig",
             params,
             (data) => {
-                this._adConfig = data;
+                this._adConfig = data ?? null;
                 if (!data) {
                     egf.Logger.warn("[ClientApi] adConfig empty, channel:", channel);
                 } else {
                     egf.Logger.log("[ClientApi] adConfig:", data);
                 }
                 if (cb) {
-                    cb(data);
+                    cb(data ?? undefined);
                 }
             },
             errCb,
@@ -593,5 +629,40 @@ export class ClientApi {
      */
     public deleteMails(mailIds: string[], cb?: (data: IMailDeleteData) => void, errCb?: TApiErrCallback) {
         this.request<IMailDeleteData>("/client/mail/delete", { mail_ids: mailIds }, cb, errCb);
+    }
+
+    // ---------- 12. 每日任务 ----------
+
+    /** 获取当天任务；使用响应的北京时间业务日和服务端重置时间，不依赖设备日期。 */
+    public getTaskList(cb?: (data: ITaskListData) => void, errCb?: TApiErrCallback) {
+        this.request<ITaskListData>("/client/task/list", {}, cb, errCb);
+    }
+
+    /**
+     * 声明任务完成，只保存完成记录和奖励快照，不发放奖励；领奖需另行调用 claimTask。
+     * 重试必须沿用同一 taskId/taskDate；已完成记录支持跨日重放，返回 replay=true 且保留领取状态。
+     * 未领取时 reward_result 为空结果，不代表玩家当前余额；10066/10067 需刷新任务。
+     * @param taskId 列表中的任务 ID
+     * @param taskDate 列表中的 task_date（Asia/Shanghai，YYYY-MM-DD），不可在重试时改为设备当天日期
+     */
+    public completeTask(
+        taskId: string,
+        taskDate: string,
+        cb?: (data: ITaskCompleteData) => void,
+        errCb?: TApiErrCallback,
+    ) {
+        this.request<ITaskCompleteData>("/client/task/complete", { task_id: taskId, task_date: taskDate }, cb, errCb);
+    }
+
+    /**
+     * 领取已完成任务奖励，按完成时保存的奖励快照发放，支持跨日领取。
+     * 重试必须沿用同一 taskId/taskDate；成功重放返回 replay=true 和首次领取时的余额结果，不重复发奖。
+     * reward_result 是余额快照，调用方不得将其作为增量累加；未完成返回 10072。
+     * 10044 可用相同请求稍后重试；10069/10070 不立即重试。
+     * @param taskId 完成记录中的任务 ID
+     * @param taskDate 完成记录原始的 task_date（Asia/Shanghai，YYYY-MM-DD），跨日后仍须保留
+     */
+    public claimTask(taskId: string, taskDate: string, cb?: (data: ITaskClaimData) => void, errCb?: TApiErrCallback) {
+        this.request<ITaskClaimData>("/client/task/claim", { task_id: taskId, task_date: taskDate }, cb, errCb);
     }
 }
