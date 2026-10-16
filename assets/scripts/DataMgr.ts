@@ -67,23 +67,38 @@ class DataManager {
     private _coin: egf.SecureValue = new egf.SecureValue(0);
     private _level: egf.SecureValue = new egf.SecureValue(0);
     private _onlineCoin: egf.SecureValue = new egf.SecureValue(0);
+    private _syncCloudDataTime: number = 0;
 
     private _userData: IUserInfo = { money: 0, level: 0, coin: 0 }; // 用户数据
-    public get userData(): IUserInfo {
-        return this._userData;
-    }
-    public set userData(v: IUserInfo) {
-        this._userData = v;
-    }
+
     public onlineGetTime: number = Date.now(); // 在线奖励获取时间
     public bBannerAd: boolean = false; // 是否显示banner
     public isDebugMode: boolean = false; // 调试模式
     public waitingBuy: number = -1; //优先安排购买
     public version: string = "1.0.0"; // 版本号
+    public bSyncCloudData: boolean = false; // 是否有数据更新
 
     public startEnterGame() {
         game.on(Game.EVENT_SHOW, this.onGameShow, this);
         game.on(Game.EVENT_HIDE, this.onGameHide, this);
+
+        // 每秒同步数据
+        this._syncCloudDataTime = setInterval(this.syncCloudData.bind(this), 500);
+    }
+
+    public reset() {
+        this.bSyncCloudData = false;
+        clearInterval(this._syncCloudDataTime);
+        this._syncCloudDataTime = 0;
+        game.off(Game.EVENT_SHOW, this.onGameShow, this);
+        game.off(Game.EVENT_HIDE, this.onGameHide, this);
+    }
+
+    public get userData(): IUserInfo {
+        return this._userData;
+    }
+    public set userData(v: IUserInfo) {
+        this._userData = v;
     }
 
     public get coin() {
@@ -123,7 +138,7 @@ class DataManager {
     private updateCoinBalance(value: number) {
         this._coin.set(value);
         LocalDataMgr.GameInfo.coin = value;
-        LocalDataMgr.saveGameInfoData();
+        this.bSyncCloudData = true;
         egf.EventMgr.emit(Constants.EVENT_NAME.UPDATE_FORMATION);
         egf.EventMgr.emit("coin_changed");
     }
@@ -149,7 +164,7 @@ class DataManager {
         const level = Math.min(Math.max(this.level, 0), Constants.MAX_LEVEL);
         this._level.set(level);
         LocalDataMgr.GameInfo.level = this._level.get();
-        LocalDataMgr.saveGameInfoData();
+        this.bSyncCloudData = true;
 
         ClientApi.inst.completeProgress(
             this._level.get(),
@@ -160,12 +175,6 @@ class DataManager {
                 egf.Logger.warn("[DataMgr] 通关进度上报失败:", this._level.get(), errcode, errmsg);
             },
         );
-    }
-
-    private getMaxLevelIndex(): number {
-        return Number.isSafeInteger(Constants.MAX_LEVEL) && Constants.MAX_LEVEL > 0
-            ? Constants.MAX_LEVEL - 1
-            : Number.MAX_SAFE_INTEGER;
     }
 
     public get onlineCoin() {
@@ -184,6 +193,13 @@ class DataManager {
     private onGameHide() {
         egf.AudioMgr.pause();
         ClientApi.inst.background();
+    }
+
+    private syncCloudData() {
+        if (this.bSyncCloudData) {
+            LocalDataMgr.saveGameInfoData();
+            this.bSyncCloudData = false;
+        }
     }
 }
 

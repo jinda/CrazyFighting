@@ -2,6 +2,7 @@ import { _decorator, Component } from "cc";
 import { UI_HUD } from "../../scripts/UIDef";
 import { GameMgr } from "../game/scripts/GameMgr";
 import { Constants } from "../../scripts/Constants";
+import { DataMgr } from "../../scripts/DataMgr";
 const { ccclass } = _decorator;
 
 @ccclass("FightScene")
@@ -18,5 +19,6 @@ export class FightScene extends Component {
 
     protected onDisable(): void {
         egf.AudioMgr.stop();
+        DataMgr.reset();
     }
 }

@@ -93,21 +93,30 @@ class LocalDataManager {
 
     public resetLocalGameInfo() {
         this._gameInfo.saveTime = 0;
-        this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
+        const encryptStr = this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
+        if (encryptStr) {
+            this.saveCloud(this.GameInfoStr, encryptStr);
+        }
     }
 
     public saveGameInfoData() {
         // 每次落盘都刷新存档时间
         this._gameInfo.saveTime = Date.now();
-        this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
+        const encryptStr = this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
+        if (encryptStr) {
+            this.saveCloud(this.GameInfoStr, encryptStr);
+        }
     }
 
     public saveSettingData() {
-        this.writeLocalValue(this.SettingStr, this._setting, "local");
+        const encryptStr = this.writeLocalValue(this.SettingStr, this._setting, "local");
+        if (encryptStr) {
+            this.saveCloud(this.SettingStr, encryptStr);
+        }
     }
 
     public saveData() {
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
         this.saveSettingData();
     }
 
@@ -175,7 +184,7 @@ class LocalDataManager {
             DataMgr.coin = this._gameInfo.coin;
             DataMgr.level = this._gameInfo.level;
             //再次存档一次
-            this.saveGameInfoData();
+            DataMgr.bSyncCloudData = true;
         } else {
             egf.Logger.log("use local save data");
             DataMgr.coin = this._gameInfo.coin;
@@ -229,7 +238,7 @@ class LocalDataManager {
             egf.Logger.log("writeLocalValue: ", key, value);
             const encryptStr = AES.encrypt(JSON.stringify(value), AES_KEY).toString();
             sys.localStorage.setItem(key, encryptStr);
-            this.saveCloud(key, encryptStr);
+
             return encryptStr;
         } catch (error) {
             egf.Logger.error(`[LocalDataMgr] failed to save local ${label}:`, error);
@@ -247,7 +256,7 @@ class LocalDataManager {
         this.GameInfo.formation[cellA] = this.GameInfo.formation[cellB];
         this.GameInfo.formation[cellB] = tmp;
 
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
     }
 
     /**
@@ -260,7 +269,7 @@ class LocalDataManager {
         this.GameInfo.formation[cellOld] = 0;
         this.GameInfo.formation[cellTarget] = nextId;
 
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
     }
 
     /**
@@ -278,7 +287,7 @@ class LocalDataManager {
 
         //刚生成的格子上默认没有士兵
         this.GameInfo.formation[nextPos] = 0;
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
         return nextPos;
     }
 
@@ -318,7 +327,7 @@ class LocalDataManager {
 
         this._gameInfo.formation[pos] = Number(fighterId); //强制转换成阵型，避免因为异常数据转成字符串了
 
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
 
         return true;
     }
@@ -354,17 +363,17 @@ class LocalDataManager {
 
     public upgradeCoin() {
         this._gameInfo.coinLv++;
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
     }
 
     public upgradeFighter() {
         this._gameInfo.fighterLv++;
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
     }
 
     public upgradeLand() {
         this._gameInfo.landLv++;
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
     }
 
     // ---------- Sign 签到便捷访问 ----------
@@ -424,7 +433,7 @@ class LocalDataManager {
 
         this._gameInfo.signDay += 1;
         this._gameInfo.lastSignTime = Date.now();
-        this.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
 
         egf.Logger.log("doSign success:", rewardDay);
         return rewardDay;

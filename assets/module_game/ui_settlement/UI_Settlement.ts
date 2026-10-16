@@ -93,7 +93,7 @@ export class UI_Settlement extends egf.UIController {
             if (LocalDataMgr.GameInfo.unlock.indexOf(unlock) === -1) {
                 LocalDataMgr.GameInfo.unlock.push(unlock);
 
-                LocalDataMgr.saveGameInfoData();
+                DataMgr.bSyncCloudData = true;
 
                 DataMgr.waitingBuy = unlock;
                 const fighter = GameCfg.queryByID("fighter", unlock.toString());

@@ -99,7 +99,14 @@ export class Start extends Component {
             },
             successCb: (code: string) => {
                 egf.Logger.log("platform login success");
-                //微信和 SUD 使用一次性 code；其余平台沿用游客身份。
+                // 生成或复用设备 ID
+                let deviceId = sys.localStorage.getItem("device_id");
+                if (!deviceId) {
+                    deviceId = "dev-" + Date.now().toString(36) + "-" + Math.random().toString(36).substr(2, 9);
+                    sys.localStorage.setItem("device_id", deviceId);
+                    LocalDataMgr.GameInfo.deviceID = deviceId;
+                }
+                //微信和 SUD 使用一次性 code
                 if (PlatformMgr.platform === EPlatform.WeChat || PlatformMgr.platform === EPlatform.SUD) {
                     ClientApi.inst.oauthLogin(
                         PlatformMgr.platform === EPlatform.SUD ? "sud" : "wechat",
@@ -110,12 +117,6 @@ export class Start extends Component {
                         this.onLoginFail.bind(this),
                     );
                 } else {
-                    // 生成或复用设备 ID 作为游客身份
-                    let deviceId = sys.localStorage.getItem("device_id");
-                    if (!deviceId) {
-                        deviceId = "dev-" + Date.now().toString(36) + "-" + Math.random().toString(36).substr(2, 9);
-                        sys.localStorage.setItem("device_id", deviceId);
-                    }
                     ClientApi.inst.oauthLogin(
                         "guest",
                         { device_id: deviceId },

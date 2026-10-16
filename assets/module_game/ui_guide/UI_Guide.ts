@@ -4,6 +4,7 @@ import { Layout_Guide } from "./Layout_Guide";
 import { Constants } from "../../scripts/Constants";
 import { GameMgr } from "../game/scripts/GameMgr";
 import { UI_BuyFighter } from "../ui_buyFighter/UI_BuyFighter";
+import { DataMgr } from "../../scripts/DataMgr";
 
 const ShowSaveStep: number[] = [];
 
@@ -21,7 +22,7 @@ export class UI_Guide extends egf.UIController {
             }, delay);
 
             if (ShowSaveStep.includes(step)) {
-                LocalDataMgr.saveGameInfoData();
+                DataMgr.bSyncCloudData = true;
             }
             return true;
         }
@@ -89,7 +90,7 @@ export class UI_Guide extends egf.UIController {
 
     clickBtn() {
         console.log("clickBtn:", LocalDataMgr.GameInfo.guideStep);
-        LocalDataMgr.saveGameInfoData();
+        DataMgr.bSyncCloudData = true;
         this.close();
 
         // 战斗引导
