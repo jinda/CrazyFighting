@@ -129,6 +129,7 @@ export class Start extends Component {
         };
 
         PlatformMgr.login(params);
+        this.initAd();
     }
 
     private initAd() {
@@ -154,7 +155,6 @@ export class Start extends Component {
      * 登录成功后处理
      */
     private onLoginSuccess(data: ILoginData) {
-        this.initAd();
         DataMgr.userData = data.user_info;
         // ClientApi 内部已设置 Authorization Header
         LocalDataMgr.loadCloud(() => {

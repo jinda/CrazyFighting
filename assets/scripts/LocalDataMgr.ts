@@ -62,11 +62,13 @@ class LocalDataManager {
 
     private loadGameInfoData(): boolean {
         const encryptStr = sys.localStorage.getItem(this.GameInfoStr);
-        let gameInfoData = this.decryptValue(encryptStr, "local");
-        egf.Logger.log("local game info:", gameInfoData);
-        if (!gameInfoData) {
+        let gameInfoData = null;
+        if (encryptStr) {
+            gameInfoData = this.decryptValue(encryptStr, "local");
+        } else {
             gameInfoData = this.createDefaultGameInfo();
         }
+        egf.Logger.log("local game info:", gameInfoData);
         this._gameInfo = gameInfoData as IGameInfo;
         DataMgr.coin = this._gameInfo.coin;
         DataMgr.level = this._gameInfo.level;
@@ -79,8 +81,10 @@ class LocalDataManager {
 
     private loadSettingData(): boolean {
         const encryptStr = sys.localStorage.getItem(this.SettingStr);
-        let settingData = this.decryptValue(encryptStr, "local");
-        if (!settingData) {
+        let settingData = null;
+        if (encryptStr) {
+            settingData = this.decryptValue(encryptStr, "local");
+        } else {
             settingData = this.createDefaultSetting();
         }
         this._setting = settingData as ISetting;
@@ -212,7 +216,7 @@ class LocalDataManager {
         try {
             const decryptStr = AES.decrypt(encryptStr, AES_KEY).toString(CryptoTS.enc.Utf8);
             if (!decryptStr) {
-                throw new Error("empty decrypted value");
+                return null;
             }
             return JSON.parse(decryptStr) as unknown;
         } catch (error) {

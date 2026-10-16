@@ -32,8 +32,9 @@ import type {
     TRequestParams,
     TOAuthLoginType,
 } from "./apiInterface";
-import { EPlatform, PlatformMgr } from "./SDK/PlatformMgr";
 import { NetworkTips } from "./NetworkTips";
+
+const UnURIs = ["/client/adconfig", "/client/login", "/client/oauthlogin"];
 
 /**
  * 客户端 API 客户端（对应 client-api.md）
@@ -118,7 +119,7 @@ export class ClientApi {
         errCb?: TApiErrCallback,
         isGet: boolean = false,
     ) {
-        if (this._token == "" && uri != "/client/login" && uri != "/client/oauthlogin") {
+        if (this._token == "" && !UnURIs.includes(uri)) {
             if (errCb) {
                 errCb(-1, "没有登陆不支持网络请求");
             }
