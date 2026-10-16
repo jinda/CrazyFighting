@@ -9,7 +9,7 @@ import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 
 @egf_class(ModuleDef.EXTRA, UI_Award)
 export class UI_Award_Impl extends egf.UIController {
-    private _params = { type: 0, coin: 0, bDouble: false };
+    private _params = { type: 0, coin: 0, bAD: false };
     constructor() {
         super("ui_award/UI_Award", egf.UILayers.ALERT, Layout_Award);
     }
@@ -25,7 +25,7 @@ export class UI_Award_Impl extends egf.UIController {
         this.onButtonEvent(layout.btnDoubleGet, this.clickDoubleGet, this);
 
         const addCoin = Math.floor(this._params.coin * LocalDataMgr.getCoinRate());
-        layout.showInfo(this._params.type, this._params.coin, addCoin, this._params.bDouble);
+        layout.showInfo(this._params.type, this._params.coin, addCoin, this._params.bAD);
         this._params.coin += addCoin;
         //本界面打开时暂停战斗，关闭时恢复（与 onDispose 成对派发，GameMgr 内部按计数处理叠加暂停）
         egf.EventMgr.emit(Constants.EVENT_NAME.GAME_PAUSE);

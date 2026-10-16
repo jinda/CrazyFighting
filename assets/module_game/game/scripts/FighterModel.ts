@@ -51,6 +51,7 @@ export class FighterModel extends Component {
     private _currentAni: string = ""; //当前动画名称
     private _crownGeneration: number = 0; //皇冠异步加载代次：每次 show()/reset() 递增，防止模型复用后旧皇冠挂到新角色
     private _isBattlePaused: boolean = false;
+    private _animationTimeScale: number = -1;
 
     start() {
         // Your initialization goes here.
@@ -67,6 +68,7 @@ export class FighterModel extends Component {
         this._target = null;
         this._currentAni = "";
         this._isBattlePaused = false;
+        this._animationTimeScale = -1;
         this.ani.stop();
         if (this.bThrowWeapon && this.nodeWeapon) {
             this.nodeWeapon.active = true;
@@ -244,12 +246,24 @@ export class FighterModel extends Component {
     }
 
     /**
-     * 更新士兵动画速度
+     * 同步当前模型的动画状态速度；只在战斗倍速变化或模型复用后更新。
      */
     public updateAniSpeed() {
-        const aryClips = this.ani.clips;
-        aryClips.forEach((clip: any) => {
-            clip.speed = GameMgr.timeScale;
-        });
+        const timeScale = GameMgr.timeScale;
+        if (this._animationTimeScale === timeScale) {
+            return;
+        }
+
+        //AnimationClip 是共享资源，修改其 speed 不会同步已经创建的 AnimationState。
+        for (const clip of this.ani.clips) {
+            if (!clip) {
+                continue;
+            }
+            const state = this.ani.getState(clip.name);
+            if (state) {
+                state.speed = timeScale;
+            }
+        }
+        this._animationTimeScale = timeScale;
     }
 }

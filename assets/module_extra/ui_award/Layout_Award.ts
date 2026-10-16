@@ -18,7 +18,7 @@ export class Layout_Award extends Component {
     @property(Node)
     nodeAd: Node = null!;
 
-    public showInfo(type: number, coin: number, addCoin: number, bDouble: boolean) {
+    public showInfo(type: number, coin: number, addCoin: number, bAD: boolean = true) {
         if (type == 1) {
             this.labelContent.string = egf.i18nMgr.getText("获得在线时长金币奖励");
             this.btnDoubleGet.node.active = true;
@@ -31,6 +31,6 @@ export class Layout_Award extends Component {
         }
         this.labelCoin.string = "x" + coin;
         this.labelCoinAdd.string = "+" + addCoin;
-        this.nodeAd.active = bDouble;
+        this.nodeAd.active = bAD;
     }
 }

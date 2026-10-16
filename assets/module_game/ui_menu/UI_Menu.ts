@@ -108,7 +108,7 @@ export class UI_Menu extends egf.UIController {
 
     private clickOnline() {
         egf.AudioMgr.playOneShot("tap");
-        egf.UIMgr.showUI(UI_Award, null, this, { type: 1, coin: DataMgr.onlineCoin, bDouble: true });
+        egf.UIMgr.showUI(UI_Award, null, this, { type: 1, coin: DataMgr.onlineCoin, bAD: false });
     }
     private clickSign() {
         egf.AudioMgr.playOneShot("tap");

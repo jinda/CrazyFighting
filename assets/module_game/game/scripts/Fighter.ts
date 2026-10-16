@@ -309,6 +309,11 @@ export class Fighter extends Component {
      * @returns
      */
     private _attack() {
+        //伤害由动画帧事件触发；上一击尚未出手时重播动画，会让伤害帧始终无法到达。
+        if (this._isAttacking && this._isWaitingDamage) {
+            return;
+        }
+
         //还在冷却中，不得发起攻击，进入待机状态
         if (this._coolTime > 0) {
             this._enterStatus(Constants.FIGHTER_STATUS.IDLE);
@@ -339,6 +344,7 @@ export class Fighter extends Component {
         } else {
             //动作未加载完成？
             this._isAttacking = false;
+            this._isWaitingDamage = false;
             this._enterStatus(Constants.FIGHTER_STATUS.IDLE);
         }
     }
@@ -600,6 +606,8 @@ export class Fighter extends Component {
         if (this.isDead || GameMgr.isGamePause) {
             return;
         }
+
+        this._fighterModel?.updateAniSpeed();
 
         //deltaTime 加入时间缩放，用于加快攻击及移动速度
         deltaTime *= GameMgr.timeScale;

@@ -87,8 +87,9 @@ class LocalDataManager {
         return true;
     }
 
-    public removeLocalGameInfo() {
-        sys.localStorage.removeItem(this.GameInfoStr);
+    public resetLocalGameInfo() {
+        this._gameInfo.saveTime = 0;
+        this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
     }
 
     public saveGameInfoData() {

@@ -135,7 +135,7 @@ export class NetworkTips implements egf.INetworkTips {
                     if (ok) {
                         egf.UIMgr.closeAll();
                         ClientApi.inst.setToken("");
-                        LocalDataMgr.removeLocalGameInfo();
+                        LocalDataMgr.resetLocalGameInfo();
                         setTimeout(() => {
                             director.loadScene(SceneDef.START.name);
                         }, 500);
