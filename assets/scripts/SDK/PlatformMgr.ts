@@ -4,6 +4,7 @@ import { SDKBase, SDKInterface } from "./SDKInterface";
 import { IWeChat } from "./IWeChat";
 import { ITT } from "./ITT";
 import { IAndroid } from "./IAndroid";
+import { ISud, isSudRuntime } from "./ISud";
 import { LocalDataMgr } from "../LocalDataMgr";
 import { ClientApi } from "../ClientApi";
 
@@ -12,6 +13,7 @@ export enum EPlatform {
     WeChat = 1,
     TT = 2,
     Android = 3,
+    SUD = 4,
 }
 
 export const PlatformStr = {
@@ -19,6 +21,7 @@ export const PlatformStr = {
     [EPlatform.WeChat]: "wechat",
     [EPlatform.TT]: "tt",
     [EPlatform.Android]: "Android",
+    [EPlatform.SUD]: "sud",
 };
 
 class PlatformManager {
@@ -42,8 +45,14 @@ class PlatformManager {
     }
 
     // 初始化
-    public init(cb?: Function): void {
-        if (sys.platform == sys.Platform.WECHAT_GAME) {
+    public init(cb?: (result: string) => void): void {
+        if (this._sdkInterface instanceof ISud) {
+            this._sdkInterface.dispose();
+        }
+        //SUD 适配器可能使用微信构建产物，优先识别真实运行时，避免误走微信 SDK。
+        if (isSudRuntime()) {
+            this.platform = EPlatform.SUD;
+        } else if (sys.platform === sys.Platform.WECHAT_GAME) {
             this.platform = EPlatform.WeChat;
         } else if (sys.platform == sys.Platform.BYTEDANCE_MINI_GAME) {
             this.platform = EPlatform.TT;
@@ -53,10 +62,13 @@ class PlatformManager {
             this.platform = EPlatform.Unkown;
         }
 
-        if (sys.os === sys.OS.ANDROID && sys.isNative) {
+        if (sys.os === sys.OS.ANDROID && sys.isNative && this.platform !== EPlatform.SUD) {
             this._sdkInterface = new IAndroid();
         } else {
             switch (this.platform) {
+                case EPlatform.SUD:
+                    this._sdkInterface = new ISud();
+                    break;
                 case EPlatform.WeChat:
                     this._sdkInterface = new IWeChat();
                     break;

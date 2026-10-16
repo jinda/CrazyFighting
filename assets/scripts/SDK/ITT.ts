@@ -1,6 +1,6 @@
 import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
 
-const tt = (<any>window).tt;
+const tt = typeof window === "undefined" ? undefined : Reflect.get(window, "tt");
 
 const adUnitIdVideo = "2h7689m9d1e77pu0je";
 const adUnitIdInterstitial = "ea3hf01o6ao3h4xw9t";

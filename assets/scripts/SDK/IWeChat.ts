@@ -1,7 +1,7 @@
 import { view } from "cc";
 import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
 
-let wx = (<any>window).wx;
+const wx = typeof window === "undefined" ? undefined : Reflect.get(window, "wx");
 
 const adunitVideo = "adunit-1299ee38a033d8ab";
 const adunitInterstitial = "adunit-827bfde533614675";

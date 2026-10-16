@@ -95,15 +95,14 @@ export class Start extends Component {
     private login() {
         const params = {
             failCb: () => {
-                egf.Logger.log("login fail");
+                this.onLoginFail(-1, "平台登录失败");
             },
             successCb: (code: string) => {
                 egf.Logger.log("platform login success");
-                // 微信平台使用 wx.login 的 code 进行 oauthlogin
-                // 其他平台使用 guest + device_id 游客登录
-                if (PlatformMgr.platform == EPlatform.WeChat) {
+                //微信和 SUD 使用一次性 code；其余平台沿用游客身份。
+                if (PlatformMgr.platform === EPlatform.WeChat || PlatformMgr.platform === EPlatform.SUD) {
                     ClientApi.inst.oauthLogin(
-                        "wechat",
+                        PlatformMgr.platform === EPlatform.SUD ? "sud" : "wechat",
                         { code },
                         undefined,
                         undefined,
@@ -130,10 +129,14 @@ export class Start extends Component {
         };
 
         PlatformMgr.login(params);
+    }
 
-        // 拉取广告配置（无需认证）
+    private initAd() {
+        //在业务登录成功后读取，兼容当前 ClientApi 的本地 token 检查。
         let channel = "wechat";
-        if (PlatformMgr.platform == EPlatform.Android) {
+        if (PlatformMgr.platform === EPlatform.SUD) {
+            channel = "sud";
+        } else if (PlatformMgr.platform === EPlatform.Android) {
             channel = "admob";
         }
         ClientApi.inst.getAdConfig(
@@ -151,6 +154,7 @@ export class Start extends Component {
      * 登录成功后处理
      */
     private onLoginSuccess(data: ILoginData) {
+        this.initAd();
         DataMgr.userData = data.user_info;
         // ClientApi 内部已设置 Authorization Header
         LocalDataMgr.loadCloud(() => {
@@ -161,6 +165,7 @@ export class Start extends Component {
     }
 
     private onLoginFail(errcode: number, errmsg: string) {
+        PlatformMgr.initAd(null);
         egf.Logger.warn("oauthLogin fail, errcode:", errcode, " errmsg:" + errmsg);
         this.dataReady = true;
         this.tryEnterGame();
