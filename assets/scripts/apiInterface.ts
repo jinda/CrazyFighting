@@ -64,7 +64,12 @@ export interface ILoginData {
      * true=自动注册, false=已存在
      */
     is_new: boolean;
+    /** 登录时结算后的当前资源快照 */
+    resources: IResourceData;
 }
+
+/** 排行榜地区；省略请求参数时服务端默认中国榜。 */
+export type TLeaderboardRegion = "cn" | "overseas";
 
 /** OAuth 登录渠道；SUD 和微信均提交一次性 code，由服务端校验身份。 */
 export type TOAuthLoginType = "guest" | "wechat" | "google" | "apple" | "sud";
@@ -151,6 +156,8 @@ export interface IPushScoreResp {
      * 玩法标识
      */
     mode: string;
+    /** 实际写入的地区 */
+    region: TLeaderboardRegion;
     /**
      * 分数
      */
@@ -191,8 +198,23 @@ export interface ILeaderboardEntry {
  * 排行榜响应数据
  */
 export interface ILeaderboardData {
+    /** 实际查询的地区 */
+    region: TLeaderboardRegion;
     list: ILeaderboardEntry[];
     my: ILeaderboardEntry;
+}
+
+/** 更多游戏列表项；icon_url 为相对 API 服务根路径的公开地址。 */
+export interface IMoreGameItem {
+    id: string;
+    name: string;
+    icon_url: string;
+    url: string;
+}
+
+/** 更多游戏响应数据，列表顺序由服务端确定。 */
+export interface IMoreGamesData {
+    list: IMoreGameItem[];
 }
 
 /**
@@ -294,6 +316,8 @@ export interface IProgressCompleteData {
      * 持久化后的历史最高关
      */
     level: number;
+    /** 本次更新排名的地区 */
+    region: TLeaderboardRegion;
     /**
      * 各最高关玩法(score_type=1)、通过关卡数玩法(score_type=2)及其已配置周期的当前排名
      * key 为 mode, 值为 { daily/weekly/monthly/alltime: 排名 }
@@ -444,6 +468,16 @@ export interface IGainCoinData {
      */
     coin: number;
 }
+
+/** 上报获得一种资源的参数；同一笔奖励重试时保持所有字段不变。 */
+export type TGainResourceParams = {
+    req_id: string;
+    amount: number;
+    scene?: string;
+} & ({ type?: "coin"; item_id?: never } | { type: "stamina"; item_id?: never } | { type: "item"; item_id: string });
+
+/** 上报资源发放后的余额或道具数量。 */
+export type TGainResourceData = IGainCoinData | { stamina: number } | { item_id: string; num: number };
 
 /**
  * 兑换码兑换响应数据（发放清单）

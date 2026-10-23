@@ -13,6 +13,7 @@ import type {
     IMailDeleteData,
     IMailDetail,
     IMailListData,
+    IMoreGamesData,
     IOAuthLoginCredentials,
     IProgressCompleteData,
     IPushScoreResp,
@@ -28,13 +29,22 @@ import type {
     ITaskListData,
     IUserInfo,
     TApiErrCallback,
+    TGainResourceData,
+    TGainResourceParams,
+    TLeaderboardRegion,
     TQueryParams,
     TRequestParams,
     TOAuthLoginType,
 } from "./apiInterface";
 import { NetworkTips } from "./NetworkTips";
 
-const UnURIs = ["/client/adconfig", "/client/login", "/client/oauthlogin"];
+const UnURIs = [
+    "/client/adconfig",
+    "/client/leaderboards",
+    "/client/login",
+    "/client/more-games",
+    "/client/oauthlogin",
+];
 
 /**
  * 客户端 API 客户端（对应 client-api.md）
@@ -119,7 +129,7 @@ export class ClientApi {
         errCb?: TApiErrCallback,
         isGet: boolean = false,
     ) {
-        if (this._token == "" && !UnURIs.includes(uri)) {
+        if (this._token === "" && !UnURIs.includes(uri)) {
             if (errCb) {
                 errCb(-1, "没有登陆不支持网络请求");
             }
@@ -371,9 +381,33 @@ export class ClientApi {
      * 最高关分数同步全部启用的最高关玩法；通过关卡数榜禁止调用本接口。
      * @param mode 玩法标识
      * @param score score_type=0 传自定义分数；score_type=1 传当前最高关（整数，如 52）
+     * @param region 榜单地区；省略时服务端默认 cn
      */
-    public pushScore(mode: string, score: number, cb?: (data: IPushScoreResp) => void, errCb?: TApiErrCallback) {
-        this.request<IPushScoreResp>("/client/pushscore", { mode, score }, cb, errCb);
+    public pushScore(mode: string, score: number, cb?: (data: IPushScoreResp) => void, errCb?: TApiErrCallback): void;
+    public pushScore(
+        mode: string,
+        score: number,
+        region: TLeaderboardRegion,
+        cb?: (data: IPushScoreResp) => void,
+        errCb?: TApiErrCallback,
+    ): void;
+    public pushScore(
+        mode: string,
+        score: number,
+        regionOrCallback?: TLeaderboardRegion | ((data: IPushScoreResp) => void),
+        callbackOrError?: ((data: IPushScoreResp) => void) | TApiErrCallback,
+        regionError?: TApiErrCallback,
+    ) {
+        const params: TRequestParams = { mode, score };
+        if (typeof regionOrCallback === "string") {
+            params.region = regionOrCallback;
+        }
+        const cb =
+            typeof regionOrCallback === "string"
+                ? (callbackOrError as ((data: IPushScoreResp) => void) | undefined)
+                : regionOrCallback;
+        const errCb = typeof regionOrCallback === "string" ? regionError : (callbackOrError as TApiErrCallback);
+        this.request<IPushScoreResp>("/client/pushscore", params, cb, errCb);
     }
 
     // ---------- 4.1 上报通关进度 ----------
@@ -383,9 +417,31 @@ export class ClientApi {
      * 最高关只增不减，通过关卡数按各周期对关卡编号去重，不推断遗漏关卡已完成。
      * 临时失败须用相同 level 在同周期重试，避免遗漏通过关卡数或误计入其他业务日。
      * @param level 已通关关卡，范围 1..9006，必须是整数（不接受浮点数或字符串）
+     * @param region 榜单地区；省略时服务端默认 cn
      */
-    public completeProgress(level: number, cb?: (data: IProgressCompleteData) => void, errCb?: TApiErrCallback) {
-        this.request<IProgressCompleteData>("/client/progress/complete", { level }, cb, errCb);
+    public completeProgress(level: number, cb?: (data: IProgressCompleteData) => void, errCb?: TApiErrCallback): void;
+    public completeProgress(
+        level: number,
+        region: TLeaderboardRegion,
+        cb?: (data: IProgressCompleteData) => void,
+        errCb?: TApiErrCallback,
+    ): void;
+    public completeProgress(
+        level: number,
+        regionOrCallback?: TLeaderboardRegion | ((data: IProgressCompleteData) => void),
+        callbackOrError?: ((data: IProgressCompleteData) => void) | TApiErrCallback,
+        regionError?: TApiErrCallback,
+    ) {
+        const params: TRequestParams = { level };
+        if (typeof regionOrCallback === "string") {
+            params.region = regionOrCallback;
+        }
+        const cb =
+            typeof regionOrCallback === "string"
+                ? (callbackOrError as ((data: IProgressCompleteData) => void) | undefined)
+                : regionOrCallback;
+        const errCb = typeof regionOrCallback === "string" ? regionError : (callbackOrError as TApiErrCallback);
+        this.request<IProgressCompleteData>("/client/progress/complete", params, cb, errCb);
     }
 
     // ---------- 4.2 上报游戏事件 ----------
@@ -450,15 +506,41 @@ export class ClientApi {
      * @param mode 玩法标识
      * @param type 周期类型: 1=日榜 2=周榜 3=月榜 4=总榜
      * @param top 返回前 N 名，默认 50，上限 100
+     * @param region 榜单地区；省略时服务端默认 cn
      */
     public getLeaderboard(
         mode: string,
         type: number,
-        top: number = 50,
+        top?: number,
         cb?: (data: ILeaderboardData) => void,
         errCb?: TApiErrCallback,
+    ): void;
+    public getLeaderboard(
+        mode: string,
+        type: number,
+        top: number,
+        region: TLeaderboardRegion,
+        cb?: (data: ILeaderboardData) => void,
+        errCb?: TApiErrCallback,
+    ): void;
+    public getLeaderboard(
+        mode: string,
+        type: number,
+        top: number = 50,
+        regionOrCallback?: TLeaderboardRegion | ((data: ILeaderboardData) => void),
+        callbackOrError?: ((data: ILeaderboardData) => void) | TApiErrCallback,
+        regionError?: TApiErrCallback,
     ) {
-        this.request<ILeaderboardData>("/client/leaderboard", { mode, type, top }, cb, errCb);
+        const params: TRequestParams = { mode, type, top };
+        if (typeof regionOrCallback === "string") {
+            params.region = regionOrCallback;
+        }
+        const cb =
+            typeof regionOrCallback === "string"
+                ? (callbackOrError as ((data: ILeaderboardData) => void) | undefined)
+                : regionOrCallback;
+        const errCb = typeof regionOrCallback === "string" ? regionError : (callbackOrError as TApiErrCallback);
+        this.request<ILeaderboardData>("/client/leaderboard", params, cb, errCb);
     }
 
     // ---------- 6. 资源（金币/体力/道具） ----------
@@ -516,6 +598,24 @@ export class ClientApi {
             params.scene = scene;
         }
         this.request<IGainCoinData>("/client/resource/gain", params, cb, errCb);
+    }
+
+    /**
+     * 6.3 上报获得一种资源（金币、体力或道具）。
+     * 10044/10000 重试时须保持 req_id、type、item_id、amount 和 scene 不变。
+     */
+    public gainResource(params: TGainResourceParams, cb?: (data: TGainResourceData) => void, errCb?: TApiErrCallback) {
+        const body: TRequestParams = { req_id: params.req_id, amount: params.amount };
+        if (params.type !== undefined) {
+            body.type = params.type;
+        }
+        if (params.type === "item") {
+            body.item_id = params.item_id;
+        }
+        if (params.scene !== undefined) {
+            body.scene = params.scene;
+        }
+        this.request<TGainResourceData>("/client/resource/gain", body, cb, errCb);
     }
 
     // ---------- 7. 兑换码兑换 ----------
@@ -665,5 +765,12 @@ export class ClientApi {
      */
     public claimTask(taskId: string, taskDate: string, cb?: (data: ITaskClaimData) => void, errCb?: TApiErrCallback) {
         this.request<ITaskClaimData>("/client/task/claim", { task_id: taskId, task_date: taskDate }, cb, errCb);
+    }
+
+    // ---------- 13. 更多游戏 ----------
+
+    /** 获取当前游戏配置的上架推荐；无需登录，列表顺序由服务端确定。 */
+    public getMoreGames(cb?: (data: IMoreGamesData) => void, errCb?: TApiErrCallback) {
+        this.request<IMoreGamesData>("/client/more-games", {}, cb, errCb, true);
     }
 }

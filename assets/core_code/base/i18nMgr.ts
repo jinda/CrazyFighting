@@ -68,6 +68,10 @@ class i18nManager {
         return this._language;
     }
 
+    public get region() {
+        return this._language == ELanguage["zh-cn"] ? "cn" : "overseas";
+    }
+
     private resolveLanguage(language: unknown): ELanguage | null {
         if (typeof language !== "string" || !language.trim()) {
             return null;

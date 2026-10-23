@@ -70,8 +70,7 @@ class LocalDataManager {
         }
         egf.Logger.log("local game info:", gameInfoData);
         this._gameInfo = gameInfoData as IGameInfo;
-        DataMgr.coin = this._gameInfo.coin;
-        DataMgr.level = this._gameInfo.level;
+        this.setUseRes();
         if (this.isSignToday()) {
             this._gameInfo.bShare = true;
         }
@@ -181,16 +180,18 @@ class LocalDataManager {
             // 使用云存档
             this._gameInfo = gameInfoData;
 
-            DataMgr.coin = this._gameInfo.coin;
-            DataMgr.level = this._gameInfo.level;
+            this.setUseRes();
             //再次存档一次
             DataMgr.bSyncCloudData = true;
         } else {
             egf.Logger.log("use local save data");
-            DataMgr.coin = this._gameInfo.coin;
-            DataMgr.level = this._gameInfo.level;
+            this.setUseRes();
         }
         egf.Logger.log("use game info:", this.GameInfo);
+    }
+    private setUseRes() {
+        DataMgr.coin = this._gameInfo.coin || 0;
+        DataMgr.level = this._gameInfo.level || 0;
     }
 
     private createDefaultGameInfo(): IGameInfo {

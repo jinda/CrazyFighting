@@ -5,6 +5,7 @@ import { ClientApi } from "../../scripts/ClientApi";
 import { DataMgr } from "../../scripts/DataMgr";
 import { EPlatform, PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { Constants } from "../../scripts/Constants";
+import { ELanguage } from "../../core_code/base/i18nMgr";
 
 /**
  * 排行榜周期类型
@@ -123,10 +124,12 @@ export class UI_Rank extends egf.UIController {
     }
 
     private getRankData(mode: string, period: LeaderboardPeriod) {
+        const region = egf.i18nMgr.region;
         ClientApi.inst.getLeaderboard(
             mode,
             period,
             100,
+            region,
             (data) => {
                 const rankDatas: IRankData[] = (data?.list || []).map((p, idx) => ({
                     index: idx,

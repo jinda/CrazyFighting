@@ -165,16 +165,8 @@ class DataManager {
         this._level.set(level);
         LocalDataMgr.GameInfo.level = this._level.get();
         this.bSyncCloudData = true;
-
-        ClientApi.inst.completeProgress(
-            this._level.get(),
-            (data) => {
-                //服务端返回持久化后的历史最高关，据此清理已确认（≤ 该值）的待上报进度
-            },
-            (errcode, errmsg) => {
-                egf.Logger.warn("[DataMgr] 通关进度上报失败:", this._level.get(), errcode, errmsg);
-            },
-        );
+        const region = egf.i18nMgr.region;
+        ClientApi.inst.completeProgress(this._level.get(), region);
     }
 
     public get onlineCoin() {

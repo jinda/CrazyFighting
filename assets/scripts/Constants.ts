@@ -124,7 +124,7 @@ export class Constants {
 
     //音效常量
     public static AUDIO_SOUND = {
-        BACKGROUND: "bg", //背景音乐
+        BACKGROUND: "bgm", //背景音乐
         BUY_CELL: "ui_sfx_valer_level_up", //购买格子
         BUY_FIGHTER: "buyFighter", //购买人物
         COMBINE: "combine", //合并成功
