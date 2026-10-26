@@ -9,7 +9,6 @@ import { EPlatform, PlatformMgr } from "../scripts/SDK/PlatformMgr";
 import { IAdConfigData, ILoginData } from "../scripts/apiInterface";
 import { LocalDataMgr } from "../scripts/LocalDataMgr";
 import { GetEnvConfig } from "../scripts/config/EnvConfig";
-import { ELanguage } from "../core_code/base/i18nMgr";
 
 const { ccclass, property } = _decorator;
 
@@ -73,7 +72,7 @@ export class Start extends Component {
         this.loadingBar!.progress = now / total;
         if (now == 1) {
             egf.i18nMgr.setLanguage(LocalDataMgr.Setting.language);
-            this.nodeGameHeath.active = egf.i18nMgr.language == ELanguage["zh-cn"];
+            this.nodeGameHeath.active = egf.i18nMgr.language == egf.ELanguage["zh-cn"];
         }
     }
 

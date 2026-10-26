@@ -65,7 +65,9 @@ class GameManager {
 
     private _setBattlePaused(paused: boolean) {
         for (const participant of [...this._lifecycleParticipants]) {
-            participant.setBattlePaused(paused);
+            if (participant && participant.setBattlePaused) {
+                participant.setBattlePaused(paused);
+            }
         }
     }
 

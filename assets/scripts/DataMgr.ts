@@ -16,31 +16,36 @@ const sanitizeDiagnostic = (value: unknown): string => {
         .replace(/("(?:token|password|identity_token|id_token)"\s*:\s*")[^"]+/gi, "$1[REDACTED]");
 };
 
+let lastError: string = "";
+
 window.onerror = function (message, _source, lineno, colno, error) {
     const safeMessage = sanitizeDiagnostic(message);
     const safeStack = sanitizeDiagnostic(error?.stack || "");
-    egf.Logger.error("捕获到全局错误: ", safeMessage, lineno, colno);
-    ClientApi.inst.reportError(
-        {
-            /** 一次异常的稳定 ID，非空，最多 128 字节；重试必须复用 */
-            event_id: ClientApi.createReqId("global_error"),
-            error_type: "runtime",
-            /** 非空，最多 2 KiB；发送前移除敏感信息 */
-            message: safeMessage,
-            /** 最多 16 KiB；发送前移除敏感信息 */
-            stack: safeStack,
-            /** 最多 128 字节 */
-            game_version: DataMgr.version,
-            /** 最多 128 字节 */
-            platform: PlatformMgr.platform.toString(),
-        },
-        () => {
-            egf.Logger.log("reportError success");
-        },
-        (errcode) => {
-            egf.Logger.warn("reportError fail:", errcode);
-        },
-    );
+    if (lastError != safeMessage) {
+        lastError = safeMessage;
+        egf.Logger.error("捕获到全局错误: ", safeMessage, lineno, colno);
+        ClientApi.inst.reportError(
+            {
+                /** 一次异常的稳定 ID，非空，最多 128 字节；重试必须复用 */
+                event_id: ClientApi.createReqId("global_error"),
+                error_type: "runtime",
+                /** 非空，最多 2 KiB；发送前移除敏感信息 */
+                message: safeMessage,
+                /** 最多 16 KiB；发送前移除敏感信息 */
+                stack: safeStack,
+                /** 最多 128 字节 */
+                game_version: DataMgr.version,
+                /** 最多 128 字节 */
+                platform: PlatformMgr.platform.toString(),
+            },
+            () => {
+                egf.Logger.log("reportError success");
+            },
+            (errcode) => {
+                egf.Logger.warn("reportError fail:", errcode);
+            },
+        );
+    }
     return true; // 返回true可以阻止错误冒泡
 };
 export interface IMaintenance {
@@ -83,6 +88,9 @@ class DataManager {
         game.on(Game.EVENT_HIDE, this.onGameHide, this);
 
         // 每秒同步数据
+        if (this._syncCloudDataTime) {
+            clearInterval(this._syncCloudDataTime);
+        }
         this._syncCloudDataTime = setInterval(this.syncCloudData.bind(this), 500);
     }
 
