@@ -1,6 +1,6 @@
 import { Layout_Sign } from "./Layout_Sign";
 import { ModuleDef } from "../../scripts/ModuleDef";
-import { Sprite, sys, v3 } from "cc";
+import { Sprite, sys } from "cc";
 import { Constants } from "../../scripts/Constants";
 import { DataMgr } from "../../scripts/DataMgr";
 import { UI_CommonTips } from "../../scripts/UIDef";

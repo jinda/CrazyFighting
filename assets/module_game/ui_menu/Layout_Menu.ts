@@ -1,7 +1,7 @@
 import { _decorator, Node, Button, Component, Label, RichText, tween, v3, Vec3, Tween, Color } from "cc";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
-import { LevelTips } from "./LevelTips";
+import { LevelTips } from "./levelTips";
 import { Constants } from "../../scripts/Constants";
 const { ccclass, property } = _decorator;
 

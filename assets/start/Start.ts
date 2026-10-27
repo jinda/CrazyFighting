@@ -1,4 +1,4 @@
-import { _decorator, Component, director, game, Label, Prefab, sys, ProgressBar, Node } from "cc";
+import { _decorator, Component, game, Label, Prefab, sys, ProgressBar, Node } from "cc";
 import { ModuleDef } from "../scripts/ModuleDef";
 import { SceneDef } from "../scripts/SceneDef";
 import { DataMgr } from "../scripts/DataMgr";

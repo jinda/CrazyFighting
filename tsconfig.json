@@ -7,6 +7,15 @@
     /* 脱离编辑器直接跑 `npm run typecheck` 时，需要显式声明 lib 才能解析引擎声明 */
     "lib": ["ES2017", "DOM"],
     "skipLibCheck": true,
+    /* 基配置 temp/tsconfig.cocos.json 使用已弃用的 "node"（node10）解析策略，
+       TypeScript 6.0 起会报弃用错误、7.0 起移除。Cocos 属于打包器（bundler）场景，
+       在此覆盖为 "bundler"，避免直接修改编辑器生成的文件 */
+    "moduleResolution": "bundler",
+    /* 显式声明 paths 会整体覆盖基配置中的 paths；基配置里的 db://internal/* 指向本机
+       编辑器绝对路径（不可移植），项目代码未使用该别名，故这里只保留项目内别名 */
+    "paths": {
+      "db://assets/*": ["./assets/*"]
+    },
     /* crypto-ts 为 CommonJS 包（无 default 导出声明），Cocos 运行时按 CJS 互操作把模块挂到 default 上，
        需允许合成默认导入才能用 `import CryptoTS from "crypto-ts"` 通过类型检查 */
     "allowSyntheticDefaultImports": true,

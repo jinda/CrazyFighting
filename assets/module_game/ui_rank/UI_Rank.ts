@@ -5,7 +5,6 @@ import { ClientApi } from "../../scripts/ClientApi";
 import { DataMgr } from "../../scripts/DataMgr";
 import { EPlatform, PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 import { Constants } from "../../scripts/Constants";
-import { ELanguage } from "../../core_code/base/i18nMgr";
 
 /**
  * 排行榜周期类型

@@ -4,7 +4,6 @@ import {
     Component,
     Sprite,
     Node,
-    SpriteFrame,
     UITransform,
     v3,
     Vec3,

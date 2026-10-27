@@ -1,4 +1,4 @@
-import { assetManager, director, sys } from "cc";
+import { assetManager, director } from "cc";
 import { GetEnvConfig } from "./config/EnvConfig";
 import { LocalDataMgr } from "./LocalDataMgr";
 import { UI_CommonTips } from "./UIDef";
@@ -126,7 +126,7 @@ export class NetworkTips implements egf.INetworkTips {
                 tipsStr = data.msg || `unknown error code:(${data.code})`;
                 break;
         }
-        egf.Logger.error("showHttpErrorTips:", data, response);
+        egf.Logger.error("showHttpErrorTips:", tipsStr, data, response);
         const res = egf.SafeJSON.parse(response);
         if (res.errcode == EApiErrcode.SessionReplaced) {
             egf.UIMgr.showUI(UI_CommonTips, null, this, {
