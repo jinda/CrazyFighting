@@ -187,7 +187,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 66.872,
+      "y": 10.278000000000006,
       "z": 0
     },
     "_lrot": {
@@ -277,8 +277,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 116.40199279785156,
-      "height": 71
+      "width": 116.396780643422,
+      "height": 70.99999999999999
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -316,7 +316,7 @@
     "_string": "第7关",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45.6421875,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -464,7 +464,7 @@
     "_target": null,
     "_left": 0,
     "_right": 0,
-    "_top": -73.872,
+    "_top": -17.278000000000006,
     "_bottom": 0,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
@@ -1283,7 +1283,7 @@
     "_string": "战力",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20,
+    "_actualFontSize": 21,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 20,
@@ -1465,7 +1465,7 @@
     "_string": "100",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24,
+    "_actualFontSize": 26,
     "_fontSize": 24,
     "_fontFamily": "Arial",
     "_lineHeight": 24,
@@ -1630,7 +1630,7 @@
     "_string": "战力",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 20,
+    "_actualFontSize": 21,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 20,
@@ -1812,7 +1812,7 @@
     "_string": "100",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24,
+    "_actualFontSize": 26,
     "_fontSize": 24,
     "_fontFamily": "Arial",
     "_lineHeight": 24,
@@ -1989,8 +1989,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 87.5379638671875,
-      "height": 46.84
+      "width": 87.51888254852624,
+      "height": 46.839999999999996
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -2028,7 +2028,7 @@
     "_string": "x100",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 34,
+    "_actualFontSize": 36.9484375,
     "_fontSize": 34,
     "_fontFamily": "Arial",
     "_lineHeight": 34,
@@ -3093,7 +3093,7 @@
     "_string": "",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -3710,7 +3710,6 @@
       "__id__": 0
     },
     "fileId": "32y4IjJFZICr2SaP1qH/lC",
-    "instance": null,
     "targetOverrides": null
   }
 ]

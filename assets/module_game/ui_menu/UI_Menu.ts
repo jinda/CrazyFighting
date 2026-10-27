@@ -45,7 +45,10 @@ export class UI_Menu extends egf.UIController {
         this.node.on(Node.EventType.TOUCH_END, this.onTouchEvent, this);
         this.node.on(Node.EventType.TOUCH_CANCEL, this.onTouchEvent, this);
 
-        layout.btnShare.node.active = !LocalDataMgr.GameInfo.bShare;
+        layout.btnShare.node.active = PlatformMgr.platform == EPlatform.WeChat;
+        if (layout.btnShare.node.active) {
+            layout.btnShare.node.active = !LocalDataMgr.GameInfo.bShare;
+        }
         layout.showInfo(GameMgr.getCurLevelEnemyFight());
         layout.updateMyPower(GameMgr.getFormationFight());
         layout.updateCoinCost();

@@ -94,6 +94,11 @@
     "mangleList": [],
     "dontMangleList": []
   },
+  "SUDV2": {
+    "extends": "MINIGAME",
+    "mangleList": [],
+    "dontMangleList": []
+  },
   "ANDROID": {
     "extends": "NATIVE",
     "mangleList": [],

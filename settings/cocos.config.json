@@ -2,6 +2,83 @@
     "builder": {
         "bundleConfig": {
             "custom": {
+                "default": {
+                    "displayName": "i18n:builder.asset_bundle.defaultConfig",
+                    "configs": {
+                        "native": {
+                            "preferredOptions": {
+                                "isRemote": false,
+                                "compressionType": "merge_dep"
+                            },
+                            "fallbackOptions": {
+                                "compressionType": "merge_dep"
+                            }
+                        },
+                        "web": {
+                            "preferredOptions": {
+                                "isRemote": false,
+                                "compressionType": "merge_dep"
+                            },
+                            "fallbackOptions": {
+                                "compressionType": "merge_dep"
+                            }
+                        },
+                        "miniGame": {
+                            "fallbackOptions": {
+                                "isRemote": false,
+                                "compressionType": "merge_dep"
+                            },
+                            "configMode": "overwrite",
+                            "overwriteSettings": {
+                                "wechatgame": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "alipay-mini-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "bytedance-mini-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "honor-mini-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "huawei-quick-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "oppo-mini-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "taobao-mini-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "vivo-mini-game": {
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
+                                },
+                                "fb-instant-games": {
+                                    "isRemote": false,
+                                    "compressionType": "merge_dep"
+                                },
+                                "sud-mini-game": {
+                                    "compressionType": "subpackage"
+                                },
+                                "openpaas": {
+                                    "compressionType": "subpackage"
+                                },
+                                "wechatgame-playable": {
+                                    "compressionType": "subpackage"
+                                }
+                            }
+                        }
+                    }
+                },
                 "auto_7dVfWcgoNEKpbU8mPlsLOr": {
                     "displayName": "resources",
                     "configs": {
@@ -9,6 +86,9 @@
                             "preferredOptions": {
                                 "compressionType": "merge_dep",
                                 "isRemote": false
+                            },
+                            "fallbackOptions": {
+                                "compressionType": "merge_dep"
                             }
                         },
                         "miniGame": {
@@ -67,10 +147,21 @@
                                     "isRemote": false
                                 },
                                 "honor-mini-game": {
-                                    "compressionType": "subpackage"
+                                    "compressionType": "subpackage",
+                                    "isRemote": false
                                 },
                                 "fb-instant-games": {
-                                    "compressionType": "merge_dep"
+                                    "compressionType": "merge_dep",
+                                    "isRemote": false
+                                },
+                                "openpaas": {
+                                    "compressionType": "subpackage"
+                                },
+                                "sud-mini-game": {
+                                    "compressionType": "subpackage"
+                                },
+                                "wechatgame-playable": {
+                                    "compressionType": "subpackage"
                                 }
                             },
                             "fallbackOptions": {
@@ -81,62 +172,9 @@
                             "preferredOptions": {
                                 "compressionType": "merge_dep",
                                 "isRemote": false
-                            }
-                        }
-                    }
-                },
-                "default": {
-                    "displayName": "i18n:builder.asset_bundle.defaultConfig",
-                    "configs": {
-                        "native": {
-                            "preferredOptions": {
-                                "isRemote": false,
-                                "compressionType": "merge_dep"
-                            }
-                        },
-                        "web": {
-                            "preferredOptions": {
-                                "isRemote": false,
-                                "compressionType": "merge_dep"
                             },
                             "fallbackOptions": {
                                 "compressionType": "merge_dep"
-                            }
-                        },
-                        "miniGame": {
-                            "fallbackOptions": {
-                                "isRemote": false,
-                                "compressionType": "merge_dep"
-                            },
-                            "configMode": "overwrite",
-                            "overwriteSettings": {
-                                "wechatgame": {
-                                    "compressionType": "subpackage"
-                                },
-                                "alipay-mini-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "bytedance-mini-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "honor-mini-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "huawei-quick-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "oppo-mini-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "taobao-mini-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "vivo-mini-game": {
-                                    "compressionType": "subpackage"
-                                },
-                                "fb-instant-games": {
-                                    "isRemote": false
-                                }
                             }
                         }
                     }
@@ -233,7 +271,24 @@
             "width": 720,
             "height": 1280
         },
-        "customLayers": []
+        "customLayers": [],
+        "splashScreen": {
+            "logo": {
+                "type": "none",
+                "image": ""
+            },
+            "background": {
+                "type": "custom",
+                "color": {
+                    "x": 0.0156862745098039,
+                    "y": 0.0352941176470588,
+                    "z": 0.0392156862745098,
+                    "w": 1
+                },
+                "image": "project://settings/loading.jpg"
+            },
+            "totalTime": 500
+        }
     },
     "script": {
         "preserveSymlinks": true

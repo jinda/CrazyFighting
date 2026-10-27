@@ -109,7 +109,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 0,
-      "y": 578,
+      "y": 515,
       "z": 0
     },
     "_lrot": {
@@ -138,7 +138,7 @@
   {
     "__type__": "cc.Node",
     "_name": "BtnSetting",
-    "_objFlags": 512,
+    "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
       "__id__": 2
@@ -162,7 +162,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": -284.397,
-      "y": -13.42599999999993,
+      "y": 0,
       "z": 0
     },
     "_lrot": {
@@ -335,7 +335,7 @@
   {
     "__type__": "cc.Node",
     "_name": "BtnHelp",
-    "_objFlags": 512,
+    "_objFlags": 0,
     "__editorExtras__": {},
     "_parent": {
       "__id__": 2
@@ -359,7 +359,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": -177.727,
-      "y": -13.426,
+      "y": 0,
       "z": 0
     },
     "_lrot": {
@@ -570,7 +570,7 @@
     "_target": null,
     "_left": 0,
     "_right": 0,
-    "_top": 12,
+    "_top": 75,
     "_bottom": 0,
     "_horizontalCenter": 0,
     "_verticalCenter": 0,
@@ -695,7 +695,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -159.57998657226562,
+      "x": -159.57515108285406,
       "y": 0,
       "z": 0
     },
@@ -831,7 +831,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": -95.03999328613281,
+      "x": -95.03757554142703,
       "y": 0,
       "z": 0
     },
@@ -872,8 +872,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 24.079986572265625,
-      "height": 50.4
+      "width": 24.075151082854063,
+      "height": 50.400000000000006
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -911,7 +911,7 @@
     "_string": "0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1120,7 +1120,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 192.07998657226562,
+      "width": 192.07515108285406,
       "height": 52
     },
     "_anchorPoint": {
@@ -2683,7 +2683,6 @@
       "__id__": 0
     },
     "fileId": "7bOj/KcpVGCJCCF4iIk2ds",
-    "instance": null,
     "targetOverrides": null
   }
 ]

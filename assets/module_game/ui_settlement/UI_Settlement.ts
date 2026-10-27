@@ -5,7 +5,7 @@ import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 import { GameCfg } from "../game/scripts/GameConfig";
 import { UI_Menu } from "../ui_menu/UI_Menu";
 import { Layout_Settlement } from "./Layout_Settlement";
-import { PlatformMgr } from "../../scripts/SDK/PlatformMgr";
+import { EPlatform, PlatformMgr } from "../../scripts/SDK/PlatformMgr";
 
 export class UI_Settlement extends egf.UIController {
     private _bWin: boolean = false;
@@ -19,6 +19,7 @@ export class UI_Settlement extends egf.UIController {
         this.onButtonEvent(layout.btnNext, this.clickNext, this);
         this.onButtonEvent(layout.btnRetry, this.clickRetry, this);
         this.onButtonEvent(layout.btnShare, this.clickShare, this);
+        layout.btnShare.node.active = PlatformMgr.platform == EPlatform.WeChat;
 
         let coin = params.coin;
         this._bWin = params.bWin;

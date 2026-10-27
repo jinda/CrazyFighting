@@ -35,11 +35,7 @@ export class UI_HUD_Impl extends egf.UIController {
         // 每秒刷新体力显示与回复倒计时
         layout.schedule(this.onStaminaChanged.bind(this), 1);
 
-        if (DataMgr.bBannerAd) {
-            layout.widgetTop.top = 150;
-        } else {
-            layout.widgetTop.top = 12;
-        }
+        this.onUpdateBanner();
     }
 
     protected onDispose() {
@@ -122,7 +118,7 @@ export class UI_HUD_Impl extends egf.UIController {
         if (DataMgr.bBannerAd) {
             layout.widgetTop.top = 150;
         } else {
-            layout.widgetTop.top = 12;
+            layout.widgetTop.top = 75;
         }
     }
 }

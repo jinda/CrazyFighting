@@ -91,7 +91,6 @@ class ResManager {
     } else if (typeClasss === Scene) {
       director.preloadScene(url, callback);
     } else {
-      egf.Logger.log("loadRes:", url, typeClasss);
       abBundle.load(url, typeClasss, callback);
     }
   }
