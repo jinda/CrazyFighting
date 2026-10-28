@@ -625,8 +625,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 91.16000366210938,
-      "height": 71
+      "width": 91.15600287562904,
+      "height": 70.99999999999999
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -664,7 +664,7 @@
     "_string": "签到",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45.6421875,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -1249,7 +1249,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 54.15997314453125,
+      "width": 54.14988935567937,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -1288,7 +1288,7 @@
     "_string": "x0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1450,7 +1450,7 @@
     "_string": "第1天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1669,7 +1669,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -2305,7 +2305,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 54.15997314453125,
+      "width": 54.14988935567937,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -2344,7 +2344,7 @@
     "_string": "x0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2506,7 +2506,7 @@
     "_string": "第1天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2725,7 +2725,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -3361,7 +3361,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 54.15997314453125,
+      "width": 54.14988935567937,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -3400,7 +3400,7 @@
     "_string": "x0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -3562,7 +3562,7 @@
     "_string": "第1天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -3781,7 +3781,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -4417,7 +4417,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 54.15997314453125,
+      "width": 54.14988935567937,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -4456,7 +4456,7 @@
     "_string": "x0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -4618,7 +4618,7 @@
     "_string": "第1天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -4837,7 +4837,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -5473,7 +5473,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 54.15997314453125,
+      "width": 54.14988935567937,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -5512,7 +5512,7 @@
     "_string": "x0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -5674,7 +5674,7 @@
     "_string": "第1天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -5893,7 +5893,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -6529,7 +6529,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 54.15997314453125,
+      "width": 54.14988935567937,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -6568,7 +6568,7 @@
     "_string": "x0",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43.46875,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -6730,7 +6730,7 @@
     "_string": "第1天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -6949,7 +6949,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -7727,7 +7727,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 178.8479461669922,
+      "width": 178.82280059309852,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -7766,7 +7766,7 @@
     "_string": "x700~1000",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32,
+    "_actualFontSize": 34.775,
     "_fontSize": 32,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -7928,7 +7928,7 @@
     "_string": "第7天",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -8054,8 +8054,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 89.7039794921875,
-      "height": 41.8
+      "width": 89.6998814926312,
+      "height": 41.79999999999999
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -8093,7 +8093,7 @@
     "_string": "7日礼包",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24,
+    "_actualFontSize": 26.081249999999997,
     "_fontSize": 24,
     "_fontFamily": "Arial",
     "_lineHeight": 30,
@@ -8332,7 +8332,7 @@
     },
     "_type": 0,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -9038,7 +9038,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 71.31997680664062,
+      "width": 180,
       "height": 54.4
     },
     "_anchorPoint": {
@@ -9077,11 +9077,11 @@
     "_string": "领取",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 34,
+    "_actualFontSize": 36,
     "_fontSize": 34,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
-    "_overflow": 0,
+    "_overflow": 2,
     "_enableWrapText": false,
     "_font": {
       "__uuid__": "208bc5b9-d022-4776-b8d4-3a29132b729c",
@@ -9656,7 +9656,7 @@
     "_string": "双倍领取",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32,
+    "_actualFontSize": 34,
     "_fontSize": 32,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -9870,7 +9870,7 @@
     },
     "_type": 1,
     "_fillType": 0,
-    "_sizeMode": 1,
+    "_sizeMode": 0,
     "_fillCenter": {
       "__type__": "cc.Vec2",
       "x": 0,
@@ -10079,7 +10079,6 @@
       "__id__": 0
     },
     "fileId": "7bOj/KcpVGCJCCF4iIk2ds",
-    "instance": null,
     "targetOverrides": null
   }
 ]

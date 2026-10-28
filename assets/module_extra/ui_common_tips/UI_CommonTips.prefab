@@ -516,8 +516,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 91.16000366210938,
-      "height": 71
+      "width": 91.15600287562904,
+      "height": 70.99999999999999
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -555,7 +555,7 @@
     "_string": "提示",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45.6421875,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -975,7 +975,7 @@
     "_string": "网络连接不可用，请连接网络后再尝试领取",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 32,
+    "_actualFontSize": 34.775,
     "_fontSize": 32,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1125,7 +1125,7 @@
       "__id__": 46
     },
     "_lineHeight": 40,
-    "_string": "test",
+    "_string": "",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
     "_fontSize": 40,
@@ -1389,7 +1389,7 @@
     "_string": "取消",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1778,7 +1778,7 @@
     "_string": "确认",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 40,
+    "_actualFontSize": 43,
     "_fontSize": 40,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -2695,7 +2695,6 @@
       "__id__": 0
     },
     "fileId": "ff2HY4VrhEAKZ4WjB3HPGH",
-    "instance": null,
     "targetOverrides": null
   }
 ]

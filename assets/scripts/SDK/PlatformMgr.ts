@@ -1,12 +1,12 @@
 import { sys } from "cc";
-import { Constants } from "../Constants";
-import { SDKBase, SDKInterface } from "./SDKInterface";
+import { SDKBase, SDKInterface, type IPlatformSystemInfo } from "./SDKInterface";
 import { IWeChat } from "./IWeChat";
 import { ITT } from "./ITT";
 import { IAndroid } from "./IAndroid";
 import { ISud, isSudRuntime } from "./ISud";
-import { LocalDataMgr } from "../LocalDataMgr";
 import { ClientApi } from "../ClientApi";
+import { LocalDataMgr } from "../LocalDataMgr";
+import { Constants } from "../Constants";
 
 export enum EPlatform {
     Unkown = 0,
@@ -90,6 +90,45 @@ class PlatformManager {
 
         egf.Logger.log("PlatformMgr load finish:", sys.platform, this.platform);
         PlatformManager.isInitFinished = true;
+    }
+
+    /**
+     * 获取当前系统信息
+     * 数据由各平台 SDK 接口提供（微信 wx、抖音 tt、SUD 运行时、Android 原生 / H5 浏览器），
+     * 字段与小程序 getSystemInfoSync 保持一致，平台不支持的字段返回空值。
+     */
+    public getSystemInfo(): IPlatformSystemInfo {
+        const info = this._sdkInterface?.getSystemInfo() ?? null;
+        const windowWidth = info?.windowWidth ?? 0;
+        const windowHeight = info?.windowHeight ?? 0;
+        return {
+            brand: info?.brand ?? "",
+            model: info?.model ?? "",
+            pixelRatio: info?.pixelRatio ?? 0,
+            screenWidth: info?.screenWidth ?? 0,
+            screenHeight: info?.screenHeight ?? 0,
+            windowWidth,
+            windowHeight,
+            statusBarHeight: info?.statusBarHeight ?? 0,
+            language: info?.language ?? "",
+            coreVersion: info?.coreVersion ?? "",
+            system: info?.system ?? "",
+            platform: info?.platform ?? "",
+            cameraAuthorized: info?.cameraAuthorized ?? false,
+            locationAuthorized: info?.locationAuthorized ?? false,
+            microphoneAuthorized: info?.microphoneAuthorized ?? false,
+            notificationAuthorized: info?.notificationAuthorized ?? false,
+            locationEnabled: info?.locationEnabled ?? false,
+            wifiEnabled: info?.wifiEnabled ?? false,
+            safeArea: info?.safeArea ?? {
+                left: 0,
+                right: windowWidth,
+                top: 0,
+                bottom: windowHeight,
+                width: windowWidth,
+                height: windowHeight,
+            },
+        };
     }
 
     /**
@@ -275,7 +314,7 @@ class PlatformManager {
         this._sdkInterface?.openSystemSetting();
     }
     //退出游戏
-    public exitApp() {}
+    public exitApp() { }
 }
 
 export const PlatformMgr = PlatformManager.inst;

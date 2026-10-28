@@ -389,8 +389,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 164.39999389648438,
-      "height": 106.8
+      "width": 164.38633402228612,
+      "height": 106.80000000000001
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -428,7 +428,7 @@
     "_string": "胜利",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 80,
+    "_actualFontSize": 86.9375,
     "_fontSize": 80,
     "_fontFamily": "Arial",
     "_lineHeight": 80,
@@ -1036,7 +1036,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 112.40199279785156,
+      "width": 180,
       "height": 67
     },
     "_anchorPoint": {
@@ -1075,11 +1075,11 @@
     "_string": "第7关",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 46,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
-    "_overflow": 0,
+    "_overflow": 2,
     "_enableWrapText": true,
     "_font": {
       "__uuid__": "208bc5b9-d022-4776-b8d4-3a29132b729c",
@@ -1442,7 +1442,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 99.90499114990234,
+      "x": 99.90316375359453,
       "y": 0,
       "z": 0
     },
@@ -1483,7 +1483,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 79.80998229980469,
+      "width": 79.80632750718907,
       "height": 67
     },
     "_anchorPoint": {
@@ -1522,7 +1522,7 @@
     "_string": "100",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45.6421875,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -1604,7 +1604,7 @@
     },
     "_lpos": {
       "__type__": "cc.Vec3",
-      "x": 162.44597625732422,
+      "x": 162.44127987958302,
       "y": 0,
       "z": 0
     },
@@ -1645,8 +1645,8 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 45.27198791503906,
-      "height": 52.4
+      "width": 45.26990474478792,
+      "height": 52.400000000000006
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",
@@ -1684,7 +1684,7 @@
     "_string": "+10",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 24,
+    "_actualFontSize": 26.081249999999997,
     "_fontSize": 24,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1757,7 +1757,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 205.08197021484375,
+      "width": 205.076232251977,
       "height": 60
     },
     "_anchorPoint": {
@@ -1934,7 +1934,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 87.16000366210938,
+      "width": 87.15600287562904,
       "height": 67
     },
     "_anchorPoint": {
@@ -1973,7 +1973,7 @@
     "_string": "奖励",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45.6421875,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -2239,7 +2239,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 250,
+      "width": 230,
       "height": 71
     },
     "_anchorPoint": {
@@ -2278,7 +2278,7 @@
     "_string": "返回",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -2625,7 +2625,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 250,
+      "width": 230,
       "height": 71
     },
     "_anchorPoint": {
@@ -2664,7 +2664,7 @@
     "_string": "下一关",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -3011,7 +3011,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 250,
+      "width": 230,
       "height": 71
     },
     "_anchorPoint": {
@@ -3050,7 +3050,7 @@
     "_string": "重试",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 42,
+    "_actualFontSize": 45,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
@@ -4489,7 +4489,7 @@
     "_string": "",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 30,
+    "_actualFontSize": 32.6015625,
     "_fontSize": 30,
     "_fontFamily": "Arial",
     "_lineHeight": 30,
@@ -4722,7 +4722,6 @@
       "__id__": 0
     },
     "fileId": "32y4IjJFZICr2SaP1qH/lC",
-    "instance": null,
     "targetOverrides": [
       {
         "__id__": 207

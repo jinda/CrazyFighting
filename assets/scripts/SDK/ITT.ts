@@ -1,4 +1,4 @@
-import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
+import { EAdType, EBannerPosition, SDKBase, type IPlatformSystemInfo } from "./SDKInterface";
 
 const tt = typeof window === "undefined" ? undefined : Reflect.get(window, "tt");
 
@@ -20,6 +20,62 @@ export class ITT extends SDKBase {
         egf.Logger.log("TT init:", params);
         cb && cb('{"success":true}');
         return true;
+    }
+
+    /**
+     * 通过抖音接口获取系统信息
+     */
+    getSystemInfo(): IPlatformSystemInfo | null {
+        if (!tt) {
+            return null;
+        }
+        try {
+            const info = tt.getSystemInfoSync?.();
+            if (!info) {
+                return null;
+            }
+            const system: string = info.system || "";
+            const versionMatch = /[\d.]+/.exec(system);
+            const safeArea = info.safeArea;
+            const left = safeArea?.left ?? 0;
+            const right = safeArea?.right ?? 0;
+            const top = safeArea?.top ?? 0;
+            const bottom = safeArea?.bottom ?? 0;
+            return {
+                brand: info.brand,
+                model: info.model,
+                pixelRatio: info.pixelRatio,
+                screenWidth: info.screenWidth,
+                screenHeight: info.screenHeight,
+                windowWidth: info.windowWidth,
+                windowHeight: info.windowHeight,
+                statusBarHeight: info.statusBarHeight,
+                language: info.language,
+                coreVersion: info.SDKVersion || info.version,
+                //抖音部分版本不返回 system，用版本号兜底
+                system: system || (versionMatch ? versionMatch[0] : ""),
+                platform: info.platform,
+                cameraAuthorized: !!info.cameraAuthorized,
+                locationAuthorized: !!info.locationAuthorized,
+                microphoneAuthorized: !!info.microphoneAuthorized,
+                notificationAuthorized: !!info.notificationAuthorized,
+                locationEnabled: !!info.locationEnabled,
+                wifiEnabled: !!info.wifiEnabled,
+                safeArea: safeArea
+                    ? {
+                        left,
+                        right,
+                        top,
+                        bottom,
+                        width: safeArea.width ?? right - left,
+                        height: safeArea.height ?? bottom - top,
+                    }
+                    : undefined,
+            };
+        } catch (error) {
+            egf.Logger.warn("tt.getSystemInfoSync failed:", error);
+            return null;
+        }
     }
 
     /**
@@ -277,11 +333,11 @@ export class ITT extends SDKBase {
             console.error("TT not found");
             return;
         }
-        let success = () => {};
+        let success = () => { };
         let fail = () => {
             egf.Logger.log("震动失败");
         };
-        let complete = () => {};
+        let complete = () => { };
 
         if (time < 400) {
             tt.vibrateShort({

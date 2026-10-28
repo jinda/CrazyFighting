@@ -1,5 +1,5 @@
 import { view } from "cc";
-import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
+import { EAdType, EBannerPosition, SDKBase, type IPlatformSystemInfo } from "./SDKInterface";
 
 const wx = typeof window === "undefined" ? undefined : Reflect.get(window, "wx");
 
@@ -8,7 +8,6 @@ const adunitInterstitial = "adunit-827bfde533614675";
 const adunitBanner = "adunit-846ab3de180c263c";
 const gamelink =
     "-SSEykJvFV3pORt5kTNpSyVVfsEg4nDw2GllMERzeP4TmfV8ASA0tdIi46W1-QRVKUP0kIOfZgju_zZ1JpdBbz8rFFQy5t6K3Sn6nnRUzK0zsAjVrWSnlxtzvzUGGgScyczD369VU22NbgPYtXRDOuCzfcm1h90I5jtq2DBGFnjqTTnS8KLdi1Z1kvHUDASBzq-nCOl4Bn3gPcLYr0mGcpWo6xdR2bA-qxa0IqRPVV35a3JmM7rawn481oJYxtN2DxysMhaszYv1XPBpUYQRdouk29mjPyBnFBhY5PZ4cFANfd_I6psV3qDOinJbl3cH-Tc4UM5sgsLcSCI_1RswuQ";
-
 export class IWeChat extends SDKBase {
     private _bannerAd: any = null;
     private _bannerCb: Function | null = null;
@@ -82,6 +81,56 @@ export class IWeChat extends SDKBase {
 
         cb && cb('{"success":true}');
         return true;
+    }
+
+    /**
+     * 通过微信接口获取系统信息
+     */
+    getSystemInfo(): IPlatformSystemInfo | null {
+        if (!wx) {
+            return null;
+        }
+        try {
+            const info = wx.getSystemInfoSync();
+            const safeArea = info?.safeArea;
+            const left = safeArea?.left ?? 0;
+            const right = safeArea?.right ?? 0;
+            const top = safeArea?.top ?? 0;
+            const bottom = safeArea?.bottom ?? 0;
+            return {
+                brand: info.brand,
+                model: info.model,
+                pixelRatio: info.pixelRatio,
+                screenWidth: info.screenWidth,
+                screenHeight: info.screenHeight,
+                windowWidth: info.windowWidth,
+                windowHeight: info.windowHeight,
+                statusBarHeight: info.statusBarHeight,
+                language: info.language,
+                coreVersion: info.SDKVersion || info.version,
+                system: info.system,
+                platform: info.platform,
+                cameraAuthorized: !!info.cameraAuthorized,
+                locationAuthorized: !!info.locationAuthorized,
+                microphoneAuthorized: !!info.microphoneAuthorized,
+                notificationAuthorized: !!info.notificationAuthorized,
+                locationEnabled: !!info.locationEnabled,
+                wifiEnabled: !!info.wifiEnabled,
+                safeArea: safeArea
+                    ? {
+                        left,
+                        right,
+                        top,
+                        bottom,
+                        width: safeArea.width ?? right - left,
+                        height: safeArea.height ?? bottom - top,
+                    }
+                    : undefined,
+            };
+        } catch (error) {
+            egf.Logger.warn("wx.getSystemInfoSync failed:", error);
+            return null;
+        }
     }
 
     /**
@@ -298,11 +347,11 @@ export class IWeChat extends SDKBase {
             console.error("WeChat not found");
             return;
         }
-        let success = () => {};
+        let success = () => { };
         let fail = () => {
             egf.Logger.log("震动失败");
         };
-        let complete = () => {};
+        let complete = () => { };
 
         if (time <= 100) {
             wx.vibrateShort({

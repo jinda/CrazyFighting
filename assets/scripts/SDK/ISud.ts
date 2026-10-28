@@ -1,5 +1,5 @@
 import type { IAdConfigData } from "../apiInterface";
-import { EAdType, EBannerPosition, SDKBase } from "./SDKInterface";
+import { EAdType, EBannerPosition, SDKBase, type IPlatformSystemInfo } from "./SDKInterface";
 
 const adConfig = {
   reward_video_ad_id: "2110937662884458498",
@@ -61,8 +61,67 @@ interface SudBannerAd extends SudAd {
   offResize(callback: (size: { width: number; height: number }) => void): void;
 }
 
+/** SUD 运行时返回的设备信息 */
+interface IDeviceInfo {
+  abi?: string;
+  deviceAbi?: string;
+  brand?: string;
+  model?: string;
+  system?: string;
+  platform?: string;
+  cpuType?: string;
+  memorySize?: number;
+}
+
+interface ISystemSetting {
+  locationEnabled?: boolean;
+  wifiEnabled?: boolean;
+  deviceOrientation?: string;
+}
+
+interface IWindowInfo {
+  pixelRatio?: number;
+  screenWidth?: number;
+  screenHeight?: number;
+  windowWidth?: number;
+  windowHeight?: number;
+  statusBarHeight?: number;
+  safeArea?: {
+    left?: number;
+    right?: number;
+    top?: number;
+    bottom?: number;
+    width?: number;
+    height?: number;
+  };
+  screenTop?: number;
+}
+
+interface IAppBaseInfo {
+  SDKVersion?: string;
+  enableDebug?: boolean;
+  language?: string;
+  theme?: string;
+  fontSizeScaleFactor?: number;
+  fontSizeSetting?: number;
+  version?: string;
+}
+
+interface IAuthorizeSetting {
+  albumAuthorized?: string;
+  cameraAuthorized?: string;
+  locationAuthorized?: string;
+  locationReducedAccuracy?: boolean;
+  microphoneAuthorized?: string;
+}
+
 interface SudRuntime {
   login(options: SudCallbacks<{ code: string }>): void;
+  getDeviceInfo?: () => IDeviceInfo;
+  getSystemSetting?: () => ISystemSetting;
+  getWindowInfo?: () => IWindowInfo;
+  getAppBaseInfo?: () => IAppBaseInfo;
+  getAppAuthorizeSetting?: () => IAuthorizeSetting;
   getUserInfo?: (options: SudCallbacks<SudUserInfo>) => void;
   authorize?: (options: SudCallbacks<unknown> & { scope: string }) => void;
   vibrateShort?: (options: { fail: (error: SudError) => void }) => void;
@@ -119,7 +178,7 @@ class FullscreenAdController {
   constructor(
     private readonly createAd: () => SudFullscreenAd,
     private readonly rewarded: boolean,
-  ) {}
+  ) { }
 
   public prepare(): void {
     if (this.disposed || this.ad || this.reloadTimer !== null) {
@@ -273,6 +332,61 @@ export class ISud extends SDKBase {
     }
     cb?.(JSON.stringify({ success }));
     return success;
+  }
+
+  /**
+   * 通过 SUD 运行时获取系统信息
+   */
+  public getSystemInfo(): IPlatformSystemInfo | null {
+    const runtime = this.runtime;
+    if (!runtime?.getWindowInfo) {
+      return null;
+    }
+    try {
+
+      const deviceInfo = runtime.getDeviceInfo();
+      const sysInfo = runtime.getWindowInfo();
+      const baseInfo = runtime.getAppBaseInfo();
+      const setInfo = runtime.getSystemSetting();
+      const authorInfo = runtime.getAppAuthorizeSetting();
+      const safeArea = sysInfo?.safeArea;
+      const left = safeArea?.left ?? 0;
+      const right = safeArea?.right ?? 0;
+      const top = safeArea?.top ?? 0;
+      const bottom = safeArea?.bottom ?? 0;
+      return {
+        brand: deviceInfo?.brand,
+        model: deviceInfo?.model,
+        pixelRatio: sysInfo?.pixelRatio,
+        screenWidth: sysInfo?.screenWidth,
+        screenHeight: sysInfo?.screenHeight,
+        windowWidth: sysInfo?.windowWidth,
+        windowHeight: sysInfo?.windowHeight,
+        statusBarHeight: sysInfo?.statusBarHeight,
+        language: baseInfo?.language,
+        coreVersion: baseInfo?.SDKVersion,
+        system: deviceInfo?.system,
+        platform: deviceInfo?.platform,
+        cameraAuthorized: authorInfo?.cameraAuthorized == 'authorized',
+        locationAuthorized: authorInfo?.locationAuthorized == 'authorized',
+        microphoneAuthorized: authorInfo?.microphoneAuthorized == 'authorized',
+        locationEnabled: !!setInfo?.locationEnabled,
+        wifiEnabled: !!setInfo?.wifiEnabled,
+        safeArea: safeArea
+          ? {
+            left,
+            right,
+            top,
+            bottom,
+            width: safeArea?.width ?? right - left,
+            height: safeArea?.height ?? bottom - top,
+          }
+          : undefined,
+      };
+    } catch (error) {
+      egf.Logger.warn("[SUD] getSystemInfoSync 调用失败:", error);
+      return null;
+    }
   }
 
   public initAd(params?: IAdConfigData | null): boolean {

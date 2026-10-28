@@ -277,7 +277,7 @@
     },
     "_contentSize": {
       "__type__": "cc.Size",
-      "width": 116.396780643422,
+      "width": 250,
       "height": 70.99999999999999
     },
     "_anchorPoint": {
@@ -316,11 +316,11 @@
     "_string": "第7关",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 45.6421875,
+    "_actualFontSize": 46,
     "_fontSize": 42,
     "_fontFamily": "Arial",
     "_lineHeight": 50,
-    "_overflow": 0,
+    "_overflow": 2,
     "_enableWrapText": true,
     "_font": {
       "__uuid__": "208bc5b9-d022-4776-b8d4-3a29132b729c",

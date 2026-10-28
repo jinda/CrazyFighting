@@ -84,6 +84,7 @@ class i18nManager {
                     ? ELanguage["zh-tw"]
                     : ELanguage["zh-cn"];
             case "en":
+            case "us":
                 return ELanguage.en;
             case "ru":
                 return ELanguage.ru;
