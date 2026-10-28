@@ -61,7 +61,7 @@ export class Start extends Component {
         egf.ResMgr.preloadResPackage("start", StartResPkg, this.onResLoaded.bind(this), () => {
             this.onPreloadingComplete();
         });
-
+        this.initAd();
         this.login();
     }
 
@@ -132,7 +132,7 @@ export class Start extends Component {
         };
 
         PlatformMgr.login(params);
-        this.initAd();
+
     }
 
     private initAd() {
