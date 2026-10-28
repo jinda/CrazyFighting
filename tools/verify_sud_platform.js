@@ -159,9 +159,9 @@ function createHarness({ hasSud = true, platform = "wechat", native = false } = 
     const egf = {
         Logger: Object.fromEntries(["log", "warn", "error"].map((level) => [level, (...args) => logs.push(args)])),
         EventMgr: { emit: (event) => events.push(event) },
-        AudioMgr: { pause() {}, resume() {} },
+        AudioMgr: { pause() { }, resume() { } },
         Utils: { createReqId: () => "event-id" },
-        i18nMgr: { setLanguage() {} },
+        i18nMgr: { setLanguage() { } },
         SceneUtil: { loadScene: () => trace.push("scene") },
     };
     const globals = {
@@ -185,7 +185,7 @@ function createHarness({ hasSud = true, platform = "wechat", native = false } = 
         OS: { ANDROID: "android" },
         localStorage: { getItem: (key) => storage.get(key), setItem: (key, value) => storage.set(key, value) },
     };
-    const localData = { Setting: { shakeSwith: true }, loadCloud: (cb) => cb() };
+    const localData = { Setting: { shakeSwith: true }, GameInfo: {}, loadCloud: (cb) => cb() };
     const client = {
         token: "",
         oauthLogin(type, credentials, _nickname, _avatar, success) {
@@ -198,7 +198,7 @@ function createHarness({ hasSud = true, platform = "wechat", native = false } = 
             trace.push({ channel });
             success(config);
         },
-        reportEvent() {},
+        reportEvent() { },
         foreground() {
             trace.push("foreground");
         },
@@ -210,9 +210,9 @@ function createHarness({ hasSud = true, platform = "wechat", native = false } = 
             "../Constants": { Constants: constants },
             "./SDKInterface": sdkTypes,
             "./ISud": sudTypes,
-            "./IWeChat": { IWeChat: class extends sdkTypes.SDKBase {} },
-            "./ITT": { ITT: class extends sdkTypes.SDKBase {} },
-            "./IAndroid": { IAndroid: class extends sdkTypes.SDKBase {} },
+            "./IWeChat": { IWeChat: class extends sdkTypes.SDKBase { } },
+            "./ITT": { ITT: class extends sdkTypes.SDKBase { } },
+            "./IAndroid": { IAndroid: class extends sdkTypes.SDKBase { } },
             "../LocalDataMgr": { LocalDataMgr: localData },
             "../ClientApi": { ClientApi: { inst: client } },
         },
@@ -220,8 +220,8 @@ function createHarness({ hasSud = true, platform = "wechat", native = false } = 
     );
     const cc = {
         sys,
-        _decorator: { ccclass: () => (target) => target, property: () => () => {} },
-        Component: class {},
+        _decorator: { ccclass: () => (target) => target, property: () => () => { } },
+        Component: class { },
     };
     const { Start } = load(
         "assets/start/Start.ts",
@@ -493,7 +493,7 @@ async function main() {
         const h = createHarness();
         h.sdk.initAd(h.config);
         h.ads[0].emit("load");
-        h.sdk.showRewardedVideo(undefined, () => {});
+        h.sdk.showRewardedVideo(undefined, () => { });
         h.ads[0].emit("close", { isEnded: true });
         h.clock.advance(9999);
         assert.equal(h.ads.length, 2);
@@ -501,7 +501,7 @@ async function main() {
         assert.equal(h.ads.length, 3);
         assert.equal(h.ads[2].kind, "rewarded");
         h.ads[2].emit("load");
-        h.sdk.showRewardedVideo(undefined, () => {});
+        h.sdk.showRewardedVideo(undefined, () => { });
         h.ads[2].emit("close", { isEnded: true });
         assert.equal(h.clock.timers.size, 1);
         h.sdk.dispose();

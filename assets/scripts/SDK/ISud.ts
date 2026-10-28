@@ -162,6 +162,9 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "SUD 接口调用失败";
 }
 
+/** load() 只表示请求受理；若 onLoad/onError 都没到达，必须靠超时释放实例，否则会永久不可用。 */
+const LOAD_TIMEOUT = 15000;
+
 /** 激励视频与插屏共用单次展示、监听清理和加载节流；两种广告各自持有回调。 */
 class FullscreenAdController {
   private ad: SudFullscreenAd | null = null;
@@ -172,16 +175,32 @@ class FullscreenAdController {
   } | null = null;
   private reloadTimer: ReturnType<typeof setTimeout> | null = null;
   private lastLoadTime = -Infinity;
+  private loadStartTime = -Infinity;
   private disposed = false;
   public loaded = false;
 
   constructor(
     private readonly createAd: () => SudFullscreenAd,
     private readonly rewarded: boolean,
+    private readonly adUnitId: string,
+    private readonly label: string,
   ) { }
 
   public prepare(): void {
-    if (this.disposed || this.ad || this.reloadTimer !== null) {
+    if (this.disposed) {
+      return;
+    }
+    const current = this.ad;
+    if (current) {
+      //load() 既不触发 onLoad 也不触发 onError 时实例会永久占用，超时后释放并重新加载。
+      const stuck = !this.loaded && this.pending === null && Date.now() - this.loadStartTime > LOAD_TIMEOUT;
+      if (!stuck) {
+        return;
+      }
+      egf.Logger.warn(`[SUD] ${this.label}加载超时，释放实例重新加载`, "adUnitId:", this.adUnitId);
+      this.finish(current, false);
+    }
+    if (this.reloadTimer !== null) {
       return;
     }
     //官方当前限制为 10 秒内不能重复加载；只延迟一次预加载，不循环重试失败请求。
@@ -195,6 +214,7 @@ class FullscreenAdController {
     }
 
     this.lastLoadTime = Date.now();
+    this.loadStartTime = this.lastLoadTime;
     try {
       const ad = this.createAd();
       this.ad = ad;
@@ -203,8 +223,17 @@ class FullscreenAdController {
           this.loaded = true;
         }
       };
-      const onError = (_error: SudError) => {
-        egf.Logger.warn("[SUD] 全屏广告加载或展示失败");
+      const onError = (error: SudError) => {
+        //errCode/errMsg 是定位广告位无效、无填充、10 秒限频等问题的唯一线索。
+        egf.Logger.warn(
+          `[SUD] ${this.label}加载或展示失败`,
+          "errCode:",
+          error?.errCode,
+          "errMsg:",
+          error?.errMsg,
+          "adUnitId:",
+          this.adUnitId,
+        );
         this.finish(ad, false);
       };
       const onClose = (result?: { isEnded?: boolean }) => {
@@ -224,8 +253,8 @@ class FullscreenAdController {
       ad.onClose(onClose);
       //Promise 成功仅表示请求受理；只有 onLoad 才能将 loaded 置为 true。
       ad.load().catch(onError);
-    } catch {
-      egf.Logger.error("[SUD] 全屏广告创建或加载调用失败");
+    } catch (error) {
+      egf.Logger.error(`[SUD] ${this.label}创建或加载调用失败`, "adUnitId:", this.adUnitId, error);
       if (this.ad) {
         this.finish(this.ad, false);
       }
@@ -236,6 +265,15 @@ class FullscreenAdController {
     const ad = this.ad;
     if (this.disposed || this.pending || !ad || !this.loaded) {
       //未就绪时继续游戏，不排队到之后突然展示；下一次用户触发时再检查。
+      egf.Logger.warn(
+        `[SUD] ${this.label}未就绪，跳过本次展示`,
+        "hasAd:",
+        ad !== null,
+        "loaded:",
+        this.loaded,
+        "adUnitId:",
+        this.adUnitId,
+      );
       this.prepare();
       endCb?.(false);
       return;
@@ -393,36 +431,60 @@ export class ISud extends SDKBase {
     this.disposeAds();
     this.adConfig = params ?? adConfig;
     const runtime = this.runtime;
-    if (!runtime || !this.adConfig) {
+    if (!runtime) {
+      egf.Logger.error("[SUD] 广告初始化失败：小游戏运行时不存在");
+      return false;
+    }
+    if (!this.adConfig) {
+      //没有服务端配置就不创建实例，避免用错误的广告位反复触发加载限频。
+      egf.Logger.warn("[SUD] 广告初始化跳过：未获取到 adconfig 配置");
       return false;
     }
     const createRewarded = runtime.createRewardedVideoAd;
     const createInterstitial = runtime.createInterstitialAd;
-    if (createRewarded && this.adConfig.reward_video_ad_id) {
+    const rewardedId = this.adConfig?.reward_video_ad_id;
+    const interstitialId = this.adConfig?.interstitial_ad_id;
+    const bannerId = this.adConfig?.banner_ad_id;
+    if (!createRewarded) {
+      egf.Logger.error("[SUD] 当前运行时不支持 createRewardedVideoAd");
+    }
+    if (!createInterstitial) {
+      egf.Logger.warn("[SUD] 当前运行时不支持 createInterstitialAd");
+    }
+    if (!runtime.createBannerAd) {
+      egf.Logger.warn("[SUD] 当前运行时不支持 createBannerAd");
+    }
+    if (createRewarded && rewardedId) {
       this.rewardedAd = new FullscreenAdController(
-        () =>
-          createRewarded.call(runtime, {
-            adUnitId: this.adConfig.reward_video_ad_id,
-          }),
+        () => createRewarded.call(runtime, { adUnitId: rewardedId }),
         true,
+        rewardedId,
+        "激励视频广告",
       );
       this.rewardedAd.prepare();
+    } else if (createRewarded) {
+      egf.Logger.warn("[SUD] 缺少 reward_video_ad_id，跳过激励视频初始化");
     }
-    if (createInterstitial && this.adConfig.interstitial_ad_id) {
+    if (createInterstitial && interstitialId) {
       this.interstitialAd = new FullscreenAdController(
-        () =>
-          createInterstitial.call(runtime, {
-            adUnitId: this.adConfig.interstitial_ad_id,
-          }),
+        () => createInterstitial.call(runtime, { adUnitId: interstitialId }),
         false,
+        interstitialId,
+        "插屏广告",
       );
       this.interstitialAd.prepare();
+    } else if (createInterstitial) {
+      egf.Logger.warn("[SUD] 缺少 interstitial_ad_id，跳过插屏初始化");
     }
-    return !!(
-      this.rewardedAd ||
-      this.interstitialAd ||
-      (runtime.createBannerAd && this.adConfig.banner_ad_id)
-    );
+    if (!bannerId) {
+      egf.Logger.warn("[SUD] 缺少 banner_ad_id，跳过 Banner 初始化");
+    }
+    egf.Logger.log("[SUD] 广告初始化:", {
+      rewarded: rewardedId ?? "",
+      interstitial: interstitialId ?? "",
+      banner: bannerId ?? "",
+    });
+    return !!(this.rewardedAd || this.interstitialAd || (runtime.createBannerAd && bannerId));
   }
 
   public showRewardedVideo(
@@ -430,6 +492,7 @@ export class ISud extends SDKBase {
     endCb?: (success: boolean) => void,
   ): void {
     if (!this.rewardedAd) {
+      egf.Logger.warn("[SUD] 激励视频未初始化，本次按未完成处理");
       endCb?.(false);
       return;
     }
@@ -441,6 +504,7 @@ export class ISud extends SDKBase {
     endCb?: (success: boolean) => void,
   ): void {
     if (!this.interstitialAd) {
+      egf.Logger.warn("[SUD] 插屏广告未初始化，本次按未展示处理");
       endCb?.(false);
       return;
     }

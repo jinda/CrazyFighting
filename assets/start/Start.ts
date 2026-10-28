@@ -31,6 +31,7 @@ export class Start extends Component {
     private resourcesReady = false;
     private dataReady = false;
     private sceneLoadStarted = false;
+    private adInitialized = false;
 
     protected onLoad(): void {
         PlatformMgr.reportEvent("game_show", {
@@ -61,7 +62,7 @@ export class Start extends Component {
         egf.ResMgr.preloadResPackage("start", StartResPkg, this.onResLoaded.bind(this), () => {
             this.onPreloadingComplete();
         });
-        this.initAd();
+
         this.login();
     }
 
@@ -132,10 +133,14 @@ export class Start extends Component {
         };
 
         PlatformMgr.login(params);
-
     }
 
     private initAd() {
+        //只初始化一次：重复 initAd 会销毁现有实例并立即重新 load，触发 SUD 的 10 秒加载限频。
+        if (this.adInitialized) {
+            return;
+        }
+        this.adInitialized = true;
         //在业务登录成功后读取，兼容当前 ClientApi 的本地 token 检查。
         let channel = "wechat";
         if (PlatformMgr.platform === EPlatform.SUD) {
@@ -160,6 +165,7 @@ export class Start extends Component {
     private onLoginSuccess(data: ILoginData) {
         DataMgr.userData = data.user_info;
         // ClientApi 内部已设置 Authorization Header
+        this.initAd();
         LocalDataMgr.loadCloud(() => {
             this.dataReady = true;
             this.tryEnterGame();
@@ -168,7 +174,6 @@ export class Start extends Component {
     }
 
     private onLoginFail(errcode: number, errmsg: string) {
-        PlatformMgr.initAd(null);
         egf.Logger.warn("oauthLogin fail, errcode:", errcode, " errmsg:" + errmsg);
         this.dataReady = true;
         this.tryEnterGame();
