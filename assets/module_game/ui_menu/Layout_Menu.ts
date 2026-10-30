@@ -1,7 +1,7 @@
 import { _decorator, Node, Button, Component, Label, RichText, tween, v3, Vec3, Tween, Color } from "cc";
 import { DataMgr } from "../../scripts/DataMgr";
 import { LocalDataMgr } from "../../scripts/LocalDataMgr";
-import { LevelTips } from "./levelTips";
+import { LevelStartTips } from "./LevelStartTips";
 import { Constants } from "../../scripts/Constants";
 const { ccclass, property } = _decorator;
 
@@ -63,12 +63,10 @@ export class Layout_Menu extends Component {
     nodeLandAd: Node = null!;
     @property(Node)
     nodePowerTips: Node = null!;
-    @property(Node)
-    nodeHand: Node = null!;
     @property(Label)
     labelPowerAdd: Label = null!;
-    @property(LevelTips)
-    levelTips: LevelTips = null!;
+    @property(LevelStartTips)
+    levelTips: LevelStartTips = null!;
 
     private bCanOnline: boolean = false;
 

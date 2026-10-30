@@ -5,8 +5,8 @@ import { GameMgr } from "../game/scripts/GameMgr";
 
 const { ccclass, property } = _decorator;
 //士兵等级提示脚本：在界面移动士兵时，士兵头上会展示
-@ccclass("LevelTips")
-export class LevelTips extends Component {
+@ccclass("LevelStartTips")
+export class LevelStartTips extends Component {
     @property([Node])
     public aryStar: Node[] = []; //星星节点数组
 
