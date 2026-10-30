@@ -73,9 +73,16 @@ export class Start extends Component {
         this.txtLoading!.string = percent;
         this.loadingBar!.progress = now / total;
         if (now == 1) {
-            const langs = PlatformMgr.getSystemInfo().language.split("_");
+            const langs = PlatformMgr.getSystemInfo().language!.split("_");
             const lang = LocalDataMgr.Setting.language || langs[langs.length - 1];
-            egf.Logger.log("lang:", lang, ", set lang:", LocalDataMgr.Setting.language, ", sys lang:", PlatformMgr.getSystemInfo().language);
+            egf.Logger.log(
+                "lang:",
+                lang,
+                ", set lang:",
+                LocalDataMgr.Setting.language,
+                ", sys lang:",
+                PlatformMgr.getSystemInfo().language,
+            );
             egf.i18nMgr.setLanguage(lang);
             this.nodeGameHeath.active = egf.i18nMgr.language == egf.ELanguage["zh-cn"];
         }
