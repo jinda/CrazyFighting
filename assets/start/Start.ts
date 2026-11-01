@@ -64,6 +64,7 @@ export class Start extends Component {
         });
 
         this.login();
+        this.initAd();
     }
 
     onResLoaded(now: number, total: number) {
