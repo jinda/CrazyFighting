@@ -63,34 +63,15 @@ class LocalDataManager {
         this.loadGameInfoData();
     }
 
-    private loadGameInfoData(): boolean {
-        const encryptStr = sys.localStorage.getItem(this.GameInfoStr);
-        let gameInfoData = null;
-        if (encryptStr) {
-            gameInfoData = this.decryptValue(encryptStr, "local");
-        } else {
-            gameInfoData = this.createDefaultGameInfo();
-        }
-        egf.Logger.log("local game info:", gameInfoData);
-        this._gameInfo = gameInfoData as IGameInfo;
+    private loadGameInfoData(): void {
+        const value = this.readLocalValue(this.GameInfoStr);
+        this._gameInfo = this.normalizeGameInfo(value) ?? this.createDefaultGameInfo();
         this.setUseRes();
-        if (this.isSignToday()) {
-            this._gameInfo.bShare = true;
-        }
-        egf.Logger.log("load game info local:", this._gameInfo);
-        return true;
     }
 
-    private loadSettingData(): boolean {
-        const encryptStr = sys.localStorage.getItem(this.SettingStr);
-        let settingData = null;
-        if (encryptStr) {
-            settingData = this.decryptValue(encryptStr, "local");
-        } else {
-            settingData = this.createDefaultSetting();
-        }
-        this._setting = settingData as ISetting;
-        return true;
+    private loadSettingData(): void {
+        const defaults = this.createDefaultSetting();
+        this._setting = this.mergeSave(this.readLocalValue(this.SettingStr), defaults, "settings") ?? defaults;
     }
 
     public resetLocalGameInfo() {
@@ -105,7 +86,7 @@ class LocalDataManager {
         // 每次落盘都刷新存档时间
         this._gameInfo.saveTime = Date.now();
         this._gameInfo.coin = DataMgr.coin;
-        this._gameInfo.level = Math.max(0, DataMgr.level - 1);
+        this._gameInfo.level = DataMgr.completedLevel;
         this._gameInfo.stamina = DataMgr.stamina;
         const encryptStr = this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
         if (encryptStr) {
@@ -141,17 +122,22 @@ class LocalDataManager {
     public loadCloud(finish: () => void) {
         if (!ClientApi.inst.token) {
             egf.Logger.warn("请先登陆获取用户信息！");
+            finish();
             return;
         }
         ClientApi.inst.getData(
             this.SettingStr,
             (data) => {
-                egf.Logger.log("loadCloud Setting success:", data);
                 if (data?.value) {
-                    const settingData = this.decryptValue(data?.value, "cloud");
-                    this._setting = settingData as ISetting;
-                    //再次存档一次
-                    this.saveSettingData();
+                    const setting = this.mergeSave(
+                        this.decryptValue(data.value, "cloud settings"),
+                        this.createDefaultSetting(),
+                        "cloud settings",
+                    );
+                    if (setting) {
+                        this._setting = setting;
+                        this.saveSettingData();
+                    }
                 } else {
                     egf.Logger.log("loadCloud Setting is null");
                 }
@@ -164,17 +150,18 @@ class LocalDataManager {
             this.GameInfoStr,
             (data) => {
                 if (data?.value) {
-                    const gameInfoData = this.decryptValue(data?.value, "cloud");
-                    egf.Logger.log("loadCloud GameInfo success:", gameInfoData);
-                    this.setGameInfo(gameInfoData as IGameInfo);
+                    const gameInfo = this.normalizeGameInfo(this.decryptValue(data.value, "cloud game info"));
+                    if (gameInfo) {
+                        this.setGameInfo(gameInfo);
+                    }
                 } else {
                     egf.Logger.log("loadCloud GameInfo is null");
                 }
-                finish && finish();
+                finish();
             },
             (errcode, errmsg) => {
                 egf.Logger.log("loadCloud GameInfo error:", errmsg);
-                finish && finish();
+                finish();
             },
         );
     }
@@ -198,7 +185,7 @@ class LocalDataManager {
     private setUseRes() {
         DataMgr.coin = this._gameInfo.coin || 0;
         DataMgr.level = this._gameInfo.level || 0;
-        DataMgr.stamina = this._gameInfo.stamina || Constants.MAX_STAMINA;
+        DataMgr.stamina = this._gameInfo.stamina;
     }
 
     private createDefaultGameInfo(): IGameInfo {
@@ -231,13 +218,112 @@ class LocalDataManager {
         };
     }
 
+    private readLocalValue(key: string): unknown {
+        try {
+            const value = sys.localStorage.getItem(key);
+            return value ? this.decryptValue(value, key) : null;
+        } catch (error) {
+            egf.Logger.error("[LocalDataMgr] failed to read local save:", key, error);
+            return null;
+        }
+    }
+
+    private isRecord(value: unknown): value is Record<string, unknown> {
+        return typeof value === "object" && value !== null && !Array.isArray(value);
+    }
+
+    private mergeSave<T extends object>(value: unknown, defaults: T, label: string): T | null {
+        if (!this.isRecord(value)) {
+            if (value !== null) {
+                egf.Logger.warn("[LocalDataMgr] invalid save:", label);
+            }
+            return null;
+        }
+
+        const merged = { ...defaults };
+        let hasKnownField = false;
+        for (const [key, fallback] of Object.entries(defaults)) {
+            const field = value[key];
+            if (field === undefined) {
+                continue;
+            }
+            if (
+                typeof field !== typeof fallback ||
+                field === null ||
+                (typeof field === "number" && !Number.isFinite(field))
+            ) {
+                egf.Logger.warn("[LocalDataMgr] invalid save field:", label, key);
+                return null;
+            }
+            Reflect.set(merged, key, field);
+            hasKnownField = true;
+        }
+        if (!hasKnownField) {
+            egf.Logger.warn("[LocalDataMgr] save has no known fields:", label);
+            return null;
+        }
+        return merged;
+    }
+
+    private normalizeGameInfo(value: unknown): IGameInfo | null {
+        const defaults = this.createDefaultGameInfo();
+        if (!this.isRecord(value)) {
+            return this.mergeSave(value, defaults, "game info");
+        }
+
+        const stamina = value.stamina;
+        const validStamina = typeof stamina === "number" && Number.isSafeInteger(stamina) && stamina >= 0;
+        const fields = { ...value };
+        if (stamina !== undefined && !validStamina) {
+            egf.Logger.warn("[LocalDataMgr] invalid saved stamina");
+            delete fields.stamina;
+        }
+        const gameInfo = this.mergeSave(fields, defaults, "game info");
+        if (!gameInfo) {
+            return null;
+        }
+        if (!Array.isArray(gameInfo.unlock) || !this.isRecord(gameInfo.formation)) {
+            egf.Logger.warn("[LocalDataMgr] invalid formation or unlock list");
+            return null;
+        }
+
+        // 旧存档中的兵种编号可能来自 CSV 字符串。
+        const unlock = gameInfo.unlock.map((id: unknown) => this.readSavedFighterId(id));
+        if (!unlock.every((id): id is number => id !== null && id > 0)) {
+            egf.Logger.warn("[LocalDataMgr] invalid unlock list");
+            return null;
+        }
+        const formation: IGameInfo["formation"] = {};
+        for (const [cell, savedFighterId] of Object.entries(gameInfo.formation)) {
+            const id = this.readSavedFighterId(savedFighterId);
+            if (!/^\d+$/.test(cell) || !Number.isSafeInteger(Number(cell)) || id === null) {
+                egf.Logger.warn("[LocalDataMgr] invalid formation cell:", cell);
+                return null;
+            }
+            formation[Number(cell)] = id;
+        }
+        gameInfo.unlock = unlock.length ? unlock : defaults.unlock;
+        gameInfo.formation = formation;
+        return gameInfo;
+    }
+
+    private readSavedFighterId(value: unknown): number | null {
+        const id = typeof value === "string" && /^\d+$/.test(value) ? Number(value) : value;
+        return typeof id === "number" && Number.isSafeInteger(id) && id >= 0 ? id : null;
+    }
+
     private decryptValue(encryptStr: string, label: string): unknown | null {
         try {
             const decryptStr = AES.decrypt(encryptStr, AES_KEY).toString(CryptoTS.enc.Utf8);
             if (!decryptStr) {
+                egf.Logger.warn("[LocalDataMgr] empty decrypted save:", label);
                 return null;
             }
-            return JSON.parse(decryptStr) as unknown;
+            const value: unknown = JSON.parse(decryptStr);
+            if (value === null) {
+                egf.Logger.warn("[LocalDataMgr] invalid null save:", label);
+            }
+            return value;
         } catch (error) {
             egf.Logger.error(`[LocalDataMgr] failed to decrypt or parse ${label}:`, error);
             return null;

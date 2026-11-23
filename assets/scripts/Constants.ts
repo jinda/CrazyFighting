@@ -4,7 +4,7 @@ export class Constants {
         REMOTE: 2, //远程
     };
 
-    // 显示关卡上限；运行时存档使用 0-based 索引，因此最大内部索引为 MAX_LEVEL - 1
+    // 最后一关的编号，也是存档中已完成关卡数的上限。
     static MAX_LEVEL = 1000;
     static MAX_STAMINA = 5;
     static STAMINA_RECOVER_MS = 10 * 60 * 1000; // 每 10 分钟回复 1 点体力

@@ -1,11 +1,32 @@
 const fs = require("fs");
 const path = require("path");
 
-const ROLE_DIR = "assets/module_game/game/prefabs/model/role";
-const SKIN_WHITE = "51756739-7bb0-4ab0-bfdf-b83099a80ff2";
+const GAME_DIR = path.join(__dirname, "../assets/module_game");
+const ROLE_DIR = path.join(GAME_DIR, "game/prefabs/role");
+
+function readRows(table) {
+    const lines = fs.readFileSync(path.join(GAME_DIR, "datas", table + ".csv"), "utf8").trimEnd().split(/\r?\n/);
+    const headers = lines[2].split(",");
+    return lines.slice(3).filter(Boolean).map((line) => {
+        const fields = line.split(",");
+        return Object.fromEntries(headers.map((header, index) => [header, fields[index]]));
+    });
+}
+
+const fighters = readRows("fighter");
+const skills = new Map(readRows("skill").map((skill) => [skill.ID, skill]));
+const unlocks = new Set(["101", ...readRows("level").map((level) => level.unlock)]);
+const playableModels = new Set(fighters.filter((fighter) => unlocks.has(fighter.ID)).map((fighter) => fighter.model));
 
 let allOk = true;
-const files = fs.readdirSync(ROLE_DIR).filter((f) => f.endsWith(".prefab") && f !== "Barbarian.prefab");
+const files = fs.readdirSync(ROLE_DIR).filter((f) => f.endsWith(".prefab"));
+const existingModels = new Set(files.map((file) => path.basename(file, ".prefab")));
+for (const model of new Set(fighters.map((fighter) => fighter.model))) {
+    if (!existingModels.has(model)) {
+        allOk = false;
+        console.error(`FAIL ${model}: missing role prefab`);
+    }
+}
 for (const f of files) {
     const p = path.join(ROLE_DIR, f);
     const arr = JSON.parse(fs.readFileSync(p, "utf8"));
@@ -17,11 +38,11 @@ for (const f of files) {
     if (!root) errs.push("no root");
     else if (root._name !== name) errs.push(`root _name=${root._name}`);
 
-    // material check
+    // A skin can use a different default material before FighterModel applies the team skin.
     for (const o of arr) {
         if (o && o.__type__ === "cc.SkinnedMeshRenderer") {
-            if (!o._materials || o._materials.length !== 1 || o._materials[0].__uuid__ !== SKIN_WHITE) {
-                errs.push("bad material");
+            if (!o._materials?.length || o._materials.some((material) => !material?.__uuid__)) {
+                errs.push("missing renderer material");
             }
         }
     }
@@ -30,8 +51,9 @@ for (const f of files) {
     const skel = arr.find((o) => o && o.__type__ === "cc.SkeletalAnimation");
     if (!skel) errs.push("no SkeletalAnimation");
     else {
-        if (!skel._clips || skel._clips.length !== 8) errs.push(`clips=${skel._clips && skel._clips.length}`);
-        if (!skel._defaultClip || !skel._defaultClip.__uuid__) errs.push("no defaultClip");
+        if (skel._clips?.length !== 8 || skel._clips.some((clip) => !clip?.__uuid__)) {
+            errs.push("missing animation slots");
+        }
         if (!skel._sockets || skel._sockets.length < 2) errs.push(`sockets=${skel._sockets && skel._sockets.length}`);
     }
 
@@ -39,10 +61,32 @@ for (const f of files) {
     const fm = arr.find((o) => o && o.__type__ === "9caecH2ycVFvb6W+2Mskenz");
     if (!fm) errs.push("no FighterModel");
     else {
-        if (!Array.isArray(fm.models) || fm.models.length < 1) errs.push("bad models");
-        if (!Array.isArray(fm.aryMaterial) || fm.aryMaterial.length !== 2) errs.push("bad aryMaterial");
-        if (!fm.nodeWeapon || !fm.nodeShield || !fm.ndHead || !fm.ani) errs.push("missing refs");
-        if (!fm.pfWeapon || !fm.pfShield) errs.push("missing prefab refs");
+        const modelFighters = fighters.filter((fighter) => fighter.model === name);
+        const materialSlots = new Set([0]);
+        if (playableModels.has(name)) {
+            for (const fighter of modelFighters) {
+                materialSlots.add(Number(fighter.color));
+            }
+        }
+        if ([...materialSlots].some((slot) => !fm.aryMaterial?.[slot]?.__uuid__)) {
+            errs.push("missing team skin material");
+        }
+
+        if (!fm.models?.length || fm.models.some((ref) => arr[ref?.__id__]?.__type__ !== "cc.SkinnedMeshRenderer")) {
+            errs.push("bad models");
+        }
+        if (fm.msrs?.some((ref) => arr[ref?.__id__]?.__type__ !== "cc.MeshRenderer")) {
+            errs.push("bad mesh renderers");
+        }
+        if ([fm.nodeWeapon, fm.nodeShield, fm.ndHead].some((ref) => arr[ref?.__id__]?.__type__ !== "cc.Node")) {
+            errs.push("missing node refs");
+        }
+        if (!skel || arr[fm.ani?.__id__] !== skel) {
+            errs.push("missing animation ref");
+        }
+        if (modelFighters.some((fighter) => skills.get(fighter.skill)?.fly) && !fm.pfThrowWeapon?.__uuid__) {
+            errs.push("missing projectile prefab");
+        }
     }
 
     // socket paths
@@ -76,3 +120,4 @@ for (const f of files) {
     }
 }
 console.log(allOk ? "\nALL OK" : "\nSOME FAILED");
+process.exitCode = allOk ? 0 : 1;

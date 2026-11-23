@@ -66,6 +66,7 @@
 	"版本": "Version",
 	"战力": "Power",
 	"第#0关": "Stage #0",
+	"此关卡暂时无法开始": "This level can't be started right now.",
 	"第#0关解锁#1": "Stage #0 unlocks #1",
 	"增加兵力": "Add troops",
 	"增加位置": "Add slot",

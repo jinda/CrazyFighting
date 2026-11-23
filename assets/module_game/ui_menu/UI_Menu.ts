@@ -119,6 +119,10 @@ export class UI_Menu extends egf.UIController {
     }
     private clickStart() {
         egf.AudioMgr.playOneShot("tap");
+        if (!DataMgr.isDebugMode && !GameMgr.getCurLevelEnemy()) {
+            egf.UI_Toast.show(egf.i18nMgr.getText("此关卡暂时无法开始"));
+            return;
+        }
         if (LocalDataMgr.tryConsumeStamina()) {
             const layout = this.layout as Layout_Menu;
             layout.btnStart.interactable = false;
@@ -136,12 +140,11 @@ export class UI_Menu extends egf.UIController {
             egf.UI_Toast.show(egf.i18nMgr.getText("士兵累啦，看个广告充充电？"));
             egf.UIMgr.showUI(UI_Award, null, this, { type: 3, coin: 1 });
         }
-
     }
     private clickCoin() {
         egf.AudioMgr.playOneShot("tap");
         const coin = LocalDataMgr.getBuyCoinPrice();
-        if (DataMgr.coin > coin) {
+        if (DataMgr.coin >= coin) {
             DataMgr.subCoin(coin, Constants.LEDGER_SCENE.UPGRADE_COIN);
             LocalDataMgr.upgradeCoin();
             const layout = this.layout as Layout_Menu;
@@ -163,7 +166,7 @@ export class UI_Menu extends egf.UIController {
     private clickLand() {
         egf.AudioMgr.playOneShot("tap");
         const land = LocalDataMgr.getBuyCellPrice();
-        if (DataMgr.coin > land) {
+        if (DataMgr.coin >= land) {
             DataMgr.subCoin(land, Constants.LEDGER_SCENE.UPGRADE_LAND);
             LocalDataMgr.upgradeLand();
             this.addCell();

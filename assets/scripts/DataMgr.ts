@@ -189,21 +189,30 @@ class DataManager {
     }
 
     public get level() {
-        return this._level.get() + 1;
+        return Math.min(this.completedLevel + 1, Constants.MAX_LEVEL);
+    }
+
+    public get completedLevel(): number {
+        return this._level.get();
     }
 
     public set level(value: number) {
-        const level = Math.min(Math.max(value, 0), Constants.MAX_LEVEL);
+        const level = Math.min(Math.max(Math.floor(value), 0), Constants.MAX_LEVEL);
         this._level.set(level);
     }
 
-    public nextLevel() {
-        const level = Math.min(Math.max(this.level, 0), Constants.MAX_LEVEL);
-        this._level.set(level);
-        LocalDataMgr.GameInfo.level = this._level.get();
+    public nextLevel(): boolean {
+        if (this.completedLevel >= Constants.MAX_LEVEL) {
+            return false;
+        }
+
+        const completedLevel = this.level;
+        this._level.set(completedLevel);
+        LocalDataMgr.GameInfo.level = completedLevel;
         this.bSyncCloudData = true;
         const region = egf.i18nMgr.region;
-        ClientApi.inst.completeProgress(Constants.LeaderboardMode, this._level.get(), region);
+        ClientApi.inst.completeProgress(Constants.LeaderboardMode, completedLevel, region);
+        return true;
     }
 
     public get onlineCoin() {

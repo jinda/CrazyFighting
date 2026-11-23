@@ -178,7 +178,16 @@ class GameManager {
             const enemyInfo = enemy.split("#");
             const fighterId = Number(enemyInfo[0]);
             const pos = Number(enemyInfo[1]);
-            if (!Number.isSafeInteger(fighterId) || fighterId <= 0 || !Number.isSafeInteger(pos) || pos < 0) {
+            if (
+                enemyInfo.length !== 2 ||
+                !enemyInfo[1].trim() ||
+                !Number.isSafeInteger(fighterId) ||
+                fighterId <= 0 ||
+                !Number.isSafeInteger(pos) ||
+                pos < 0 ||
+                dictFormation[pos] !== undefined ||
+                !GameCfg.queryByID("fighter", fighterId.toString())
+            ) {
                 egf.Logger.error("[GameMgr] 关卡阵型配置无效:", level, enemy);
                 return null;
             }

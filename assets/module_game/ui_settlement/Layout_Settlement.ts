@@ -1,4 +1,5 @@
-import { _decorator, Node, Button, Component, Label, SpriteFrame, Sprite, isValid } from "cc";
+import { _decorator, Node, Button, Component, Label, SpriteFrame, Sprite, isValid, v3 } from "cc";
+import { Constants } from "../../scripts/Constants";
 import { ModuleDef } from "../../scripts/ModuleDef";
 const { ccclass, property } = _decorator;
 
@@ -42,13 +43,16 @@ export class Layout_Settlement extends Component {
         this.nodeLose.active = !bWin;
         this.nodeWinEffect1.active = bWin;
         this.nodeWinEffect2.active = bWin;
-        this.btnNext.node.active = bWin;
+        this.btnNext.node.active = bWin && level < Constants.MAX_LEVEL;
         this.btnRetry.node.active = !bWin;
         this.nodeUnlock.active = false;
+        this.nodeWin.position = v3(0, 264, 0);
     }
 
     showUnlockHero(model: string, name: string) {
         //展示对应卡片
+        this.nodeUnlock.active = true;
+        this.nodeWin.position = v3(0, 440, 0);
         this.labelHeroName.string = egf.i18nMgr.getText(name);
         egf.ResMgr.getAsset(ModuleDef.GAME, `texture/card/${model}/spriteFrame`, (sp: SpriteFrame) => {
             if (isValid(this.spriteItem)) {

@@ -66,6 +66,7 @@
 	"版本": "Version",
 	"战力": "Puissance",
 	"第#0关": "Niveau #0",
+	"此关卡暂时无法开始": "Ce niveau ne peut pas être lancé pour le moment.",
 	"第#0关解锁#1": "Niveau #0 débloque #1",
 	"增加兵力": "Ajouter des troupes",
 	"增加位置": "Ajouter un emplacement",
