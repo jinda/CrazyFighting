@@ -1,4 +1,4 @@
-import { RedDotCalculateFunc } from "./RedDotStaticConfig";
+import type { RedDotCalculateFunc } from "./RedDotStaticConfig";
 
 /** 红点树的一个结点 */
 export default class RedDotNode {

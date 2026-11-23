@@ -64,6 +64,20 @@ class UIManager {
     }
 
     /**
+     * 解析 UI 类：既支持真正的 UIController 子类，也支持 scripts/UIDef.ts 里的占位类（UI_*），
+     * 占位类由 `egf_class(module, placeholder)` 在实现类加载时映射到真正的实现类。
+     * 循环引用或脚本尚未执行完成时，模块导入进来的类可能还是 undefined，
+     * 这里统一返回 null，避免 `instanceof` 抛出 "Right-hand side of 'instanceof' is not an object"。
+     */
+    private static resolveUIClass(uiCls: any): any {
+        if (!uiCls) {
+            return null;
+        }
+        const implCls = ModuleContext.getImplClass(uiCls);
+        return typeof implCls === "function" ? implCls : null;
+    }
+
+    /**
      * @en setup this UIMgr,`don't call more than once`.
      * @zh 初始化UIMgr,`不要多次调用`
      *  */
@@ -115,21 +129,31 @@ class UIManager {
     }
 
     public closeUI(uiCls: any) {
+        const implCls = UIManager.resolveUIClass(uiCls);
+        if (!implCls) {
+            egf.Logger.error("UIMgr.closeUI: 传入的 UI 类无效或尚未加载完成:", uiCls);
+            return;
+        }
         let allControllers = (UIController as any)._controllers;
         allControllers.forEach((v: any) => {
             let c = v.data as UIController;
-            if (c instanceof uiCls) {
+            if (c instanceof implCls) {
                 c.close();
             }
         });
     }
 
     public getUI<T extends UIController>(uiCls: any): T {
+        const implCls = UIManager.resolveUIClass(uiCls);
+        if (!implCls) {
+            egf.Logger.error("UIMgr.getUI: 传入的 UI 类无效或尚未加载完成:", uiCls);
+            return null as any;
+        }
         let allControllers = (UIController as any)._controllers;
         let ui = null;
         allControllers.forEach((v: any) => {
             let c = v.data as UIController;
-            if (c instanceof uiCls) {
+            if (c instanceof implCls) {
                 ui = c as T;
             }
         });
@@ -137,12 +161,16 @@ class UIManager {
     }
 
     public isShowing(uiCls: any): boolean {
+        const implCls = UIManager.resolveUIClass(uiCls);
+        if (!implCls) {
+            egf.Logger.error("UIMgr.isShowing: 传入的 UI 类无效或尚未加载完成:", uiCls);
+            return false;
+        }
         let allControllers = (UIController as any)._controllers;
         let bShow = false;
         allControllers.forEach((v: any) => {
             let c = v.data as UIController;
-
-            if (c instanceof uiCls) {
+            if (c instanceof implCls) {
                 bShow = true;
                 return;
             }
@@ -159,6 +187,10 @@ class UIManager {
      * @returns the instance of `uiCls`
      *  */
     public showUI(uiCls: any, cb?: ShowFunc | null, thisArg?: any, params?: any): any {
+        if (!UIManager.resolveUIClass(uiCls)) {
+            egf.Logger.error("UIMgr.showUI: 传入的 UI 类无效或尚未加载完成:", uiCls);
+            return;
+        }
         if (this.isShowing(uiCls)) {
             const controller = this.getUI(uiCls);
             if (!controller) {

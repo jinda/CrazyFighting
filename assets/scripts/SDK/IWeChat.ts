@@ -91,31 +91,36 @@ export class IWeChat extends SDKBase {
             return null;
         }
         try {
-            const info = wx.getSystemInfoSync();
-            const safeArea = info?.safeArea;
+            const sysSetting = wx.getSystemSetting();
+            const authorSetting = wx.getAppAuthorizeSetting();
+            const deviceInfo = wx.getDeviceInfo();
+            const windowInfo = wx.getWindowInfo();
+            const baseInfo = wx.getAppBaseInfo();
+
+            const safeArea = windowInfo?.safeArea;
             const left = safeArea?.left ?? 0;
             const right = safeArea?.right ?? 0;
             const top = safeArea?.top ?? 0;
             const bottom = safeArea?.bottom ?? 0;
             return {
-                brand: info.brand,
-                model: info.model,
-                pixelRatio: info.pixelRatio,
-                screenWidth: info.screenWidth,
-                screenHeight: info.screenHeight,
-                windowWidth: info.windowWidth,
-                windowHeight: info.windowHeight,
-                statusBarHeight: info.statusBarHeight,
-                language: info.language,
-                coreVersion: info.SDKVersion || info.version,
-                system: info.system,
-                platform: info.platform,
-                cameraAuthorized: !!info.cameraAuthorized,
-                locationAuthorized: !!info.locationAuthorized,
-                microphoneAuthorized: !!info.microphoneAuthorized,
-                notificationAuthorized: !!info.notificationAuthorized,
-                locationEnabled: !!info.locationEnabled,
-                wifiEnabled: !!info.wifiEnabled,
+                brand: deviceInfo.brand,
+                model: deviceInfo.model,
+                pixelRatio: windowInfo.pixelRatio,
+                screenWidth: windowInfo.screenWidth,
+                screenHeight: windowInfo.screenHeight,
+                windowWidth: windowInfo.windowWidth,
+                windowHeight: windowInfo.windowHeight,
+                statusBarHeight: windowInfo.statusBarHeight,
+                language: baseInfo.language,
+                coreVersion: baseInfo.SDKVersion || baseInfo.version,
+                system: deviceInfo.system,
+                platform: deviceInfo.platform,
+                cameraAuthorized: !!authorSetting.cameraAuthorized,
+                locationAuthorized: !!authorSetting.locationAuthorized,
+                microphoneAuthorized: !!authorSetting.microphoneAuthorized,
+                notificationAuthorized: !!authorSetting.notificationAuthorized,
+                locationEnabled: !!sysSetting.locationEnabled,
+                wifiEnabled: !!sysSetting.wifiEnabled,
                 safeArea: safeArea
                     ? {
                         left,
@@ -128,7 +133,7 @@ export class IWeChat extends SDKBase {
                     : undefined,
             };
         } catch (error) {
-            egf.Logger.warn("wx.getSystemInfoSync failed:", error);
+            egf.Logger.warn("wx.getSystemInfo failed:", error);
             return null;
         }
     }
@@ -515,9 +520,9 @@ export class IWeChat extends SDKBase {
                     });
                 } else {
                     // 否则，先通过 wx.createUserInfoButton 接口发起授权
-                    const systemInfo = wx.getSystemInfoSync();
-                    const screenWidth = systemInfo.windowWidth;
-                    const screenHeight = systemInfo.windowHeight;
+                    const windowInfo = wx.getWindowInfo();
+                    const screenWidth = windowInfo.windowWidth;
+                    const screenHeight = windowInfo.windowHeight;
                     // 计算缩放比例
                     const designSize = view.getDesignResolutionSize();
                     const scaleX = screenWidth / designSize.width;

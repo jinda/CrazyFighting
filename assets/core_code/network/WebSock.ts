@@ -1,5 +1,5 @@
-import { ISocket, MessageFunc, NetData } from "./NetInterface";
-import { NetConnectOptions } from "./NetNode";
+import type { ISocket, MessageFunc, NetData } from "./NetInterface";
+import type { NetConnectOptions } from "./NetNode";
 
 /*
  *   WebSocket封装

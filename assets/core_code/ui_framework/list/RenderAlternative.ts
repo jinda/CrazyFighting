@@ -22,6 +22,29 @@ const { ccclass, property } = _decorator;
 @ccclass
 export default class RenderAlternative extends Component {
     private static _isDirty: WeakMap<Node, boolean> = new WeakMap();
+    /** 所有在跑同步的实例 */
+    private static _actives: Set<RenderAlternative> = new Set();
+    /** 全局唯一的 rAF 句柄（只创建一次，不再每帧 bind） */
+    private static _tickHandle: (() => void) | null = null;
+    private static _rafId: number = 0;
+
+    private static startLoop(): void {
+        if (this._rafId !== 0) {
+            return;
+        }
+        if (!this._tickHandle) {
+            this._tickHandle = () => {
+                RenderAlternative._rafId = 0;
+                // Set.forEach 允许在遍历中删除当前元素（组件在帧内被销毁是常见情况）
+                RenderAlternative._actives.forEach((c) => c.frameUpdate());
+                if (RenderAlternative._actives.size > 0) {
+                    RenderAlternative.startLoop();
+                }
+            };
+        }
+        this._rafId = requestAnimationFrame(this._tickHandle);
+    }
+
     public static isDirty(renderLayer: Node): boolean {
         return this._isDirty.get(renderLayer) ?? false;
     }
@@ -120,7 +143,9 @@ export default class RenderAlternative extends Component {
         let node = this.getRender();
         node.setParent(this.renderLayer ? this.renderLayer : director.getScene()!.getChildByName("Canvas"));
         this.isAttachFrame = true;
-        requestAnimationFrame(this.frameUpdate.bind(this));
+        // 注册到静态循环：一个 rAF 驱动全部实例，且不再每帧新建 bind 闭包
+        RenderAlternative._actives.add(this);
+        RenderAlternative.startLoop();
         return this.doProxy<T>();
     }
     /**生成代理 */
@@ -130,8 +155,11 @@ export default class RenderAlternative extends Component {
     }
 
     protected frameUpdate(): void {
+        // 不再自己续帧：由静态循环统一调度
         let now = sys.now();
-        !this.lastFrameTime && (this.lastFrameTime = now);
+        if (!this.lastFrameTime) {
+            this.lastFrameTime = now;
+        }
         let dt = (now - this.lastFrameTime) / 1000;
         this.lastFrameTime = now;
         if (this.proxyRender) {
@@ -140,9 +168,6 @@ export default class RenderAlternative extends Component {
                 this.accuTime -= this.syncInv;
                 this.updateProp();
             }
-        }
-        if (this.isAttachFrame) {
-            requestAnimationFrame(this.frameUpdate.bind(this));
         }
     }
 
@@ -181,14 +206,20 @@ export default class RenderAlternative extends Component {
             uiOpacity.opacity != opacity && (uiOpacity.opacity = opacity);
         }
 
-        let wMat4 = this.node.worldMatrix.clone();
-        let lMat4 = this.node.matrix?.clone();
-        if (!this.lastWMat4?.equals(wMat4) || (this.lastLMat4 && !this.lastLMat4?.equals(lMat4))) {
+        // 用 set() 原地拷贝代替 clone()：equals 需要 Mat4 实例，但不需要新实例
+        const wMat4 = this.node.worldMatrix;
+        const lMat4 = this.node.matrix;
+        if (!this.lastWMat4) {
+            this.lastWMat4 = new Mat4();
+            this.lastLMat4 = new Mat4();
+            this.lastWMat4.set(wMat4);
+            this.lastLMat4.set(lMat4);
+        } else if (!this.lastWMat4.equals(wMat4) || !this.lastLMat4.equals(lMat4)) {
             this.onAngleChange();
             this.onScaleChange();
             this.onPosChange();
-            this.lastLMat4 = lMat4;
-            this.lastWMat4 = wMat4;
+            this.lastWMat4.set(wMat4);
+            this.lastLMat4.set(lMat4);
         }
         //@ts-ignore
         let old = node._rZIndex;
@@ -200,6 +231,8 @@ export default class RenderAlternative extends Component {
     }
 
     protected onDestroy(): void {
+        RenderAlternative._actives.delete(this);
+        this.isAttachFrame = false;
         this.renderCompnent?.node.destroy();
         this.renderCompnent = null!;
         this.proxyRender = null!;
@@ -218,17 +251,17 @@ export default class RenderAlternative extends Component {
         }
         return opacity * 255;
     }
-    /**位置变化处理 */
+    /**位置变化处理（setWorldPosition 内部会拷贝，不必先 clone） */
     private onPosChange() {
-        this.renderCompnent.node.worldPosition = this.node.worldPosition.clone();
+        this.renderCompnent.node.setWorldPosition(this.node.worldPosition);
     }
     /**旋转变化处理 */
     private onAngleChange() {
-        this.renderCompnent.node.worldRotation = this.node.worldRotation.clone();
+        this.renderCompnent.node.setWorldRotation(this.node.worldRotation);
     }
     /**缩放变化处理 */
     private onScaleChange() {
-        this.renderCompnent.node.worldScale = this.node.worldScale.clone();
+        this.renderCompnent.node.setWorldScale(this.node.worldScale);
     }
     /**
      * 获取渲染组件

@@ -36,11 +36,11 @@ type TDate = { index?: number; size?: Size };
 export class ShowNode<T extends TDate> extends Component {
     private hasInit: boolean = false;
     /**渲染分层开启的挂载节点 */
-    public renderLayer: Node | null = null;
+    public renderLayer: Node | null = null!;
     /**上级的cell */
-    public cell: ItemCell<T> | null = null;
+    public cell: ItemCell<T> | null = null!;
     /**数据 */
-    public data: T | null = null;
+    public data: T | null = null!;
     /**初始化 */
     public init(cell: ItemCell<T>, data: T, renderLayer: Node) {
         this.cell = cell;
@@ -135,6 +135,34 @@ export class ItemCell<T extends TDate> {
     /**数据 */
     public data: T | null = null;
     /**
+     * 复用的边界缓存：一个 cell 一份，创建后滚动期间零分配。
+     * 注意：updateBorder() 返回的是同一个对象，调用方不得跨帧持有。
+     */
+    public readonly border: IBorder = { size: size() };
+    /** 是否有正在跑的尺寸 tween（用于跳过无意义的 stopAllByTarget 扫描） */
+    public tweening: boolean = false;
+
+    /**
+     * 刷新并返回本 cell 的世界坐标边界。
+     * 4 边恒算：比"按需传 boolean[]"更省，省掉的是每次的数组字面量与 Size 分配。
+     */
+    public updateBorder(): IBorder {
+        const wp = this.node.worldPosition; // 返回节点内部实例，不分配
+        const t = this.uiTrans;
+        const w = t.width;
+        const h = t.height;
+        const ax = t.anchorX;
+        const ay = t.anchorY;
+        const b = this.border;
+        b.leftSide = wp.x - w * ax;
+        b.rightSide = wp.x + w * (1 - ax);
+        b.bottomSide = wp.y - h * ay;
+        b.topSide = wp.y + h * (1 - ay);
+        b.size!.width = w;
+        b.size!.height = h;
+        return b;
+    }
+    /**
      * 构造函数
      * @param node
      * @param looplist
@@ -153,10 +181,16 @@ export class ItemCell<T extends TDate> {
      * @param looplist 挂载的列表
      */
     public init(data: T, size: Size, dataIndex: number, cellIndex: number) {
-        Tween.stopAllByTarget(this.node!);
         this.cellIndex = cellIndex;
         this.dataIndex = dataIndex;
         !this.uiTrans && (this.uiTrans = this.node!.getComponent(UITransform)!);
+        // 原来这里无条件 Tween.stopAllByTarget(this.node)，但停错了目标：
+        // dealChangeSize 的 tween 打在 cell.uiTrans 上，所以多条 resize tween 会同时存在、
+        // 互相覆盖 width/height。改成"有 tween 才停，且停 uiTrans"。
+        if (this.tweening) {
+            Tween.stopAllByTarget(this.uiTrans);
+            this.tweening = false;
+        }
         this.uiTrans!.width = size.width;
         this.uiTrans!.height = size.height;
         this.data = data;
@@ -168,7 +202,7 @@ export class ItemCell<T extends TDate> {
      * @param time
      */
     resize(newSize: Size, time: number) {
-        let nodeSides = getNodeBorder(this, [true, true, true, true]);
+        let nodeSides = this.updateBorder();
         let changeSize = size(newSize.width - this.size!.width, newSize.height - this.size!.height);
         this.size = newSize;
         this.looplist!.dealChangeSize(this, nodeSides, changeSize, time).then(() => {
@@ -291,8 +325,13 @@ export default class LoopList<T extends TDate> {
     private showNodePool: ShowNode<T>[] = [];
     /**边缘数据 */
     private viewSides: IBorder = {};
-    /**上一帧滚动容器的坐标 */
-    private lastPos: Vec3 | null = null;
+    /** 上一帧滚动容器的坐标（复用，不 clone） */
+    private _lastPos: Vec3 = new Vec3();
+    private _hasLastPos: boolean = false;
+    /** 本帧位移，复用，避免每次滚动都新建 Vec3 */
+    private _tmpOffset: Vec3 = new Vec3();
+    /** 复用的显示列表缓存：updateNodes 的返回值，调用方不得跨帧持有 */
+    private _showCells: ItemCell<T>[] = [];
     /**刷新显示的间隔次数 */
     public updateInv: number = 0;
     /**循环切换的最后一次时间 */
@@ -368,26 +407,32 @@ export default class LoopList<T extends TDate> {
     /**滚动监听 */
     scrollingListener() {
         this.updateInv--;
-        if (this.updateInv <= 0) {
-            this.updateInv = 2;
-            let showCells = this.updateNodes();
+        if (this.updateInv > 0) {
+            return;
+        }
+        this.updateInv = 2;
 
-            // egf.Logger.log("scrollingListener:", this.lastChange, this.cellMaxNum);
-            // if (!this.cellMaxNum) {
-            //   return;
-            // }
-            if (!this.lastPos) {
-                this.lastPos = this.scrollView?.content!.position.clone()!;
-            } else {
-                let offset = this.scrollView?.content!.position.clone().subtract(this.lastPos);
-                this.lastPos = this.scrollView?.content!.position.clone()!;
-                let now = sys.now();
+        const showCells = this.updateNodes();
+        const content = this.scrollView?.content;
+        if (!content) {
+            return;
+        }
 
-                if (!this.lastChange || now - this.lastChange > 1) {
-                    this.lastChange = now;
-                    this.dealLoopList(offset!, showCells);
-                }
-            }
+        const pos = content.position; // Readonly<Vec3>，本身不分配
+        if (!this._hasLastPos) {
+            this._lastPos.set(pos);
+            this._hasLastPos = true;
+            return;
+        }
+
+        this._tmpOffset.set(pos.x - this._lastPos.x, pos.y - this._lastPos.y, pos.z - this._lastPos.z);
+        this._lastPos.set(pos);
+
+        const now = sys.now();
+        // 保留原有节流语义（sys.now 为毫秒，> 1 基本等价于每次滚动事件都处理）
+        if (!this.lastChange || now - this.lastChange > 1) {
+            this.lastChange = now;
+            this.dealLoopList(this._tmpOffset, showCells);
         }
     }
 
@@ -437,7 +482,8 @@ export default class LoopList<T extends TDate> {
         let len = this.cellMaxNum ? this.cellMaxNum : data.length;
         for (let i = 0; i < len; ++i) {
             let data = this.datas[this.curStartIndex + i];
-            let cellSize = data.size ? data.size : size;
+            // 虚拟化时 cell 数固定、数据可能更少，必须判空，否则读 data.size 直接崩
+            let cellSize = data && data.size ? data.size : size;
             let itemCell = this.itemCells[i];
             if (!itemCell) {
                 let node = new Node("LoopListCell");
@@ -461,6 +507,71 @@ export default class LoopList<T extends TDate> {
         }
         requestAnimationFrame(() => {
             this.updateNodes();
+        });
+    }
+
+    /** 建一个 cell 容器节点（从 initData 里抽出来，供 setDatas 复用） */
+    private createCell(index: number): ItemCell<T> {
+        const node = new Node("LoopListCell");
+        const uiTrans = node.addComponent(UITransform);
+        uiTrans.setAnchorPoint(this.anchor!);
+        node.setParent(this.scrollView!.content!);
+        node.setSiblingIndex(index);
+        return new ItemCell<T>(node, this);
+    }
+
+    /**
+     * 一次性填充数据。
+     * - 非虚拟化（cellMaxNum = 0）：按数据量建 cell，一趟建完，只在最后一帧 updateNodes 一次；
+     * - 虚拟化（cellMaxNum > 0）：只维护 cellMaxNum 个 cell，切数据时复用不重建。
+     *
+     * 与 pushDatas 的差别：不再 per-item `await requestAnimationFrame` + `tween(0.3)` + `updateNodes()`，
+     * 100 条数据从 O(n²) 的建表+刷新降到 1 次 rAF + O(n) 次赋值。
+     */
+    public setDatas(datas: T[]) {
+        if (!this.scrollView) {
+            return;
+        }
+        this.datas = datas;
+        this.curStartIndex = 0;
+
+        const virtual = this.cellMaxNum > 0;
+        const need = virtual ? this.cellMaxNum : datas.length;
+        const cells = this.itemCells;
+
+        // 1) 裁掉多余的 cell
+        if (cells.length > need) {
+            for (let i = need, len = cells.length; i < len; ++i) {
+                const cell = cells[i];
+                if (!cell) {
+                    continue;
+                }
+                const showNode = cell.recircle();
+                showNode && this.recircleShowNode(showNode);
+                cell.destroy();
+            }
+            cells.length = need;
+        }
+
+        // 2) 补齐 cell
+        for (let i = cells.length; i < need; ++i) {
+            cells[i] = this.createCell(i);
+        }
+
+        // 3) 整表赋值：不 await、不起补间
+        for (let i = 0; i < need; ++i) {
+            const data = datas[i] as T;
+            const cell = cells[i];
+            const cellSize = data && data.size ? data.size : this.size!;
+            cell.init(data, cellSize, i, i);
+        }
+
+        // 4) 一帧后统一刷显示（Layout 需要一帧完成排版，与原实现保持一致）
+        this._hasLastPos = false;
+        requestAnimationFrame(() => {
+            if (this.scrollView) {
+                this.updateNodes();
+            }
         });
     }
 
@@ -502,7 +613,7 @@ export default class LoopList<T extends TDate> {
                 //在使用范围内
                 if (cellIndex >= 0 && cellIndex < this.cellMaxNum) {
                     let itemCell = this.itemCells[cellIndex];
-                    let nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
+                    let nodeSides = itemCell.updateBorder();
                     let changeSize = size(-itemCell.size!.width, -itemCell.size!.height);
                     itemCell.size = size(0, 0);
                     this.dealChangeSize(itemCell, nodeSides, changeSize).then(() => {
@@ -518,7 +629,7 @@ export default class LoopList<T extends TDate> {
                 }
             } else {
                 let itemCell = this.itemCells.splice(removeIndex, 1)[0];
-                let nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
+                let nodeSides = itemCell.updateBorder();
                 let changeSize = size(-itemCell.size!.width, -itemCell.size!.height);
                 itemCell.size = size(0, 0);
                 this.dealChangeSize(itemCell, nodeSides, changeSize).then(() => {
@@ -593,7 +704,7 @@ export default class LoopList<T extends TDate> {
                 let nodeSides: IBorder = null!;
                 let itemCell: ItemCell<T> = this.itemCells[cellIndex];
                 if (itemCell) {
-                    nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
+                    nodeSides = itemCell.updateBorder();
                     itemCell.uiTrans.width = 0;
                     itemCell.uiTrans.height = 0;
                     this.dealChangeSize(itemCell, nodeSides, cellSize).then(() => {
@@ -606,7 +717,7 @@ export default class LoopList<T extends TDate> {
             //获取当前的位置
             let nodeSides: IBorder = null!;
             if (this.itemCells[dataIndex]) {
-                nodeSides = getNodeBorder(this.itemCells[dataIndex], [true, true, true, true]);
+                nodeSides = this.itemCells[dataIndex].updateBorder();
             }
             let node = new Node("LoopListCell");
             let uiTrans = node.addComponent(UITransform);
@@ -623,7 +734,7 @@ export default class LoopList<T extends TDate> {
             if (!nodeSides) {
                 await new Promise<void>((resolve, reject) => {
                     requestAnimationFrame(() => {
-                        nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
+                        nodeSides = itemCell.updateBorder();
                         resolve();
                     });
                 });
@@ -653,7 +764,8 @@ export default class LoopList<T extends TDate> {
 
             if (offset.y > 0) {
                 //已经到达最后倒数第二个节点并且还有数据
-                const bottomY = -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size!.height;
+                const bottomY =
+                    -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size!.height;
                 // egf.Logger.log("dealLoopList1:", this.scrollView!.content!.position.y, bottomY);
                 // egf.Logger.log("dealLoopList2:", endCell.dataIndex, this.datas.length - 2);
                 if (this.scrollView!.content!.position.y >= bottomY && endCell.dataIndex < this.datas.length - 2) {
@@ -666,7 +778,7 @@ export default class LoopList<T extends TDate> {
                     //计算第一个cell的数据下标
                     this.curStartIndex = showStart - cellStartIndex;
 
-                    let cellTop = getNodeBorder(this.itemCells[startCell.cellIndex], [true]).topSide!;
+                    let cellTop = this.itemCells[startCell.cellIndex].updateBorder().topSide!;
 
                     let contentHeight = 0;
                     let targetY = 0;
@@ -696,7 +808,7 @@ export default class LoopList<T extends TDate> {
                     let posY = targetY + (cellTop - this.viewSides.topSide!);
                     this.scrollView!.content!.setPosition(v3(this.scrollView!.content!.position.x, posY));
                     this.scrollView!.scrollToOffset(v2(0, posY + endCell.size.height), 1);
-                    this.lastPos = null;
+                    this._hasLastPos = false;
                 } else if (
                     this.scrollView!.content!.position.y >=
                         -this.itemCells[this.itemCells.length - 2].node.position.y - this.viewSides.size!.height &&
@@ -720,7 +832,7 @@ export default class LoopList<T extends TDate> {
                     this.curStartIndex = Math.max(showEndIndex - (this.itemCells.length - 1), 0);
 
                     //将content的位置移动到最下方并对齐移动前的状态
-                    let cellTop = getNodeBorder(this.itemCells[Math.max(startCell.cellIndex - 1, 0)], [true]).topSide!;
+                    let cellTop = this.itemCells[Math.max(startCell.cellIndex - 1, 0)].updateBorder().topSide!;
 
                     let contentHeight = 0;
                     let showIndex = showCells.length - 1;
@@ -748,7 +860,7 @@ export default class LoopList<T extends TDate> {
                     let posY = contentHeight + (cellTop - this.viewSides.topSide!);
                     this.scrollView!.content!.setPosition(v3(this.scrollView!.content!.position.x, posY));
                     this.scrollView!.scrollToOffset(v2(0, posY - startCell.size.height), 1);
-                    this.lastPos = null;
+                    this._hasLastPos = false;
                 }
             }
         } else if (this.scrollView!.horizontal) {
@@ -768,7 +880,7 @@ export default class LoopList<T extends TDate> {
                     //计算第一个cell的数据下标
                     this.curStartIndex = showStart - cellStartIndex;
 
-                    let cellLeft = getNodeBorder(this.itemCells[startCell.cellIndex], [false, false, true]).leftSide!;
+                    let cellLeft = this.itemCells[startCell.cellIndex].updateBorder().leftSide!;
 
                     let contentWidth = 0;
                     let targetX = 0;
@@ -799,7 +911,7 @@ export default class LoopList<T extends TDate> {
                     let posX = cellLeft - this.viewSides.leftSide! - targetX;
                     this.scrollView!.content!.setPosition(v3(posX, this.scrollView!.content!.position.y));
                     this.scrollView!.scrollToOffset(v2(-(posX - endCell.size.width), 0), 1);
-                    this.lastPos = null;
+                    this._hasLastPos = false;
                 } else if (
                     this.scrollView!.content!.position.x <=
                         -(this.itemCells[this.itemCells.length - 2].node.position.x - this.viewSides.size!.width) &&
@@ -822,11 +934,7 @@ export default class LoopList<T extends TDate> {
                     this.curStartIndex = Math.max(showEndIndex - (this.itemCells.length - 1), 0);
 
                     //将content的位置移动到最右侧并对齐移动前的状态
-                    let cellLeft = getNodeBorder(this.itemCells[Math.max(startCell.cellIndex - 1, 0)], [
-                        false,
-                        false,
-                        true,
-                    ]).leftSide!;
+                    let cellLeft = this.itemCells[Math.max(startCell.cellIndex - 1, 0)].updateBorder().leftSide!;
 
                     let contentWidth = 0;
                     let showIndex = showCells.length - 1;
@@ -855,23 +963,24 @@ export default class LoopList<T extends TDate> {
                     let posX = cellLeft - this.viewSides.leftSide! - contentWidth;
                     this.scrollView!.content!.setPosition(v3(posX, this.scrollView!.content!.position.y));
                     this.scrollView!.scrollToOffset(v2(-(posX + startCell.size.width), 0), 1);
-                    this.lastPos = null;
+                    this._hasLastPos = false;
                 }
             }
         }
     }
 
-    /**更新节点的显示 */
+    /**更新节点的显示。返回值是内部复用数组，调用方不得跨帧持有（当前调用点都是当帧消费）。 */
     public updateNodes() {
-        let showCells: ItemCell<T>[] = [];
-        for (let i = 0, len = this.itemCells.length; i < len; ++i) {
-            let itemCell = this.itemCells[i];
-            let isShow = this.dealItemShow(itemCell);
-            if (isShow) {
-                showCells.push(itemCell);
+        const out = this._showCells;
+        out.length = 0;
+        const cells = this.itemCells;
+        for (let i = 0, len = cells.length; i < len; ++i) {
+            const cell = cells[i];
+            if (cell && this.dealItemShow(cell)) {
+                out.push(cell);
             }
         }
-        return showCells;
+        return out;
     }
 
     /**
@@ -879,20 +988,25 @@ export default class LoopList<T extends TDate> {
      * @param itemCell
      */
     private dealItemShow(itemCell: ItemCell<T>): boolean {
-        if (itemCell) {
-            let isShow = this.checkInView(itemCell);
-            if (isShow) {
-                itemCell.hasNoNode &&
-                    itemCell.updateShow(
-                        isShow,
-                        this.prefab!,
-                        this.showNodePool.length > 0 ? this.showNodePool.pop()! : null!,
-                        this.renderLayer!,
-                    );
-            } else {
-                !itemCell.hasNoNode && this.recircleShowNode(itemCell.recircle()!);
+        if (!itemCell) {
+            return false;
+        }
+        // 虚拟化时 cell 数量固定，数据可能更少；没有数据就不该创建 showNode
+        if (!itemCell.data) {
+            if (!itemCell.hasNoNode) {
+                this.recircleShowNode(itemCell.recircle()!);
             }
-            return isShow;
+            return false;
+        }
+        if (this.checkInView(itemCell)) {
+            if (itemCell.hasNoNode) {
+                const cache = this.showNodePool.length > 0 ? this.showNodePool.pop()! : null!;
+                itemCell.updateShow(true, this.prefab!, cache, this.renderLayer!);
+            }
+            return true;
+        }
+        if (!itemCell.hasNoNode) {
+            this.recircleShowNode(itemCell.recircle()!);
         }
         return false;
     }
@@ -903,18 +1017,14 @@ export default class LoopList<T extends TDate> {
      * @returns
      */
     private checkInView(itemCell: ItemCell<T>) {
-        let nodeSides = getNodeBorder(itemCell, [true, true, true, true]);
-        //节点右侧边缘在屏幕左侧外面或者节点左边缘在屏幕右侧外面 则不在显示区域
-        let horizontalOutside =
-            nodeSides.rightSide! < this.viewSides.leftSide! || nodeSides.leftSide! > this.viewSides.rightSide!;
-
-        let verticalOutside = false;
-        if (!horizontalOutside) {
-            //节点上边缘在屏幕下方外面或者节点下边缘在屏幕上方外面 则不在显示区域
-            verticalOutside =
-                nodeSides.topSide! < this.viewSides.bottomSide! || nodeSides.bottomSide! > this.viewSides.topSide!;
+        const b = itemCell.updateBorder();
+        const view = this.viewSides;
+        // 节点右侧边缘在屏幕左侧外面或者节点左边缘在屏幕右侧外面 则不在显示区域
+        if (b.rightSide! < view.leftSide! || b.leftSide! > view.rightSide!) {
+            return false;
         }
-        return !horizontalOutside && !verticalOutside;
+        // 节点上边缘在屏幕下方外面或者节点下边缘在屏幕上方外面 则不在显示区域
+        return !(b.topSide! < view.bottomSide! || b.bottomSide! > view.topSide!);
     }
     /**
      * 处理变化的大小
@@ -942,11 +1052,14 @@ export default class LoopList<T extends TDate> {
             }
         }
         if (!(topToBottomFulfill || bottomToTopFulfill || leftToRightFulfill || RightToLeftFulfill)) {
-            Tween.stopAllByTarget(cell.node);
-            await new Promise<void>((resolve, reject) => {
+            // 停对目标：tween 打在 uiTrans 上，不是 cell.node
+            Tween.stopAllByTarget(cell.uiTrans);
+            cell.tweening = true;
+            await new Promise<void>((resolve) => {
                 tween(cell.uiTrans)
                     .to(time, { width: cell.size.width, height: cell.size.height })
                     .call(() => {
+                        cell.tweening = false;
                         resolve();
                     })
                     .start();
@@ -965,20 +1078,38 @@ export default class LoopList<T extends TDate> {
     }
 
     /**
-     * 释放当前列表
+     * 释放当前列表。
+     * @param destroy 是否真正销毁 cell 与 showNode 池。
+     *                关闭界面时传 true —— 原实现的销毁循环被注释掉了，
+     *                只清数组会让节点残留在 scrollView.content 下直到父节点销毁。
      */
-    public freeList() {
-        this.scrollView?.node?.off(ScrollView.EventType.SCROLLING, this.scrollingListener);
-        this.scrollView?.node?.off(ScrollView.EventType.SCROLL_ENDED, this.scrollendListener);
-        // for (let i = 0, len = this.itemCells.length; i < len; ++i) {
-        //   this.recircleShowNode(this.itemCells[i].recircle());
-        //   this.itemCells[i].destroy();
-        // }
+    public freeList(destroy: boolean = false) {
+        // 补 target：init() 是带 target 注册的，off 也应当带，避免误删同引用的其他监听
+        this.scrollView?.node?.off(ScrollView.EventType.SCROLLING, this.scrollingListener, this);
+        this.scrollView?.node?.off(ScrollView.EventType.SCROLL_ENDED, this.scrollendListener, this);
+
+        if (destroy) {
+            for (let i = 0, len = this.itemCells.length; i < len; ++i) {
+                const cell = this.itemCells[i];
+                if (!cell) {
+                    continue;
+                }
+                const showNode = cell.recircle();
+                showNode?.node?.destroy();
+                cell.destroy();
+            }
+            for (let i = 0, len = this.showNodePool.length; i < len; ++i) {
+                const node = this.showNodePool[i]?.node;
+                node?.destroy();
+            }
+        }
+
         this.itemCells = [];
-        // for (let index = 0, len = this.showNodePool.length; index < len; ++index) {
-        //   this.showNodePool[index].destroy();
-        // }
         this.showNodePool = [];
+        this.datas = [];
+        this.curStartIndex = 0;
+        this._showCells.length = 0;
+        this._hasLastPos = false;
         this.renderLayer = null;
         this.scrollView = null;
         this.prefab = null;
@@ -1057,35 +1188,10 @@ export default class LoopList<T extends TDate> {
         this.curStartIndex = 0;
         this.itemCells = [];
         this.showNodePool = [];
+        this._showCells.length = 0;
+        this._hasLastPos = false;
         this.scrollView!.content!.removeAllChildren();
         this._scrollCenterOffsetX = [];
         this._scrollCenterOffsetY = [];
     }
-}
-/**
- * 获取节点的边缘
- * @param cell
- * @param needArr 顺序是上 下 左 右
- */
-function getNodeBorder(cell: ItemCell<any>, needArr: boolean[]) {
-    let borderData: IBorder = {};
-    let wpos = cell.node.worldPosition.clone();
-    //显示区域上边缘
-    if (needArr[0]) {
-        borderData.topSide = wpos.y + cell.uiTrans.height * (1 - cell.uiTrans.anchorY);
-    }
-    //显示区域下边缘
-    if (needArr[1]) {
-        borderData.bottomSide = wpos.y - cell.uiTrans.height * cell.uiTrans.anchorY;
-    }
-    //显示区域左边缘
-    if (needArr[2]) {
-        borderData.leftSide = wpos.x - cell.uiTrans.width * cell.uiTrans.anchorX;
-    }
-    //显示区域右边缘
-    if (needArr[3]) {
-        borderData.rightSide = wpos.x + cell.uiTrans.width * (1 - cell.uiTrans.anchorX);
-    }
-    borderData.size = size(cell.uiTrans.width, cell.uiTrans.height);
-    return borderData;
 }

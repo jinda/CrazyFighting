@@ -50,7 +50,7 @@ export default class Time {
         return `${year}/${pad(month)}/${pad(day)} ${pad(hours)}:${pad(minutes)}:${pad(seconds)} UTC`;
     }
 
-    public static convertSecondsToTimeFormat(seconds: number) {
+    public static timeFormat(seconds: number) {
         const days = Math.floor(seconds / (3600 * 24));
         const hours = Math.floor((seconds % (3600 * 24)) / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);
@@ -67,7 +67,7 @@ export default class Time {
         return timer;
     }
 
-    public static convertSecondsToDHM(seconds: number) {
+    public static timeFormatDHM(seconds: number) {
         const days = Math.floor(seconds / (3600 * 24));
         const hours = Math.floor((seconds % (3600 * 24)) / 3600);
         const minutes = Math.floor((seconds % 3600) / 60);

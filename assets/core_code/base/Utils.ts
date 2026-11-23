@@ -1,4 +1,4 @@
-import { isValid, Label, UITransform, Vec2, Node, instantiate } from "cc";
+import { isValid, Label, UITransform, Vec2, Node, instantiate, Color, Vec4, v4 } from "cc";
 // import qrcode from "qrcode-generator";
 
 export class Utils {
@@ -636,5 +636,59 @@ export class Utils {
         }
 
         return v;
+    }
+
+    public static toInteger(value: unknown, defaultVal: number) {
+        return typeof value === "number" && Number.isInteger(value) ? value : defaultVal;
+    }
+
+    public static clearObj(obj: any) {
+        if (!obj) return;
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                if (typeof obj[key] === "object") {
+                    obj[key] = null;
+                }
+            }
+        }
+    }
+
+    /**
+     * 颜色转换
+     * @param c
+     * @returns
+     */
+    public static getColorRate(c: Color, out?: Vec4) {
+        out = out || v4();
+        out.x = c.r / 255;
+        out.y = c.g / 255;
+        out.z = c.b / 255;
+        out.w = c.a / 255;
+        return out;
+    }
+
+    /**
+     * 将数组内容进行随机排列
+     * @param {Array}array 需要被随机的数组
+     * @returns
+     */
+    public static shuffleArray(array: any[]): any[] {
+        const shuffledArray = array.slice();
+        let currentIndex = shuffledArray.length;
+        let temporaryValue, randomIndex;
+
+        // 如果还有元素需要排序
+        while (0 !== currentIndex) {
+            // 随机选择一个未排序的元素
+            randomIndex = Math.floor(Math.random() * currentIndex);
+            currentIndex -= 1;
+
+            // 与当前元素交换
+            temporaryValue = shuffledArray[currentIndex];
+            shuffledArray[currentIndex] = shuffledArray[randomIndex];
+            shuffledArray[randomIndex] = temporaryValue;
+        }
+
+        return shuffledArray;
     }
 }

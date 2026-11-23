@@ -25,6 +25,8 @@ class AudioManager {
     private _soundVolume = 1.0;
     private _bundleName = "resources";
     private _currentEffect = 0;
+    /** 短音效 clip 缓存：键为 "bundle|路径"，避免每次 playOneShot 都走一次异步加载 */
+    private _clipCache: { [key: string]: AudioClip } = {};
     constructor() {
         if (EDITOR_NOT_IN_PREVIEW) {
             return;
@@ -114,18 +116,30 @@ class AudioManager {
             sources.clip = sound;
             sources.volume = this._soundVolume;
             sources.playOneShot(sound, volume * this._soundVolume);
-        } else {
-            let bundle = assetManager.getBundle(bundleName);
-            bundle?.load(sound, (err, clip: AudioClip) => {
-                if (err) {
-                    egf.Logger.error("playOneShot error:", err);
-                } else {
-                    sources.clip = clip;
-                    sources.volume = this._soundVolume;
-                    sources.playOneShot(clip, volume * this._soundVolume);
-                }
-            });
+            return;
         }
+
+        // 命中缓存直接播，不再走异步加载（每次 load 都会新建一个回调闭包）
+        const key = bundleName + "|" + sound;
+        const cached = this._clipCache[key];
+        if (cached) {
+            sources.clip = cached;
+            sources.volume = this._soundVolume;
+            sources.playOneShot(cached, volume * this._soundVolume);
+            return;
+        }
+
+        let bundle = assetManager.getBundle(bundleName);
+        bundle?.load(sound, (err, clip: AudioClip) => {
+            if (err) {
+                egf.Logger.error("playOneShot error:", err);
+            } else {
+                this._clipCache[key] = clip;
+                sources.clip = clip;
+                sources.volume = this._soundVolume;
+                sources.playOneShot(clip, volume * this._soundVolume);
+            }
+        });
     }
 
     /**
@@ -155,7 +169,7 @@ class AudioManager {
                 if (err) {
                     egf.Logger.log("AudioMgr play error", err);
                 } else {
-                    egf.Logger.log("AudioMgr play clip:", clip.name);
+                    // egf.Logger.log("AudioMgr play clip:", clip.name);
                     this._musicSource.stop();
                     this._musicSource.clip = null;
                     this._musicSource.clip = clip;
@@ -171,7 +185,7 @@ class AudioManager {
      * stop the audio play
      */
     stop() {
-        egf.Logger.log("AudioMgr stop");
+        // egf.Logger.log("AudioMgr stop");
         this._musicSource.stop();
         this._musicSource.clip = null;
     }
@@ -179,12 +193,16 @@ class AudioManager {
     /**
      * stop the effect audio play
      */
-    stopShot(sound: AudioClip | string) {
+    stopShot(sound: AudioClip | string | null) {
         this._effectSources.forEach((as) => {
             if (as.clip === sound) {
                 as.stop();
                 as.clip = null;
             } else if (as?.clip?.name === sound) {
+                egf.Logger.log("stopShot:", sound, this._effectSources);
+                as.stop();
+                as.clip = null;
+            } else if (sound == null) {
                 as.stop();
                 as.clip = null;
             }
@@ -203,6 +221,10 @@ class AudioManager {
      */
     resume() {
         this._musicSource.play();
+    }
+
+    public isPlaying() {
+        return this._musicSource.playing;
     }
 }
 

@@ -1,5 +1,6 @@
-import { NetNode, NetConnectOptions, NetNodeState } from "./NetNode";
-import { CallbackObject, NetCallFunc, IProtocolHelper } from "./NetInterface";
+import { NetNode, NetNodeState } from "./NetNode";
+import type { NetConnectOptions } from "./NetNode";
+import type { CallbackObject, NetCallFunc, IProtocolHelper } from "./NetInterface";
 import { WebSock } from "./WebSock";
 
 /*

@@ -1,7 +1,6 @@
 import {
     _decorator,
     Prefab,
-    isValid,
     Button,
     find,
     EventHandler,
@@ -11,6 +10,7 @@ import {
     Component,
     EventTouch,
     Slider,
+    Tween,
 } from "cc";
 import { DoubleList, DoubleListItem } from "../base/DoubleList";
 import { NetMgr } from "../network/NetMgr";
@@ -65,17 +65,15 @@ export class __NodeEventAgent__ extends Component {
      * @zh 接受Toggle事件，并转发给真正的处理函数
      * */
     onToggleEvent(toggle: Toggle, customEventData: any) {
-        let checkEvents = toggle.checkEvents;
-        if (toggle["_toggleContainer"]) {
-            checkEvents = toggle["_toggleContainer"].checkEvents;
-        }
-        for (let i = 0; i < checkEvents.length; ++i) {
-            let h = checkEvents[i];
-            if (h.customEventData == customEventData) {
-                const ex = handlerExtras(h);
-                ex.$cb$!.apply(ex.$target$, [toggle, ex.$args$]);
-            }
-        }
+        // Toggle 自身与父容器会分别派发事件，必须按注册 ID 查找对应的回调。
+        const handler =
+            toggle.checkEvents.find((h) => h.customEventData === customEventData) ??
+            toggle.node.parent
+                ?.getComponent(ToggleContainer)
+                ?.checkEvents.find((h) => h.customEventData === customEventData);
+        if (!handler) return;
+        const ex = handlerExtras(handler);
+        ex.$cb$!.apply(ex.$target$, [toggle, ex.$args$]);
     }
 
     /***
@@ -99,22 +97,33 @@ export class __NodeEventAgent__ extends Component {
  * @zh 各类UI面板基类
  * */
 export class UIController {
-    private static _idBase = 1000;
+    /** 实例 id 计数器（只用于 instId） */
+    private static _instIdBase = 1000;
+    /** 事件 id 计数器（只用于 EventHandler.customEventData，与 instId 解耦） */
+    private static _eventIdBase = 1;
 
     private static _controllers: DoubleList = new DoubleList();
+    /**
+     * 需要逐帧更新的控制器。
+     * 原来 updateAll 每帧遍历全部 controller 并调用空实现的 onUpdate，
+     * 现在只登记真正覆写了 onUpdate 的实例（基于原型比较，只判一次）。
+     */
+    private static _updaters: Set<UIController> = new Set();
+
     private _listItem: DoubleListItem | null = null;
     private _instId: number = 0;
     private _prefab: string | Prefab;
     private _layer: number;
     private _layout: any;
+    private _layoutCls: any;
     protected _node: Node | null = null;
     protected _destroyed: boolean = false;
     protected _ingoreCloseAll: boolean = false;
     constructor(prefab: string | Prefab, layer: number, layoutCls: any) {
         this._prefab = prefab;
         this._layer = layer;
-        this._layout = layoutCls;
-        this._instId = UIController._idBase++;
+        this._layoutCls = layoutCls;
+        this._instId = UIController._instIdBase++;
         this._listItem = UIController._controllers.addToTail(this);
     }
 
@@ -179,11 +188,15 @@ export class UIController {
         });
     }
 
-    //update all ui, called by UIMgr.
+    /** 只驱动真正需要逐帧更新的界面 */
     public static updateAll(dt: number) {
-        this._controllers.forEach((v) => {
-            let c = v.data as UIController;
-            if (c.node && isValid(c.node)) {
+        const updaters = this._updaters;
+        if (updaters.size === 0) {
+            return;
+        }
+        // Set.forEach 允许在遍历中删除当前元素（界面在 onUpdate 里 close 自己是常见写法）
+        updaters.forEach((c) => {
+            if (c._node) {
                 c.onUpdate(dt);
             }
         });
@@ -193,9 +206,15 @@ export class UIController {
     public setup(node: Node, params: any) {
         this._node = node;
 
-        if (this._layout) {
-            this._layout = this.node.getComponent(this._layout);
+        if (this._layoutCls) {
+            this._layout = this.node.getComponent(this._layoutCls);
         }
+
+        // 只在真正覆写了 onUpdate 时登记，避免每帧调用空实现
+        if (this.onUpdate !== UIController.prototype.onUpdate) {
+            UIController._updaters.add(this);
+        }
+
         //notify sub class to handle something.
         //节点创建完毕，调用子类的处理函数。
         this.onCreated(params);
@@ -213,15 +232,32 @@ export class UIController {
      *  */
     public close() {
         this._destroyed = true;
+        UIController._updaters.delete(this);
         this._listItem?.dispose();
         this._listItem = null;
         NetMgr.clearHandlerTarget(this);
+        // 按 target 兜底清理事件总线：界面漏写 EventMgr.off 也不会把 controller 钉在事件表里
+        egf.EventMgr.offTarget(this);
+
         if (this.node) {
             this.layout?.unscheduleAllCallbacks();
+            // 停掉整棵子树上的补间。
+            // 原来只 unschedule 定时器，repeatForever 的 tween（如 Layout_Menu 的指针摇摆、
+            // 按钮呼吸缩放）在节点销毁后仍常驻 ActionManager，并持有已销毁节点的引用。
+            this.stopTweens(this.node);
             this.node.removeFromParent();
             this.onDispose();
             this.node.destroy();
             this._node = null;
+        }
+    }
+
+    /** 递归停掉节点及其子节点上的所有补间 */
+    private stopTweens(node: Node) {
+        Tween.stopAllByTarget(node);
+        const children = node.children;
+        for (let i = 0, len = children.length; i < len; ++i) {
+            this.stopTweens(children[i]);
         }
     }
 
@@ -271,7 +307,7 @@ export class UIController {
         handler.target = this.node;
         handler.component = "NodeEventAgent";
         handler.handler = "onButtonClicked";
-        handler.customEventData = "" + UIController._idBase++;
+        handler.customEventData = "" + UIController._eventIdBase++;
 
         //附加额外信息 供事件转发使用
         const ex = handlerExtras(handler);
@@ -354,6 +390,7 @@ export class UIController {
         }
 
         if (!buttonNode) {
+            egf.Logger.error("onToggleEvent: buttonNode is empty:", relativeNodePath);
             return;
         }
 
@@ -372,7 +409,7 @@ export class UIController {
         handler.target = this.node;
         handler.component = "NodeEventAgent";
         handler.handler = "onToggleEvent";
-        handler.customEventData = "" + UIController._idBase++;
+        handler.customEventData = "" + UIController._eventIdBase++;
 
         //附加额外信息 供事件转发使用
         const ex = handlerExtras(handler);
@@ -454,7 +491,7 @@ export class UIController {
         handler.target = this.node;
         handler.component = "NodeEventAgent";
         handler.handler = "onSlideEvent";
-        handler.customEventData = "" + UIController._idBase++;
+        handler.customEventData = "" + UIController._eventIdBase++;
 
         //附加额外信息 供事件转发使用
         const ex = handlerExtras(handler);

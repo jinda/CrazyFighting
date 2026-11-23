@@ -16,6 +16,7 @@ export enum ELanguage {
     ko = "ko", // 韩语
     es = "es", // 西班牙语
     pt = "pt", // 葡萄牙语
+    ar = "ar", // 阿拉伯语
 }
 
 export enum ELanguageKey {
@@ -29,6 +30,7 @@ export enum ELanguageKey {
     ko = "한국어", // 韩语
     es = "Español", // 西班牙语
     pt = "Português", // 葡萄牙语
+    // ar = "العربية", // 阿拉伯语
 }
 
 class i18nManager {
@@ -78,30 +80,31 @@ class i18nManager {
         }
         const code = language.trim().toLowerCase().replace(/_/g, "-");
         const parts = code.split("-");
-        switch (parts[0]) {
-            case "zh":
-                return parts.some((part) => ["tw", "hk", "mo", "hant"].includes(part))
-                    ? ELanguage["zh-tw"]
-                    : ELanguage["zh-cn"];
-            case "en":
-            case "us":
-                return ELanguage.en;
-            case "ru":
-                return ELanguage.ru;
-            case "fr":
-                return ELanguage.fr;
-            case "de":
-                return ELanguage.de;
-            case "ja":
-                return ELanguage.ja;
-            case "ko":
-                return ELanguage.ko;
-            case "es":
-                return ELanguage.es;
-            case "pt":
-                return ELanguage.pt;
-            default:
-                return null;
+        console.log("resolveLanguage:", language, code, parts[0]);
+        if (parts.some((part) => ["zh"].includes(part))) {
+            return parts.some((part) => ["tw", "hk", "mo", "hant"].includes(part))
+                ? ELanguage["zh-tw"]
+                : ELanguage["zh-cn"];
+        } else if (parts.some((part) => ["en"].includes(part))) {
+            return ELanguage.en;
+        } else if (parts.some((part) => ["ru"].includes(part))) {
+            return ELanguage.ru;
+        } else if (parts.some((part) => ["fr"].includes(part))) {
+            return ELanguage.fr;
+        } else if (parts.some((part) => ["de"].includes(part))) {
+            return ELanguage.de;
+        } else if (parts.some((part) => ["ja"].includes(part))) {
+            return ELanguage.ja;
+        } else if (parts.some((part) => ["ko"].includes(part))) {
+            return ELanguage.ko;
+        } else if (parts.some((part) => ["pt"].includes(part))) {
+            return ELanguage.pt;
+        } else if (parts.some((part) => ["es"].includes(part))) {
+            return ELanguage.es;
+        } else if (parts.some((part) => ["ar"].includes(part))) {
+            return ELanguage.ar;
+        } else {
+            return null;
         }
     }
 
@@ -261,7 +264,7 @@ class i18nManager {
                 this._bundleName,
                 path,
                 (data: JsonAsset) => {
-                    // egf.Logger.log("reloadLabel:", this.language, data.json);
+                    egf.Logger.log("reloadLabel:", this.language);
                     if (data) {
                         this._labelData = data.json as {};
                     }

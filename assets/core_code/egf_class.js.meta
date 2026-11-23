@@ -13,6 +13,9 @@
     "loadPluginInNative": true,
     "loadPluginInMiniGame": true,
     "isPlugin": true,
-    "executionScope": "global"
+    "executionScope": "global",
+    "simulateGlobals": [
+      "egf"
+    ]
   }
 }

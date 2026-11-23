@@ -1,5 +1,5 @@
 import Logger from "../base/Logger";
-import { INetworkTips } from "./NetInterface";
+import type { INetworkTips } from "./NetInterface";
 
 type HttpParams = { [key: string]: unknown };
 type CompleteCallback<T> = (response: T) => void;

@@ -35,14 +35,15 @@ import { ResMgr } from "./base/ResMgr";
 import { ELanguage, ELanguageKey, i18nMgr } from "./base/i18nMgr";
 import Logger from "./base/Logger";
 import { NetMgr } from "./network/NetMgr";
-import { DefStringProtocol, INetworkTips, NetData } from "./network/NetInterface";
+import { DefStringProtocol } from "./network/NetInterface";
+import type { INetworkTips, NetData } from "./network/NetInterface";
 import { ECS } from "./ecs/ECS";
 import { CCComp } from "./ecs/CCComp";
 import LoopList, { ItemCell, ShowNode } from "./ui_framework/list/LoopList";
 import RenderAlternative from "./ui_framework/list/RenderAlternative";
 import { RenderReactiveHandler } from "./ui_framework/list/RenderReactiveHandler";
 import { RedDotMgr } from "./redDot/RedDotMgr";
-import { RedDotCalculateFunc, RedDotConfigTable } from "./redDot/RedDotStaticConfig";
+import type { RedDotCalculateFunc, RedDotConfigTable } from "./redDot/RedDotStaticConfig";
 import RedDotComponent from "./redDot/RedDotComponent";
 import { HttpEvent, HttpMgr } from "./network/HttpMgr";
 import { SimpleStateMachine, State, StateMachine } from "./fsm";
@@ -51,6 +52,9 @@ import { UI_Toast } from "./ui_framework/tips/UI_Toast";
 import { SecureValue } from "./base/SecureValue";
 import { PoolMgr } from "./base/PoolMgr";
 import Time from "./base/time";
+import { UI_Tips } from "./ui_framework/tips/UI_Tips";
+import { Layout_UITips } from "./ui_framework/tips/Layout_UITips";
+import { ArrayUtil } from "./base/ArrayUtil";
 
 const __egf__ = {
     ISceneInfo,
@@ -87,6 +91,8 @@ const __egf__ = {
     UIWaiting,
     Layout_Toast,
     UI_Toast,
+    UI_Tips,
+    Layout_UITips,
     UIController,
     UILayers,
     UILayerNames,
@@ -111,6 +117,7 @@ const __egf__ = {
     SecureValue,
     PoolMgr,
     Time,
+    ArrayUtil,
 } as const;
 
 (globalThis as any)["egf"] = __egf__;
@@ -156,6 +163,8 @@ declare global {
                 UIWaiting,
                 Layout_Toast,
                 UI_Toast,
+                UI_Tips,
+                Layout_UITips,
                 UIController,
                 UILayers,
                 UILayerNames,
@@ -182,6 +191,7 @@ declare global {
                 SecureValue,
                 PoolMgr,
                 Time,
+                ArrayUtil,
             };
         }
     }

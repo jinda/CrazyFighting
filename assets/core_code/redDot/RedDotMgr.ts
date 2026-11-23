@@ -1,7 +1,8 @@
 import { EventMgr } from "../base/EventMgr";
 import Logger from "../base/Logger";
 import RedDotNode from "./RedDotNode";
-import { EVENT_RED_DOT_REFRESH, RedDotConfigTable } from "./RedDotStaticConfig";
+import { EVENT_RED_DOT_REFRESH } from "./RedDotStaticConfig";
+import type { RedDotConfigTable } from "./RedDotStaticConfig";
 
 export class RedDotMgr {
     /**  固定的根结点 */
