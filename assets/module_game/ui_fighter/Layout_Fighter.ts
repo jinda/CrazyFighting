@@ -30,6 +30,8 @@ export class Layout_Fighter extends Component {
     nodeVS: Node = null!;
     @property(Node)
     nodeCoin: Node = null!;
+    @property(Node)
+    nodeSkillAd: Node = null!;
     @property(Label)
     labelCoin: Label = null!;
 

@@ -6,6 +6,8 @@ export class Constants {
 
     // 显示关卡上限；运行时存档使用 0-based 索引，因此最大内部索引为 MAX_LEVEL - 1
     static MAX_LEVEL = 1000;
+    static MAX_STAMINA = 5;
+    static STAMINA_RECOVER_MS = 10 * 60 * 1000; // 每 10 分钟回复 1 点体力
 
     //士兵移动速度换算基数：166.6 = 10000/60帧
     //原实现中追击分支按“每帧位移”、冲锋分支按“每秒位移”，帧率不同速度就不同，这里统一为按秒计算
@@ -171,6 +173,11 @@ export class Constants {
         CLICK_START: "clickStart", //点击开始按钮
         CLICK_USE_SKILL: "clickUseSkill", //点击使用技能按钮
         SHARE_SUCCESS: "share_success", //分享成功
+        STAMINA_CHANGED: "stamina_changed", // 体力变化 
+        COIN_CHANGED: "coin_changed",   // 金币变化
+        ADD_COIN_FLY: "add_coin_fly",   // 金币飞行
+        ADD_STAMINA_FLY: "add_stamina_fly", // 体力飞行
+        UPDATE_BANNER: "update_banner", // banner广告更新
     };
 
     //动画类型
@@ -235,4 +242,5 @@ export class Constants {
     // 金币加成配置
     public static goldRate = { default: 1, step: 0.1, maxLv: 50 };
     public static maxOnlineCoin = 300;
+    public static skillFreeCount = 1;   // 每局技能免费次数
 }

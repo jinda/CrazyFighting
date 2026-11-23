@@ -111,7 +111,7 @@ export class UI_Menu extends egf.UIController {
 
     private clickOnline() {
         egf.AudioMgr.playOneShot("tap");
-        egf.UIMgr.showUI(UI_Award, null, this, { type: 1, coin: DataMgr.onlineCoin, bAD: false });
+        egf.UIMgr.showUI(UI_Award, null, this, { type: 1, coin: DataMgr.onlineCoin });
     }
     private clickSign() {
         egf.AudioMgr.playOneShot("tap");
@@ -119,18 +119,24 @@ export class UI_Menu extends egf.UIController {
     }
     private clickStart() {
         egf.AudioMgr.playOneShot("tap");
-        const layout = this.layout as Layout_Menu;
-        layout.btnStart.interactable = false;
+        if (LocalDataMgr.tryConsumeStamina()) {
+            const layout = this.layout as Layout_Menu;
+            layout.btnStart.interactable = false;
 
-        layout.scheduleOnce(() => {
-            layout.btnSign.interactable = true;
-        }, 2);
+            layout.scheduleOnce(() => {
+                layout.btnSign.interactable = true;
+            }, 2);
 
-        const angleZ = layout.stopPointer();
-        this.showStart(angleZ);
-        PlatformMgr.reportEvent("game_start", {
-            mode: 0,
-        });
+            const angleZ = layout.stopPointer();
+            this.showStart(angleZ);
+            PlatformMgr.reportEvent("game_start", {
+                mode: 0,
+            });
+        } else {
+            egf.UI_Toast.show(egf.i18nMgr.getText("士兵累啦，看个广告充充电？"));
+            egf.UIMgr.showUI(UI_Award, null, this, { type: 3, coin: 1 });
+        }
+
     }
     private clickCoin() {
         egf.AudioMgr.playOneShot("tap");

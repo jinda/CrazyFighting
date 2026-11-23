@@ -25,7 +25,7 @@ export class UI_Award_Impl extends egf.UIController {
         this.onButtonEvent(layout.btnDoubleGet, this.clickDoubleGet, this);
 
         const addCoin = Math.floor(this._params.coin * LocalDataMgr.getCoinRate());
-        layout.showInfo(this._params.type, this._params.coin, addCoin, this._params.bAD);
+        layout.showInfo(this._params.type, this._params.coin, addCoin);
         this._params.coin += addCoin;
         //本界面打开时暂停战斗，关闭时恢复（与 onDispose 成对派发，GameMgr 内部按计数处理叠加暂停）
         egf.EventMgr.emit(Constants.EVENT_NAME.GAME_PAUSE);
@@ -51,35 +51,44 @@ export class UI_Award_Impl extends egf.UIController {
         }
         if (this._params.type == 1) {
             DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.ONLINE_REWARD);
-            egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
+            egf.EventMgr.emit(Constants.EVENT_NAME.ADD_COIN_FLY, { coin: this._params.coin });
             DataMgr.onlineGetTime = Date.now();
             this.close();
-            PlatformMgr.reportEvent("game_award", {
-                type: 1,
-            });
         } else if (this._params.type == 2) {
             PlatformMgr.share({ content: "我发现个好玩的游戏，快来玩吧！" });
             setTimeout(() => {
                 LocalDataMgr.GameInfo.bShare = true;
                 DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.SHARE_GAME);
-                egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
+                egf.EventMgr.emit(Constants.EVENT_NAME.ADD_COIN_FLY, { coin: this._params.coin });
                 this.close();
                 egf.EventMgr.emit(Constants.EVENT_NAME.SHARE_SUCCESS);
             }, 500);
+        }
+        else if (this._params.type == 3) {
+            PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
+                if (ret) {
+                    DataMgr.addStamina(this._params.coin, true);
+                    egf.EventMgr.emit(Constants.EVENT_NAME.ADD_STAMINA_FLY, { coin: this._params.coin });
+                    this.close();
+                } else {
+                    egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));
+                }
+            });
         } else {
             PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
                 if (ret) {
                     DataMgr.addCoin(this._params.coin, Constants.LEDGER_SCENE.AD_REWARD);
-                    egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin });
+                    egf.EventMgr.emit(Constants.EVENT_NAME.ADD_COIN_FLY, { coin: this._params.coin });
                     this.close();
-                    PlatformMgr.reportEvent("game_award", {
-                        type: 0,
-                    });
                 } else {
                     egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));
                 }
             });
         }
+
+        PlatformMgr.reportEvent("game_award", {
+            type: this._params.type,
+        });
     }
     clickDoubleGet() {
         egf.AudioMgr.playOneShot("tap");
@@ -94,7 +103,7 @@ export class UI_Award_Impl extends egf.UIController {
         PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
             if (ret) {
                 DataMgr.addCoin(this._params.coin * 2, Constants.LEDGER_SCENE.AD_REWARD);
-                egf.EventMgr.emit("add_coin_fly", { coin: this._params.coin * 2 });
+                egf.EventMgr.emit(Constants.EVENT_NAME.ADD_COIN_FLY, { coin: this._params.coin * 2 });
                 DataMgr.onlineGetTime = Date.now();
                 this.close();
             } else {

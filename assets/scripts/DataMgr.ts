@@ -72,6 +72,7 @@ class DataManager {
     private _coin: egf.SecureValue = new egf.SecureValue(0);
     private _level: egf.SecureValue = new egf.SecureValue(0);
     private _onlineCoin: egf.SecureValue = new egf.SecureValue(0);
+    private _stamina: egf.SecureValue = new egf.SecureValue(Constants.MAX_STAMINA);
     private _syncCloudDataTime: number = 0;
 
     private _userData: IUserInfo = { money: 0, level: 0, coin: 0 }; // 用户数据
@@ -159,6 +160,34 @@ class DataManager {
         return Math.floor(amount);
     }
 
+    public get stamina() {
+        return this._stamina.get();
+    }
+    public set stamina(value: number) {
+        this._stamina.set(value);
+    }
+
+    public addStamina(count: number, bNotify: boolean = true) {
+        this.stamina = this._stamina.get() + count;
+        DataMgr.bSyncCloudData = true;
+        if (bNotify) {
+            egf.EventMgr.emit("stamina_changed");
+        }
+        if (count > 0) {
+            ClientApi.inst.gainResource({
+                req_id: ClientApi.createReqId("add_stamina"),
+                type: EResourceType.Stamina,
+                amount: count,
+            });
+        } else {
+            ClientApi.inst.consumeResource({
+                req_id: ClientApi.createReqId("sub_stamina"),
+                type: EResourceType.Stamina,
+                amount: Math.abs(count),
+            });
+        }
+    }
+
     public get level() {
         return this._level.get() + 1;
     }
@@ -174,7 +203,7 @@ class DataManager {
         LocalDataMgr.GameInfo.level = this._level.get();
         this.bSyncCloudData = true;
         const region = egf.i18nMgr.region;
-        ClientApi.inst.completeProgress(this._level.get(), region);
+        ClientApi.inst.completeProgress(Constants.LeaderboardMode, this._level.get(), region);
     }
 
     public get onlineCoin() {

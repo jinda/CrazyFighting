@@ -419,20 +419,27 @@ export class ClientApi {
      * @param level 已通关关卡，范围 1..9006，必须是整数（不接受浮点数或字符串）
      * @param region 榜单地区；省略时服务端默认 cn
      */
-    public completeProgress(level: number, cb?: (data: IProgressCompleteData) => void, errCb?: TApiErrCallback): void;
     public completeProgress(
+        mode: string,
+        level: number,
+        cb?: (data: IProgressCompleteData) => void,
+        errCb?: TApiErrCallback,
+    ): void;
+    public completeProgress(
+        mode: string,
         level: number,
         region: TLeaderboardRegion,
         cb?: (data: IProgressCompleteData) => void,
         errCb?: TApiErrCallback,
     ): void;
     public completeProgress(
+        mode: string,
         level: number,
         regionOrCallback?: TLeaderboardRegion | ((data: IProgressCompleteData) => void),
         callbackOrError?: ((data: IProgressCompleteData) => void) | TApiErrCallback,
         regionError?: TApiErrCallback,
     ) {
-        const params: TRequestParams = { level };
+        const params: TRequestParams = { mode, level };
         if (typeof regionOrCallback === "string") {
             params.region = regionOrCallback;
         }
@@ -605,7 +612,10 @@ export class ClientApi {
      * 10044/10000 重试时须保持 req_id、type、item_id、amount 和 scene 不变。
      */
     public gainResource(params: TGainResourceParams, cb?: (data: TGainResourceData) => void, errCb?: TApiErrCallback) {
-        const body: TRequestParams = { req_id: params.req_id, amount: params.amount };
+        const body: TRequestParams = {
+            req_id: params.req_id,
+            amount: params.amount,
+        };
         if (params.type !== undefined) {
             body.type = params.type;
         }

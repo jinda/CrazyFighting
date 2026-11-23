@@ -3,6 +3,7 @@ import CryptoTS from "crypto-ts";
 import { ClientApi } from "./ClientApi";
 import { Constants } from "./Constants";
 import { DataMgr } from "./DataMgr";
+import { EResourceType } from "./apiInterface";
 const { AES } = CryptoTS;
 
 interface IGameInfo {
@@ -20,6 +21,8 @@ interface IGameInfo {
     signTotalDay: number;
     guideStep: number; // 引导步骤
     bShare: boolean;
+    stamina: number;
+    lastStaminaTime: number;
 }
 
 interface ISetting {
@@ -101,6 +104,9 @@ class LocalDataManager {
     public saveGameInfoData() {
         // 每次落盘都刷新存档时间
         this._gameInfo.saveTime = Date.now();
+        this._gameInfo.coin = DataMgr.coin;
+        this._gameInfo.level = Math.max(0, DataMgr.level - 1);
+        this._gameInfo.stamina = DataMgr.stamina;
         const encryptStr = this.writeLocalValue(this.GameInfoStr, this._gameInfo, "local");
         if (encryptStr) {
             this.saveCloud(this.GameInfoStr, encryptStr);
@@ -192,6 +198,7 @@ class LocalDataManager {
     private setUseRes() {
         DataMgr.coin = this._gameInfo.coin || 0;
         DataMgr.level = this._gameInfo.level || 0;
+        DataMgr.stamina = this._gameInfo.stamina || Constants.MAX_STAMINA;
     }
 
     private createDefaultGameInfo(): IGameInfo {
@@ -210,6 +217,8 @@ class LocalDataManager {
             signTotalDay: 0,
             guideStep: 0,
             bShare: false,
+            stamina: Constants.MAX_STAMINA,
+            lastStaminaTime: 0,
         };
     }
 
@@ -443,6 +452,86 @@ class LocalDataManager {
     public getCoinRate() {
         const lv = clamp(this._gameInfo.coinLv, 1, Constants.goldRate.maxLv);
         return (lv - 1) * Constants.goldRate.step;
+    }
+
+    /**
+     * 按时间差结算体力回复（离线/跨局也生效）
+     * - 体力已满：重置计时，不累加
+     * - 未满：累加经过的回复点数，满则重置计时，未满保留余数
+     */
+    public refreshStamina() {
+        const now = Date.now();
+        const lastTime = egf.Utils.toInteger(this.GameInfo.lastStaminaTime, 0);
+        const elapsed = now - lastTime;
+        if (elapsed < 0) {
+            // 时间异常回退，重置计时
+            this.GameInfo.lastStaminaTime = now;
+            DataMgr.bSyncCloudData = true;
+            return;
+        }
+
+        const cur = DataMgr.stamina;
+        if (cur >= Constants.MAX_STAMINA) {
+            if (elapsed >= Constants.STAMINA_RECOVER_MS) {
+                this.GameInfo.lastStaminaTime = now;
+                DataMgr.bSyncCloudData = true;
+            }
+            return;
+        }
+
+        const gain = Math.floor(elapsed / Constants.STAMINA_RECOVER_MS);
+        if (gain <= 0) {
+            return;
+        }
+
+        const newVal = DataMgr.stamina + gain;
+        let count = 0;
+        if (newVal >= Constants.MAX_STAMINA) {
+            count = Constants.MAX_STAMINA - DataMgr.stamina;
+            DataMgr.stamina = Constants.MAX_STAMINA;
+            this.GameInfo.lastStaminaTime = now;
+        } else {
+            count = newVal - DataMgr.stamina;
+            DataMgr.stamina = newVal;
+            this.GameInfo.lastStaminaTime += gain * Constants.STAMINA_RECOVER_MS;
+        }
+        ClientApi.inst.gainResource({
+            req_id: ClientApi.createReqId("add_stamina"),
+            type: EResourceType.Stamina,
+            amount: count,
+        });
+        DataMgr.bSyncCloudData = true;
+        egf.EventMgr.emit(Constants.EVENT_NAME.STAMINA_CHANGED);
+    }
+
+    /** 消费 1 点游戏体力；通用服务端资源的体力采用另一套规则，不参与开局。 */
+    public tryConsumeStamina(): boolean {
+        this.refreshStamina();
+        const cur = DataMgr.stamina;
+        if (cur <= 0) {
+            return false;
+        }
+
+        // 从满体力开始扣除时，重置回复计时，保证下次回复从当前时刻重新计算
+        if (cur >= Constants.MAX_STAMINA) {
+            this.GameInfo.lastStaminaTime = Date.now();
+        }
+        DataMgr.addStamina(-1, true);
+        DataMgr.bSyncCloudData = true;
+        return true;
+    }
+
+    /**
+     * 距离下一体力的剩余秒数（满体力时为 0）
+     */
+    public getStaminaRecoverRemainSec(): number {
+        this.refreshStamina();
+        if (DataMgr.stamina >= Constants.MAX_STAMINA) {
+            return 0;
+        }
+        const lastTime = egf.Utils.toInteger(this.GameInfo.lastStaminaTime, 0);
+        const remain = Constants.STAMINA_RECOVER_MS - (Date.now() - lastTime);
+        return Math.max(0, Math.ceil(remain / 1000));
     }
 }
 

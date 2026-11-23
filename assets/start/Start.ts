@@ -37,9 +37,6 @@ export class Start extends Component {
         PlatformMgr.reportEvent("game_show", {
             time: game.totalTime,
         });
-    }
-
-    start() {
         egf.ModuleContext.setDefaultModule(ModuleDef.GAME);
 
         game.frameRate = _FPS;

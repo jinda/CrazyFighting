@@ -13,6 +13,7 @@ export class UI_Fighter extends egf.UIController {
     private _factor: number = 1; //系数：每个士兵掉落金币乘以本关加成系数
     private _gameTime: number = 0; // 游戏开始时间
     private _settlementTimer: ReturnType<typeof setTimeout> | null = null;
+    private _useSkillCount: number = 0;
     constructor() {
         super("ui_fighter/UI_Fighter", egf.UILayers.GAME, Layout_Fighter);
     }
@@ -33,6 +34,8 @@ export class UI_Fighter extends egf.UIController {
         let enemyCount = GameMgr.getFighterFight(false);
         layout.updateFighterNum(myCount, enemyCount);
         this._gameTime = Date.now();
+
+        layout.nodeSkillAd.active = this._useSkillCount >= Constants.skillFreeCount;
 
         layout.scheduleOnce(() => {
             UI_Guide.showGuideStep(Constants.GUIDE_STEP.USE_SKILL, {
@@ -70,8 +73,21 @@ export class UI_Fighter extends egf.UIController {
             return;
         }
         const layout = this.layout as Layout_Fighter;
-        layout.showSkillStatus(true);
-        egf.EventMgr.emit(Constants.EVENT_NAME.USE_FIRE_BALL);
+        if (this._useSkillCount > Constants.skillFreeCount) {
+            PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
+                if (ret) {
+                    layout.showSkillStatus(true);
+                    egf.EventMgr.emit(Constants.EVENT_NAME.USE_FIRE_BALL);
+                } else {
+                    egf.UIAlert.show(egf.i18nMgr.getText("哎呀，广告还没有完成，错失奖励机会！"));
+                }
+            });
+        } else {
+            layout.showSkillStatus(true);
+            egf.EventMgr.emit(Constants.EVENT_NAME.USE_FIRE_BALL);
+        }
+        this._useSkillCount++;
+        layout.nodeSkillAd.active = this._useSkillCount >= Constants.skillFreeCount;
     }
 
     /**

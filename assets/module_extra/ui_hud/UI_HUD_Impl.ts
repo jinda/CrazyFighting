@@ -4,6 +4,7 @@ import { ModuleDef } from "../../scripts/ModuleDef";
 import { DataMgr } from "../../scripts/DataMgr";
 import { isValid, Vec3 } from "cc";
 import { Constants } from "../../scripts/Constants";
+import { LocalDataMgr } from "../../scripts/LocalDataMgr";
 
 @egf_class(ModuleDef.EXTRA, UI_HUD)
 export class UI_HUD_Impl extends egf.UIController {
@@ -63,6 +64,7 @@ export class UI_HUD_Impl extends egf.UIController {
 
     clickStamina() {
         egf.AudioMgr.playOneShot("tap");
+        egf.UIMgr.showUI(UI_Award, null, this, { type: 3, coin: 1 });
     }
 
     private showCoinFly(params: any) {
@@ -94,8 +96,8 @@ export class UI_HUD_Impl extends egf.UIController {
     private onStaminaChanged() {
         let layout = this.layout as Layout_UI_HUD;
         if (layout.labelStamina) {
-            const max = 0;
-            layout.labelStamina.string = `${0}/${max}`;
+            const max = Constants.MAX_STAMINA;
+            layout.labelStamina.string = `${DataMgr.stamina}/${max}`;
         }
         if (layout.labelStaminaTime) {
             layout.labelStaminaTime.string = this.formatStaminaTime();
@@ -103,7 +105,7 @@ export class UI_HUD_Impl extends egf.UIController {
     }
 
     private formatStaminaTime(): string {
-        const remainSec = 0;
+        const remainSec = LocalDataMgr.getStaminaRecoverRemainSec();
         if (remainSec <= 0) {
             return "";
         }
