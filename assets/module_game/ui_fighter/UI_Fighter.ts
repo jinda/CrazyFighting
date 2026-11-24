@@ -73,7 +73,7 @@ export class UI_Fighter extends egf.UIController {
             return;
         }
         const layout = this.layout as Layout_Fighter;
-        if (this._useSkillCount > Constants.skillFreeCount) {
+        if (this._useSkillCount >= Constants.skillFreeCount) {
             PlatformMgr.showRewardedVideo(undefined, (ret: boolean) => {
                 if (ret) {
                     layout.showSkillStatus(true);
